@@ -13,13 +13,13 @@ _logger = logging.getLogger(__name__)
 
 class PMS_Department_SectionLine(models.Model):
     _name = "pms.department.section.line"
-    _inherits = "pms.section.line"
+    _inherit = "pms.section.line"
     _description= "Department Section lines"
 
 
 class PMS_Department_Section(models.Model):
     _name = "pms.department.section"
-    _inherits = "pms.section"
+    _inherit = "pms.section"
     _description= "Department Sections"
 
     name = fields.Char(
@@ -31,7 +31,7 @@ class PMS_Department_Section(models.Model):
         string="Section Lines"
     )
 
-    section_id = fields.Manyone(
+    section_id = fields.Many2one(
         'pms.section', 
         string="Section ID"
         )
@@ -43,12 +43,12 @@ class PMSDepartment(models.Model):
     _description= "Department PMS to hold templates sent by HR  team for Appraisal conduct."
     _inherit = ['mail.thread']
 
-    department_id = fields.Manyone(
+    department_id = fields.Many2one(
         'hr.department', 
         string="Department ID"
         )
     
-    hr_category_id = fields.Manyone(
+    hr_category_id = fields.Many2one(
         'pms.category', 
         string="Job category ID",
         required=True
@@ -60,7 +60,7 @@ class PMSDepartment(models.Model):
         string="Description"
         )
     
-    department_manager_id = fields.Manyone(
+    department_manager_id = fields.Many2one(
         'hr.employee', 
         string="Department ID"
         )
@@ -99,7 +99,12 @@ class PMSDepartment(models.Model):
         "section_id",
         string="Section Lines"
     )
-    
+    # active = fields.Date(
+    #     string="Active",
+    #     readonly=True,
+    #     default=True,
+    #     store=True)
+
     @api.onchange('department_id')
     def onchange_department_id(self):
         if self.department_id:

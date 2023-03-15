@@ -42,7 +42,7 @@
 			<field name="name">view.pms.section.tree</field>
 			<field name="model">pms.section</field>
 			<field name="arch" type="xml">
-				<tree string="section" sample="1" multi_edit="1" create="0">
+				<tree string="section" create="0">
                     <field name="name"/>
                     <field name="type_of_section" readonly="0"/> 
                     <field name="max_line_number" required="0"/> 

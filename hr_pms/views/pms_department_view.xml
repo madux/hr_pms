@@ -39,9 +39,10 @@
 					</header>
 					<sheet>
                         <div class="oe_button_box" name="button_box"/>
-                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" />
+<!--                                attrs="{'invisible': [('active', '=', True)]}"/>-->
                         <div class="oe_title">
-                            <field name="active" invisible="1"/>
+<!--                            <field name="active" invisible="1"/>-->
                             <h1>
                                 <field name="name" default_focus="1" required="1" placeholder="Name" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             </h1>
@@ -52,10 +53,10 @@
                                 <field name="sequence" readonly="1"/>
                                 <field name="department_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="department_manager_id" readonly="1" force_save="1" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
-                            <group>
+                            </group>
                             <group>
                                 <field name="hr_category_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/> 
-                            <group>
+                            </group>
                             <separator string="Periods" colspan="4"/>
                             <group>
                                 <field name="pms_year_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
@@ -132,7 +133,7 @@
 					</sheet>
 					<div class="oe_chatter">
 						<field name="message_follower_ids" widget="mail_followers"/>
-						<field name="activity_ids" widget="mail_activity"/>
+
 						<field name="message_ids" widget="mail_thread"/>
 					</div>
 				</form>
@@ -143,7 +144,7 @@
 			<field name="name">view.pms.department.tree</field>
 			<field name="model">pms.department</field>
 			<field name="arch" type="xml">
-				<tree string="department" sample="1" multi_edit="1" create="0">
+				<tree string="department">
                     <field name="sequence" readonly="1"/>
                     <field name="name"/>
                     <field name="department_id"/>

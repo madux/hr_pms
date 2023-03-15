@@ -53,11 +53,11 @@
                                 <field name="pms_year_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="date_from" readonly="1"/>
                                 <field name="date_end" readonly="1"/>
-                            <group>
+                            </group>
                             <group>
                                 <field name="deadline"/>
                                 <field name="published_date" readonly="1" force_save="1"/>
-                            <group>
+                            </group>
                             <separator string="Category Section Weight" colspan="4"/>
                             <group>
                                 <field name="kra_weighted_score" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
@@ -81,8 +81,9 @@
 									<form string="Job Functions / Positions">
 										<group>
 											<group>
-												<field name="department_id" required="1"/> 
-												<field name="employees" string="Number of Employees" readonly="1"/> 
+												<field name="department_id" required="1"/>
+                                                <field name="company_id" invisible="1" force_save="1"/>
+
 											</group>
 											<group>
 												<field name="description" string="Job description"/>
@@ -92,7 +93,6 @@
 										<tree string="Job Functions / Position" delete="true" create="false">
 											<field name="department_id" required="1"/> 
 											<field name="description" string="Job description"/>
-											<field name="employees" string="Number of Employees" readonly="1"/>
 										</tree>
 								</field>
 							</page>
@@ -155,18 +155,18 @@
 					</sheet>
 					<div class="oe_chatter">
 						<field name="message_follower_ids" widget="mail_followers"/>
-						<field name="activity_ids" widget="mail_activity"/>
+
 						<field name="message_ids" widget="mail_thread"/>
 					</div>
 				</form>
 			</field>
 		</record>
 
-		<record id="view_pms_category" model="ir.ui.view">
-			<field name="name">view.pms.category.tree</field>
+		<record model="ir.ui.view" id="view_pms_category_tree">
+			<field name="name">view pms category.tree</field>
 			<field name="model">pms.category</field>
 			<field name="arch" type="xml">
-				<tree string="Category" sample="1" multi_edit="1" create="0">
+				<tree string="Category">
                     <field name="sequence" readonly="1"/>
                     <field name="name"/>
                     <field name="pms_year_id"/>

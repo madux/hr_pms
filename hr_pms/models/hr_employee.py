@@ -15,8 +15,8 @@ class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
     # pms_appraisal_ids = fields.Many2many('usl.employee.appraisal', string="Appraisals", readonly=True)
-    administrative_supervisor_id = fields.Manyone('hr.employee', string="Administrative Supervisor")
-    reviewer_id = fields.Manyone('hr.employee', string="Reviewer")
+    administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
+    reviewer_id = fields.Many2one('hr.employee', string="Reviewer")
     pms_number_appraisal = fields.Integer(string="Appraisal",)# compute="_compute_employees_component")
     pms_number_queries = fields.Integer(string="Queries",)# compute="_compute_employees_component")
     pms_number_commendation = fields.Integer(string="Commendation",)# compute="_compute_employees_component")

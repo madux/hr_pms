@@ -25,182 +25,183 @@
             <field name="input_weightage">1</field>
         </record>
 
+        <record model="pms.year" id="pms_year_2023_qrt1">
+            <field name="name">Jan-Mar 2023</field>
+            <field name="date_from">2023-01-01</field>
+            <field name="date_end">2023-03-30</field>
+        </record>
+
         <!-- JOB CATEGORY -->
-        <record model="pms.category" id="pms_snr_mgt">
-            <field name="name">SENIOR MANAGEMENT LEVEL</field>
-            <field name="sequence">SN000001</field>
-            <field name="loaded_via_data">True</field>
-            <field name="kra_weighted_score">35</field>
-            <field name="fc_weighted_score">20</field>
-            <field name="lc_weighted_score">45</field>
-            <field name="section_ids" eval="[
-            (6, 0, [
-            ref('hr_pms.pms_kra_section_1'),
-            ref('hr_pms.pms_functional_competency_section_1'),
-            ref('hr_pms.pms_leadership_section_1'),
-            ])
-            ]"/>
-        </record>
-        <record model="pms.category" id="pms_middle_mgt">
-            <field name="name">MIDDLE MANAGEMENT LEVEL</field>
-            <field name="sequence">MID000001</field>
-            <field name="loaded_via_data">True</field>
-            <field name="kra_weighted_score">50</field>
-            <field name="fc_weighted_score">25</field>
-            <field name="lc_weighted_score">25</field>
-            <field name="section_ids" eval="[
-            (6, 0, [
-            ref('hr_pms.pms_kra_section_1'),
-            ref('hr_pms.pms_functional_competency_section_1'),
-            ref('hr_pms.pms_leadership_section_1'),
-            ])
-            ]"/>
-        </record>
-        <record model="pms.category" id="pms_jr_mgt">
-            <field name="name">JUNIOR MANAGEMENT LEVEL</field>
-            <field name="sequence">JR000001</field>
-            <field name="loaded_via_data">True</field>
-            <field name="kra_weighted_score">60</field>
-            <field name="fc_weighted_score">25</field>
-            <field name="lc_weighted_score">15</field>
-            <field name="section_ids" eval="[
-            (6, 0, [
-            ref('hr_pms.pms_kra_section_1'),
-            ref('hr_pms.pms_functional_competency_section_1'),
-            ref('hr_pms.pms_leadership_section_1'),
-            ])
-            ]"/>
-        </record>
+<!--        <record model="pms.category" id="pms_snr_mgt">-->
+<!--            <field name="name">SENIOR MANAGEMENT LEVEL</field>-->
+<!--            <field name="sequence">SN000001</field>-->
+<!--            <field name="pms_year_id" ref="hr_pms.pms_year_2023_qrt1"/>-->
+<!--            <field name="kra_weighted_score">35</field>-->
+<!--            <field name="fc_weighted_score">20</field>-->
+<!--            <field name="lc_weighted_score">45</field>-->
+
+<!--            <field name="section_ids" eval="[(6, 0, [-->
+<!--            ref('hr_pms.pms_kra_section_1'),-->
+<!--            ref('hr_pms.pms_functional_competency_section_1'),-->
+<!--            ref('hr_pms.pms_leadership_section_1')-->
+<!--            ])]"/>-->
+<!--        </record>-->
+<!--        <record model="pms.category" id="pms_middle_mgt">-->
+<!--            <field name="name">MIDDLE MANAGEMENT LEVEL</field>-->
+<!--            <field name="sequence">MID000001</field>-->
+<!--            <field name="loaded_via_data">True</field>-->
+<!--            <field name="kra_weighted_score">50</field>-->
+<!--            <field name="fc_weighted_score">25</field>-->
+<!--            <field name="lc_weighted_score">25</field>-->
+<!--            <field name="section_ids" eval="[-->
+<!--            (6, 0, [-->
+<!--            ref('hr_pms.pms_kra_section_1'),-->
+<!--            ref('hr_pms.pms_functional_competency_section_1'),-->
+<!--            ref('hr_pms.pms_leadership_section_1'),-->
+<!--            ])-->
+<!--            ]"/>-->
+<!--        </record>-->
+<!--        <record model="pms.category" id="pms_jr_mgt">-->
+<!--            <field name="name">JUNIOR MANAGEMENT LEVEL</field>-->
+<!--            <field name="sequence">JR000001</field>-->
+<!--            <field name="loaded_via_data">True</field>-->
+<!--            <field name="kra_weighted_score">60</field>-->
+<!--            <field name="fc_weighted_score">25</field>-->
+<!--            <field name="lc_weighted_score">15</field>-->
+<!--            <field name="section_ids" eval="[-->
+<!--            (6, 0, [-->
+<!--            ref('hr_pms.pms_kra_section_1'),-->
+<!--            ref('hr_pms.pms_functional_competency_section_1'),-->
+<!--            ref('hr_pms.pms_leadership_section_1'),-->
+<!--            ])-->
+<!--            ]"/>-->
+<!--        </record>-->
 
         <!-- JOB CATEGORY ENDS -->
         
         
 
         <!-- PMS YEAR -->
-        <record model="pms.year" id="pms_year_2023_qrt1">
-            <field name="name">Jan-Mar 2023</field>
-            <field name="date_from">"01-01-2023"</field>
-            <field name="date_from">"03-30-2023"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2023_qrt2">
-            <field name="name">April-June 2023</field>
-            <field name="date_from">"04-01-2023"</field>
-            <field name="date_from">"06-30-2023"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2023_qrt3">
-            <field name="name">July-Sept 2023</field>
-            <field name="date_from">"07-01-2023"</field>
-            <field name="date_from">"09-30-2023"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2023_qrt4">
-            <field name="name">Oct-Dec 2023</field>
-            <field name="date_from">"10-01-2023"</field>
-            <field name="date_from">"12-30-2023"</field>
-        </record>
 
-        <record model="pms.year" id="pms_year_2024_qrt1">
-            <field name="name">Jan-Mar 2024</field>
-            <field name="date_from">"01-01-2024"</field>
-            <field name="date_from">"03-30-2024"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2024_qrt2">
-            <field name="name">April-June 2024</field>
-            <field name="date_from">"04-01-2024"</field>
-            <field name="date_from">"06-30-2024"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2024_qrt3">
-            <field name="name">July-Sept 2024</field>
-            <field name="date_from">"07-01-2024"</field>
-            <field name="date_from">"09-30-2024"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2024_qrt4">
-            <field name="name">Oct-Dec 2024</field>
-            <field name="date_from">"10-01-2024"</field>
-            <field name="date_from">"12-30-2024"</field>
-        </record>
+<!--        <record model="pms.year" id="pms_year_2023_qrt2">-->
+<!--            <field name="name">April-June 2023</field>-->
+<!--            <field name="date_from">"04-01-2023"</field>-->
+<!--            <field name="date_from">"06-30-2023"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2023_qrt3">-->
+<!--            <field name="name">July-Sept 2023</field>-->
+<!--            <field name="date_from">"07-01-2023"</field>-->
+<!--            <field name="date_from">"09-30-2023"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2023_qrt4">-->
+<!--            <field name="name">Oct-Dec 2023</field>-->
+<!--            <field name="date_from">"10-01-2023"</field>-->
+<!--            <field name="date_from">"12-30-2023"</field>-->
+<!--        </record>-->
 
-        <record model="pms.year" id="pms_year_2025_qrt1">
-            <field name="name">Jan-Mar 2025</field>
-            <field name="date_from">"01-01-2025"</field>
-            <field name="date_from">"03-30-2025"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2025_qrt2">
-            <field name="name">April-June 2025</field>
-            <field name="date_from">"04-01-2025"</field>
-            <field name="date_from">"06-30-2025"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2025_qrt3">
-            <field name="name">July-Sept 2025</field>
-            <field name="date_from">"07-01-2025"</field>
-            <field name="date_from">"09-30-2025"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2025_qrt4">
-            <field name="name">Oct-Dec 2025</field>
-            <field name="date_from">"10-01-2025"</field>
-            <field name="date_from">"12-30-2025"</field>
-        </record>
+<!--        <record model="pms.year" id="pms_year_2024_qrt1">-->
+<!--            <field name="name">Jan-Mar 2024</field>-->
+<!--            <field name="date_from">"01-01-2024"</field>-->
+<!--            <field name="date_from">"03-30-2024"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2024_qrt2">-->
+<!--            <field name="name">April-June 2024</field>-->
+<!--            <field name="date_from">"04-01-2024"</field>-->
+<!--            <field name="date_from">"06-30-2024"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2024_qrt3">-->
+<!--            <field name="name">July-Sept 2024</field>-->
+<!--            <field name="date_from">"07-01-2024"</field>-->
+<!--            <field name="date_from">"09-30-2024"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2024_qrt4">-->
+<!--            <field name="name">Oct-Dec 2024</field>-->
+<!--            <field name="date_from">"10-01-2024"</field>-->
+<!--            <field name="date_from">"12-30-2024"</field>-->
+<!--        </record>-->
 
-        <record model="pms.year" id="pms_year_2026_qrt1">
-            <field name="name">Jan-Mar 2026</field>
-            <field name="date_from">"01-01-2026"</field>
-            <field name="date_from">"03-30-2026"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2026_qrt2">
-            <field name="name">April-June 2026</field>
-            <field name="date_from">"04-01-2026"</field>
-            <field name="date_from">"06-30-2026"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2026_qrt3">
-            <field name="name">July-Sept 2026</field>
-            <field name="date_from">"07-01-2026"</field>
-            <field name="date_from">"09-30-2026"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2026_qrt4">
-            <field name="name">Oct-Dec 2026</field>
-            <field name="date_from">"10-01-2026"</field>
-            <field name="date_from">"12-30-2026"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2027_qrt1">
-            <field name="name">Jan-Mar 2027</field>
-            <field name="date_from">"01-01-2027"</field>
-            <field name="date_from">"03-30-2027"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2027_qrt2">
-            <field name="name">April-June 2027</field>
-            <field name="date_from">"04-01-2027"</field>
-            <field name="date_from">"06-30-2027"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2027_qrt3">
-            <field name="name">July-Sept 2027</field>
-            <field name="date_from">"07-01-2027"</field>
-            <field name="date_from">"09-30-2027"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2027_qrt4">
-            <field name="name">Oct-Dec 2027</field>
-            <field name="date_from">"10-01-2027"</field>
-            <field name="date_from">"12-30-2027"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2028_qrt1">
-            <field name="name">Jan-Mar 2028</field>
-            <field name="date_from">"01-01-2028"</field>
-            <field name="date_from">"03-30-2028"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2028_qrt2">
-            <field name="name">April-June 2028</field>
-            <field name="date_from">"04-01-2028"</field>
-            <field name="date_from">"06-30-2028"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2028_qrt3">
-            <field name="name">July-Sept 2028</field>
-            <field name="date_from">"07-01-2028"</field>
-            <field name="date_from">"09-30-2028"</field>
-        </record>
-        <record model="pms.year" id="pms_year_2028_qrt4">
-            <field name="name">Oct-Dec 2028</field>
-            <field name="date_from">"10-01-2028"</field>
-            <field name="date_from">"12-30-2028"</field>
-        </record>
+<!--        <record model="pms.year" id="pms_year_2025_qrt1">-->
+<!--            <field name="name">Jan-Mar 2025</field>-->
+<!--            <field name="date_from">"01-01-2025"</field>-->
+<!--            <field name="date_from">"03-30-2025"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2025_qrt2">-->
+<!--            <field name="name">April-June 2025</field>-->
+<!--            <field name="date_from">"04-01-2025"</field>-->
+<!--            <field name="date_from">"06-30-2025"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2025_qrt3">-->
+<!--            <field name="name">July-Sept 2025</field>-->
+<!--            <field name="date_from">"07-01-2025"</field>-->
+<!--            <field name="date_from">"09-30-2025"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2025_qrt4">-->
+<!--            <field name="name">Oct-Dec 2025</field>-->
+<!--            <field name="date_from">"10-01-2025"</field>-->
+<!--            <field name="date_from">"12-30-2025"</field>-->
+<!--        </record>-->
+
+<!--        <record model="pms.year" id="pms_year_2026_qrt1">-->
+<!--            <field name="name">Jan-Mar 2026</field>-->
+<!--            <field name="date_from">"01-01-2026"</field>-->
+<!--            <field name="date_from">"03-30-2026"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2026_qrt2">-->
+<!--            <field name="name">April-June 2026</field>-->
+<!--            <field name="date_from">"04-01-2026"</field>-->
+<!--            <field name="date_from">"06-30-2026"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2026_qrt3">-->
+<!--            <field name="name">July-Sept 2026</field>-->
+<!--            <field name="date_from">"07-01-2026"</field>-->
+<!--            <field name="date_from">"09-30-2026"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2026_qrt4">-->
+<!--            <field name="name">Oct-Dec 2026</field>-->
+<!--            <field name="date_from">"10-01-2026"</field>-->
+<!--            <field name="date_from">"12-30-2026"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2027_qrt1">-->
+<!--            <field name="name">Jan-Mar 2027</field>-->
+<!--            <field name="date_from">"01-01-2027"</field>-->
+<!--            <field name="date_from">"03-30-2027"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2027_qrt2">-->
+<!--            <field name="name">April-June 2027</field>-->
+<!--            <field name="date_from">"04-01-2027"</field>-->
+<!--            <field name="date_from">"06-30-2027"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2027_qrt3">-->
+<!--            <field name="name">July-Sept 2027</field>-->
+<!--            <field name="date_from">"07-01-2027"</field>-->
+<!--            <field name="date_from">"09-30-2027"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2027_qrt4">-->
+<!--            <field name="name">Oct-Dec 2027</field>-->
+<!--            <field name="date_from">"10-01-2027"</field>-->
+<!--            <field name="date_from">"12-30-2027"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2028_qrt1">-->
+<!--            <field name="name">Jan-Mar 2028</field>-->
+<!--            <field name="date_from">"01-01-2028"</field>-->
+<!--            <field name="date_from">"03-30-2028"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2028_qrt2">-->
+<!--            <field name="name">April-June 2028</field>-->
+<!--            <field name="date_from">"04-01-2028"</field>-->
+<!--            <field name="date_from">"06-30-2028"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2028_qrt3">-->
+<!--            <field name="name">July-Sept 2028</field>-->
+<!--            <field name="date_from">"07-01-2028"</field>-->
+<!--            <field name="date_from">"09-30-2028"</field>-->
+<!--        </record>-->
+<!--        <record model="pms.year" id="pms_year_2028_qrt4">-->
+<!--            <field name="name">Oct-Dec 2028</field>-->
+<!--            <field name="date_from">"10-01-2028"</field>-->
+<!--            <field name="date_from">"12-30-2028"</field>-->
+<!--        </record>-->
         <!-- PMS YEAR ENDS  -->
  
-    <data>
-<odoo>
+    </data>
+</odoo>
