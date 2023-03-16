@@ -18,7 +18,6 @@
             'views/hr_category_view.xml',
             'views/pms_department_view.xml',
             'views/section_view.xml',
-            'views/section_line_view.xml',
             'views/appraisee_view.xml',
     ],
     'css': [],
@@ -26,7 +25,7 @@
     'qweb': [],
     "active": False,
     'application': True,
-    "sequence": 6
+    "sequence": 6,
     "images": ['images/images.jpg'],
     "price": 60,
     "currency": 'EUR',

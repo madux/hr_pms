@@ -69,7 +69,7 @@ class KRA_SectionLine(models.Model):
             self.is_administrative_supervisor = True if current_user == self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id else False
             self.is_reviewer = True if current_user == self.kra_section_id.employee_id.reviewer_id.user_id.id else False
         else:
-            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = True
+            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
     
     weighted_score = fields.Integer(
         string='Weighted (%) Score of specific KRA', 
@@ -167,7 +167,7 @@ class LC_SectionLine(models.Model):
         string="Is required", 
         default=False
         )
-    @api.depends('kra_section_id')
+    @api.depends('lc_section_id')
     def compute_user_rating_role(self):
         """
         Used to determine if the current user
@@ -180,11 +180,11 @@ class LC_SectionLine(models.Model):
             self.is_administrative_supervisor = True if current_user == self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id else False
             self.is_reviewer = True if current_user == self.kra_section_id.employee_id.reviewer_id.user_id.id else False
         else:
-            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = True
+            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
     
     @api.depends(
         'administrative_supervisor_rating',
-        'functional_supervisor_rating'
+        'functional_supervisor_rating',
         'reviewer_rating')
     def compute_weighted_score(self):
         for rec in self:
@@ -263,7 +263,7 @@ class FC_SectionLine(models.Model):
         default=False
         )
     
-    @api.depends('kra_section_id')
+    @api.depends('fc_section_id')
     def compute_user_rating_role(self):
         """
         Used to determine if the current user
@@ -276,11 +276,11 @@ class FC_SectionLine(models.Model):
             self.is_administrative_supervisor = True if current_user == self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id else False
             self.is_reviewer = True if current_user == self.kra_section_id.employee_id.reviewer_id.user_id.id else False
         else:
-            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = True
+            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
     
     @api.depends(
         'administrative_supervisor_rating',
-        'functional_supervisor_rating'
+        'functional_supervisor_rating',
         'reviewer_rating')
     def compute_weighted_score(self):
         '''
@@ -312,19 +312,19 @@ class PMS_Appraisee(models.Model):
         string="Description Name", 
         required=True
         )
-    department_id = fields.Manyone(
+    department_id = fields.Many2one(
         'hr.department', 
         string="Department ID"
         )
-    pms_department_id = fields.Manyone(
+    pms_department_id = fields.Many2one(
         'pms.department', 
         string="PMS Department ID"
         )
-    section_id = fields.Manyone(
+    section_id = fields.Many2one(
         'pms.section', 
         string="Section ID",
         )
-    employee_id = fields.Manyone(
+    employee_id = fields.Many2one(
         'hr.employee', 
         string="Employee"
         )
@@ -484,8 +484,8 @@ class PMS_Appraisee(models.Model):
 
     @api.depends(
             'final_kra_score',
-            'lc_kra_score',
-            'fc_kra_score'
+            'final_lc_score',
+            'final_fc_score'
             ) 
     def compute_overall_score(self):
         for rec in self:

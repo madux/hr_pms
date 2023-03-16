@@ -132,7 +132,7 @@
 					</sheet>
 					<div class="oe_chatter">
 						<field name="message_follower_ids" widget="mail_followers"/>
-						<field name="activity_ids" widget="mail_activity"/>
+						
 						<field name="message_ids" widget="mail_thread"/>
 					</div>
 				</form>
@@ -143,7 +143,7 @@
 			<field name="name">view.pms.department.tree</field>
 			<field name="model">pms.department</field>
 			<field name="arch" type="xml">
-				<tree string="department" sample="1" multi_edit="1" create="0">
+				<tree string="department">
                     <field name="sequence" readonly="1"/>
                     <field name="name"/>
                     <field name="department_id"/>

@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from datetiime import datetime, date 
+from datetime import datetime, date 
 from odoo.exceptions import ValidationError
 from odoo import http
 
@@ -13,6 +13,7 @@ class PMSJobCategory(models.Model):
         string="Name", 
         placeholder="OFFICER - MGR", 
         required=True)
+    
     sequence = fields.Char(
         string="Sequence")
         
@@ -60,7 +61,7 @@ class PMSJobCategory(models.Model):
         readonly=True, 
         store=True)
     
-    loaded_via_data = fields.Date(
+    loaded_via_data = fields.Boolean(
         string="Loaded via data", 
         readonly=True, 
         default=False, 
@@ -81,7 +82,7 @@ class PMSJobCategory(models.Model):
         'pms.department', 
         'pms_department_category_rel', 
         'department_id', 
-        'cateogry_id', 
+        'category_id', 
         string="PMS Department ID")
     
     

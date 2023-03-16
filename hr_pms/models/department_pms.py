@@ -13,13 +13,13 @@ _logger = logging.getLogger(__name__)
 
 class PMS_Department_SectionLine(models.Model):
     _name = "pms.department.section.line"
-    _inherits = "pms.section.line"
+    _inherit = "pms.section.line"
     _description= "Department Section lines"
 
 
 class PMS_Department_Section(models.Model):
     _name = "pms.department.section"
-    _inherits = "pms.section"
+    _inherit = "pms.section"
     _description= "Department Sections"
 
     name = fields.Char(
@@ -31,24 +31,23 @@ class PMS_Department_Section(models.Model):
         string="Section Lines"
     )
 
-    section_id = fields.Manyone(
+    section_id = fields.Many2one(
         'pms.section', 
         string="Section ID"
         )
-    
 
-    
+
 class PMSDepartment(models.Model):
     _name = "pms.department"
     _description= "Department PMS to hold templates sent by HR  team for Appraisal conduct."
     _inherit = ['mail.thread']
 
-    department_id = fields.Manyone(
+    department_id = fields.Many2one(
         'hr.department', 
         string="Department ID"
         )
     
-    hr_category_id = fields.Manyone(
+    hr_category_id = fields.Many2one(
         'pms.category', 
         string="Job category ID",
         required=True
@@ -60,7 +59,7 @@ class PMSDepartment(models.Model):
         string="Description"
         )
     
-    department_manager_id = fields.Manyone(
+    department_manager_id = fields.Many2one(
         'hr.employee', 
         string="Department ID"
         )
@@ -72,7 +71,9 @@ class PMSDepartment(models.Model):
         ('cancel', 'Cancel'),
         ], string="Status", default = "draft", readonly=True)
     pms_year_id = fields.Many2one(
-        'pms.year', string="Period")
+        'pms.year', 
+        string="Period"
+        )
     date_from = fields.Date(
         string="Date From", 
         readonly=True, 
@@ -90,14 +91,19 @@ class PMSDepartment(models.Model):
     is_department_head = fields.Boolean(
         'Is department Head',
         help="Determines if the user is a department head",
-        compute="_check_department_head",
-        store=True
+        store=True,
+        # compute="check_department_head"
         )
     section_line_ids = fields.One2many(
         "pms.department.section",
         "section_id",
         string="Section Lines"
     )
+    active = fields.Date(
+        string="Active", 
+        readonly=True, 
+        default=True, 
+        store=True)
     
     @api.onchange('department_id')
     def onchange_department_id(self):
@@ -105,14 +111,14 @@ class PMSDepartment(models.Model):
             self.department_manager_id = self.department_id.parent_id.id
     
     # TODO If is_department_head is set to true, display the buttons to them
-    @api.depends('department_id')
-    def check_department_head(self):
-        """Checks if the current user is the departmental Manager"""
-        for rec in self:
-            if rec.department_id.parent_id.user_id.id == self.env.user.id:
-                rec.is_department_head = True 
-            else:
-                rec.is_department_head = False 
+    # @api.depends('department_id')
+    # def check_department_head(self):
+    #     """Checks if the current user is the departmental Manager"""
+    #     for rec in self:
+    #         if rec.department_id.parent_id.user_id.id == self.env.user.id:
+    #             rec.is_department_head = True 
+    #         else:
+    #             rec.is_department_head = False 
 
     # TODO Add publish button with security as PMS Officer,
     # Ensure all the appraisals sent to employees will be activated or published
