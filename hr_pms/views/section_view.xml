@@ -85,6 +85,6 @@
 			</field>
 		</record>
 
-    <menuitem id="view_pms_section_menu" name="Sections" sequence="4" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_section_view"
+    <menuitem id="view_pms_section_menu" name="Sections" sequence="20" parent="hr_pms.view_hr_pms_config_menu" action="hr_pms.action_pms_section_view"
     groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
 </odoo>

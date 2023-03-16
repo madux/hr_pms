@@ -8,14 +8,17 @@ class PMS_SectionLine(models.Model):
     _description= "Section lines"
 
     name = fields.Char(
-        string="Description", 
+        string="Title", 
         required=True)
+    description = fields.Char(
+        string="KBA Description", 
+        required=False)
     is_required = fields.Boolean(
         string="Is required", 
         default=False
         )
 
-    section_id = fields.Many2many(
+    section_id = fields.Many2one(
         'pms.section', 
         string="Section ID"
         )

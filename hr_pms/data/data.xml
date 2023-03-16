@@ -5,7 +5,8 @@
         <record model="pms.section" id="pms_kra_section_1">
             <field name="name">SECTION A: KRAs &amp; Achivements</field>
             <field name="max_line_number">0</field>
-            <field name="weighted_score">35</field>
+            <field name="weighted_score">1</field>
+            <field name="type_of_section">KRA</field>
             <field name="section_avg_scale">4</field>
             <field name="input_weightage">1</field>
         </record>
@@ -13,15 +14,17 @@
         <record model="pms.section" id="pms_functional_competency_section_1">
             <field name="name">SECTION B: Functional Competency</field>
             <field name="max_line_number">0</field>
-            <field name="weighted_score">35</field>
-            <field name="section_avg_scale">4</field>
+            <field name="weighted_score">1</field>
+            <field name="type_of_section">FC</field>
+            <field name="section_avg_scale">5</field>
             <field name="input_weightage">1</field>
         </record>
         <record model="pms.section" id="pms_leadership_section_1">
             <field name="name">SECTION C: Leadership Competency</field>
             <field name="max_line_number">0</field>
-            <field name="weighted_score">35</field>
-            <field name="section_avg_scale">4</field>
+            <field name="weighted_score">20</field>
+            <field name="type_of_section">LC</field>
+            <field name="section_avg_scale">5</field>
             <field name="input_weightage">1</field>
         </record>
         <!-- PMS YEAR -->
@@ -48,13 +51,13 @@
 
         <record model="pms.year" id="pms_year_2024_qrt1">
             <field name="name">Jan-Mar 2024</field>
-            <field name="date_from">01-01</field>
-            <field name="date_end">03-30</field>
+            <field name="date_from">2024-01-01</field>
+            <field name="date_end">2024-03-30</field>
         </record>
         <record model="pms.year" id="pms_year_2024_qrt2">
             <field name="name">April-June 2024</field>
-            <field name="date_from">04-01</field>
-            <field name="date_end">06-30</field>
+            <field name="date_from">2024-04-01</field>
+            <field name="date_end">2024-06-30</field>
         </record>
         <record model="pms.year" id="pms_year_2024_qrt3">
             <field name="name">July-Sept 2024</field>
@@ -90,63 +93,63 @@
 
         <record model="pms.year" id="pms_year_2026_qrt1">
             <field name="name">Jan-Mar 2026</field>
-            <field name="date_from">01-01-2026</field>
-            <field name="date_end">03-30-2026</field>
+            <field name="date_from">2026-01-01</field>
+            <field name="date_end">2026-03-30</field>
         </record>
         <record model="pms.year" id="pms_year_2026_qrt2">
             <field name="name">April-June 2026</field>
-            <field name="date_from">04-01-2026</field>
-            <field name="date_end">06-30-2026</field>
+            <field name="date_from">2026-04-01</field>
+            <field name="date_end">2026-06-30</field>
         </record>
         <record model="pms.year" id="pms_year_2026_qrt3">
             <field name="name">July-Sept 2026</field>
-            <field name="date_from">07-01-2026</field>
-            <field name="date_end">09-30-2026</field>
+            <field name="date_from">2026-07-01</field>
+            <field name="date_end">2026-09-30</field>
         </record>
         <record model="pms.year" id="pms_year_2026_qrt4">
             <field name="name">Oct-Dec 2026</field>
-            <field name="date_from">10-01-2026</field>
-            <field name="date_end">12-30-2026</field>
+            <field name="date_from">2026-10-01</field>
+            <field name="date_end">2026-12-30</field>
         </record>
         <record model="pms.year" id="pms_year_2027_qrt1">
             <field name="name">Jan-Mar 2027</field>
-            <field name="date_from">01-01-2027</field>
-            <field name="date_end">03-30-2027</field>
+            <field name="date_from">2027-01-01</field>
+            <field name="date_end">2027-03-30</field>
         </record>
         <record model="pms.year" id="pms_year_2027_qrt2">
             <field name="name">April-June 2027</field>
-            <field name="date_from">04-01-2027</field>
-            <field name="date_end">06-30-2027</field>
+            <field name="date_from">2027-04-01</field>
+            <field name="date_end">2027-06-30</field>
         </record>
         <record model="pms.year" id="pms_year_2027_qrt3">
             <field name="name">July-Sept 2027</field>
-            <field name="date_from">07-01-2027</field>
-            <field name="date_end">09-30-2027</field>
+            <field name="date_from">2027-07-01</field>
+            <field name="date_end">2027-09-30</field>
         </record>
         <record model="pms.year" id="pms_year_2027_qrt4">
             <field name="name">Oct-Dec 2027</field>
-            <field name="date_from">10-01-2027</field>
-            <field name="date_end">12-30-2027</field>
+            <field name="date_from">2027-10-01</field>
+            <field name="date_end">2027-12-30</field>
         </record>
         <record model="pms.year" id="pms_year_2028_qrt1">
             <field name="name">Jan-Mar 2028</field>
-            <field name="date_from">01-01-2028</field>
-            <field name="date_end">03-30-2028</field>
+            <field name="date_from">2028-01-01</field>
+            <field name="date_end">2028-03-30</field>
         </record>
         <record model="pms.year" id="pms_year_2028_qrt2">
             <field name="name">April-June 2028</field>
-            <field name="date_from">04-01-2028</field>
-            <field name="date_end">06-30-2028</field>
+            <field name="date_from">2028-04-01</field>
+            <field name="date_end">2028-06-30</field>
         </record>
         <record model="pms.year" id="pms_year_2028_qrt3">
             <field name="name">July-Sept 2028</field>
-            <field name="date_from">07-01-2028</field>
-            <field name="date_end">09-30-2028</field>
+            <field name="date_from">2028-07-01</field>
+            <field name="date_end">2028-09-30</field>
         </record>
         <record model="pms.year" id="pms_year_2028_qrt4">
             <field name="name">Oct-Dec 2028</field>
-            <field name="date_from">10-01-2028</field>
-            <field name="date_end">12-30-2028</field>
+            <field name="date_from">2028-10-01</field>
+            <field name="date_end">2028-12-30</field>
         </record>
         <!-- PMS YEAR ENDS  -->
         <!-- JOB CATEGORY -->

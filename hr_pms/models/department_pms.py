@@ -16,6 +16,10 @@ class PMS_Department_SectionLine(models.Model):
     _inherit = "pms.section.line"
     _description= "Department Section lines"
 
+    pms_department_section_id = fields.Many2one(
+        'pms.department.section', 
+        string="PMS Department section ID"
+        )
 
 class PMS_Department_Section(models.Model):
     _name = "pms.department.section"
@@ -25,12 +29,15 @@ class PMS_Department_Section(models.Model):
     name = fields.Char(
         string="Description", 
         required=True)
+    pms_department_id = fields.Many2one(
+        'pms.department', 
+        string="PMS Department ID"
+        )
     section_line_ids = fields.One2many(
         "pms.department.section.line",
-        "section_id",
-        string="Section Lines"
+        "pms_department_section_id",
+        string="epartment Section Lines"
     )
-
     section_id = fields.Many2one(
         'pms.section', 
         string="Section ID"
@@ -61,7 +68,7 @@ class PMSDepartment(models.Model):
     
     department_manager_id = fields.Many2one(
         'hr.employee', 
-        string="Department ID"
+        string="Manager"
         )
     
     state = fields.Selection([
@@ -96,10 +103,10 @@ class PMSDepartment(models.Model):
         )
     section_line_ids = fields.One2many(
         "pms.department.section",
-        "section_id",
-        string="Section Lines"
+        "pms_department_id",
+        string="Department Section Lines"
     )
-    active = fields.Date(
+    active = fields.Boolean(
         string="Active", 
         readonly=True, 
         default=True, 
@@ -161,13 +168,13 @@ class PMSDepartment(models.Model):
                         pms_appraisee.write({
                             'fc_section_line_ids': [(0, 0, {
                                                         'fc_section_id': pms_appraisee.id,
-                                                        'name': secline.name,
-                                                        'is_required': secline.is_required,
+                                                        'name': sec.name,
+                                                        'is_required': sec.is_required,
                                                         'section_avg_scale': fc_section.section_id.section_avg_scale,
                                                         'administrative_supervisor_rating': 0,
                                                         'functional_supervisor_rating': 0,
                                                         'reviewer_rating': 0,
-                                                        }) for secline in fc_section_lines] 
+                                                        }) for sec in fc_section_lines] 
                         })
                     else:
                         pms_appraisee.write({
@@ -197,11 +204,11 @@ class PMSDepartment(models.Model):
                                                     'weightage': lc_section.section_id.input_weightage,
                                                     'administrative_supervisor_rating': 0,
                                                     'functional_supervisor_rating': 0,
-                                                    'self_rating': 0,
+                                                    # 'self_rating': 0,
                                                     }) for secline in lc_section_lines] 
                     })
         self.write({
-            'state' 'published'
+            'state':'published'
         })
     
     # TODO Add cancel button as with security Departmental heads sees this button,

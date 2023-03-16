@@ -20,7 +20,7 @@ class KRA_SectionLine(models.Model):
         string="LC Section"
     )
 
-    name = fields.Integer(
+    name = fields.Char(
         string='Description', 
         required=True
         )
@@ -92,9 +92,9 @@ class KRA_SectionLine(models.Model):
         'administrative_supervisor_rating',
         'functional_supervisor_rating')
     def compute_weighted_score(self):
-        # =((admin_rating*0.4)+(functional_rating *0.6))/4 * weightage
+        # =((admin_rating*0.4 )+(functional_rating *0.6))/4 * weightage
         for rec in self:
-            fc_avg_scale = rec.fc_section_id.section_id.section_avg_scale or self.section_avg_scale or 4 # or 5 is set as default in case nothing was provided
+            fc_avg_scale = rec.kra_section_id.section_id[0].section_avg_scale or self.section_avg_scale or 4 # or 5 is set as default in case nothing was provided
             converted_fc_avg_scale = fc_avg_scale / 100 # i.e 35 / 100 = 0.3
 
             if rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
@@ -116,7 +116,7 @@ class LC_SectionLine(models.Model):
         string="LC Section"
     )
 
-    name = fields.Integer(
+    name = fields.Char(
         string='Description', 
         required=True
         )
@@ -188,7 +188,7 @@ class LC_SectionLine(models.Model):
         'reviewer_rating')
     def compute_weighted_score(self):
         for rec in self:
-            fc_avg_scale = rec.fc_section_id.section_id.section_avg_scale or self.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
+            fc_avg_scale = rec.lc_section_id.section_id[0].section_avg_scale or self.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
             converted_fc_avg_scale = fc_avg_scale / 100 # i.e 35 / 100 = 0.3
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
                 ar = rec.administrative_supervisor_rating * 0.3
@@ -211,7 +211,7 @@ class FC_SectionLine(models.Model):
         string="KRA Section"
     )
 
-    name = fields.Integer(
+    name = fields.Char(
         string='Description', 
         required=True
         )
@@ -249,7 +249,6 @@ class FC_SectionLine(models.Model):
     
     weighted_score = fields.Integer(
         string='Weighted (%) Score of specific KRA', 
-        required=True,
         compute="compute_weighted_score"
         )
     section_avg_scale = fields.Integer(
@@ -287,7 +286,7 @@ class FC_SectionLine(models.Model):
         section_avg_scale: scale configured to be used to divide the ratings
         '''
         for rec in self:
-            fc_avg_scale = rec.fc_section_id.section_id.section_avg_scale or self.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
+            fc_avg_scale = rec.fc_section_id.section_id[0].section_avg_scale or self.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
             converted_fc_avg_scale = fc_avg_scale / 100 # i.e 35 / 100 = 0.3
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
                 ar = rec.administrative_supervisor_rating * 0.3
@@ -389,21 +388,18 @@ class PMS_Appraisee(models.Model):
 
     final_kra_score = fields.Integer(
         string='Final KRA Score', 
-        required=True,
         store=True,
         compute="compute_final_kra_score"
         )
     
     final_fc_score = fields.Integer(
         string='Final FC Score', 
-        required=True,
         store=True,
         compute="compute_final_fc_score"
         )
     
     final_lc_score = fields.Integer(
         string='Final LC Score', 
-        required=True,
         store=True,
         compute="compute_final_lc_score"
         )
@@ -432,16 +428,10 @@ class PMS_Appraisee(models.Model):
         readonly=True,
         store=True,
         )
-    # consider removing
-    lc_section_weighted_score = fields.Integer(
-        string='Leadership Competency Scale', 
-        required=True,
-        store=True,
-        )
+     
     # consider removing
     fc_section_avg_scale = fields.Integer(
         string='Functional Competency Scale', 
-        required=True,
         store=True,
         )
       

@@ -19,6 +19,7 @@
             'views/pms_department_view.xml',
             'views/section_view.xml',
             'views/appraisee_view.xml',
+            'views/employee_inherit_view.xml',
     ],
     'css': [],
     'js': [],
