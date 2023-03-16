@@ -71,7 +71,6 @@ class PMSDepartment(models.Model):
         ('published', 'Published'),
         ('cancel', 'Cancel'),
         ], string="Status", default = "draft", readonly=True)
-    
     pms_year_id = fields.Many2one(
         'pms.year', string="Period")
     date_from = fields.Date(
