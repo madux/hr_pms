@@ -278,10 +278,7 @@ class FC_SectionLine(models.Model):
         else:
             self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
     
-    @api.depends(
-        'administrative_supervisor_rating',
-        'functional_supervisor_rating',
-        'reviewer_rating')
+    @api.depends('administrative_supervisor_rating','functional_supervisor_rating','reviewer_rating')
     def compute_weighted_score(self):
         '''
         ar: adminitrative rating
@@ -389,8 +386,7 @@ class PMS_Appraisee(models.Model):
         string="Overall score", 
         compute="compute_overall_score", 
         store=True)
- 
-    
+
     final_kra_score = fields.Integer(
         string='Final KRA Score', 
         required=True,

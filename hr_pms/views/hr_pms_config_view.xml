@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
     <odoo>
-    <menuitem id="view_hr_pms_menu" name="HR PMS" sequence="4" action="hr_pms.action_pms_category_view"/>
+    <menuitem id="view_hr_pms_menu" name="HR PMS" sequence="4"/>
     <menuitem id="view_hr_pms_config_menu" name="Configuration" sequence="30" parent="hr_pms.view_hr_pms_menu"/>
 </odoo>

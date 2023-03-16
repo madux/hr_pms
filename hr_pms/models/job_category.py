@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from datetime import datetime, date 
+from datetime import datetime, date
 from odoo.exceptions import ValidationError
 from odoo import http
 
@@ -82,15 +82,14 @@ class PMSJobCategory(models.Model):
         'pms.department', 
         'pms_department_category_rel', 
         'department_id', 
-        'category_id', 
+        'category_id',
         string="PMS Department ID")
-    
-    
-    active = fields.Date(
-        string="Active", 
-        readonly=True, 
-        default=True, 
-        store=True)
+
+    # active = fields.Date(
+    #     string="Active",
+    #     readonly=True,
+    #     default=True,
+    #     store=True)
     
     @api.constrains('job_role_ids')
     def _check_lines(self):
@@ -101,13 +100,12 @@ class PMSJobCategory(models.Model):
     def _onchange_year_id(self):
         '''Gets the periodic date interval from the settings'''
         if self.pms_year_id:
-            self.date_from = self.pms_year_id.date_from 
+            self.date_from = self.pms_year_id.date_from
             self.date_end = self.pms_year_id.date_end
         else:
-            self.date_from = False 
-            self.date_end = False 
+            self.date_from = False
+            self.date_end = False
 
-    
     def action_notify(self, subject, msg, email_to, email_cc):
         email_from = self.env.user.email
         email_ccs = list(filter(bool, email_cc))
@@ -123,7 +121,6 @@ class PMSJobCategory(models.Model):
         mail_id = self.env['mail.mail'].sudo().create(mail_data)
         self.env['mail.mail'].sudo().send(mail_id)
         self.message_post(body=msg)
-
     def get_url(self, id, name):
         base_url = http.request.env['ir.config_parameter'].sudo().get_param('web.base.url')
         base_url += '/web#id=%d&view_type=form&model=%s' % (id, name)

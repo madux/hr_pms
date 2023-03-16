@@ -19,7 +19,6 @@ class PmsSection(models.Model):
     max_line_number = fields.Float(
         string="Maximum Number of Input"
         )
-    
      
     type_of_section = fields.Selection([
         ('KRA', 'KRA'),
@@ -68,6 +67,6 @@ class PmsSection(models.Model):
                 )
         if self.weighted_score < 1:
             raise ValidationError(
-                """Section weight must be set above 0%"""                )
+                """Section weight must be set above 0%""")
 
     

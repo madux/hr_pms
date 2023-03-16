@@ -53,11 +53,11 @@
                                 <field name="pms_year_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="date_from" readonly="1"/>
                                 <field name="date_end" readonly="1"/>
-                            <group>
+                            </group>
                             <group>
                                 <field name="deadline"/>
                                 <field name="published_date" readonly="1" force_save="1"/>
-                            <group>
+                            </group>
                             <separator string="Category Section Weight" colspan="4"/>
                             <group>
                                 <field name="kra_weighted_score" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
@@ -161,10 +161,11 @@
 			</field>
 		</record>
 
-		<record id="view_pms_category" model="ir.ui.view">
-			<field name="name">view.pms.category.tree</field>
+		<record model="ir.ui.view" id="view_pms_category_tree">
+			<field name="name">view pms category.tree</field>
 			<field name="model">pms.category</field>
 			<field name="arch" type="xml">
+				<tree string="Category">
 				<tree string="Category">
                     <field name="sequence" readonly="1"/>
                     <field name="name"/>

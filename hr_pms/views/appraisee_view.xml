@@ -55,7 +55,7 @@
                         <field name="state" widget="statusbar" clickable="False" invisible="0" readonly="1"
 							statusbar_visible="draft,rating,waiting_approval,done"
 							/>
-                    <header>
+                    </header>
                     <div class="oe_title">
                         <h1>
                             <field name="name" default_focus="1" required="1" placeholder="KRAs &amp; Achivements"/>
@@ -67,7 +67,7 @@
                             <field name="employee_id" readonly="1"/> 
                             <field name="department_id" readonly="0"/> 
                             <field name="pms_department_id" required="1" invisible="0"/> 
-                            <field name="section_id" required="1" invisible="1"/> 
+<!--                            <field name="section_id" required="1" invisible="1"/> -->
                             
                         </group>
                         <group>
@@ -99,7 +99,7 @@
                                 <tree string="KRA Sections" delete="true" editable="bottom">
                                     <field name="name" required="1"/> 
                                     <field name="weightage" required="1"/> 
-                                    <field name="kra_section_id"/> 
+                                    <field name="section_id"/> 
                                     <!-- self rating only for KRAs -->
                                     <field name="self_rating" force_save="1" invisible="0" required="1"/> 
                                     <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
@@ -123,9 +123,9 @@
                                     
                                     <!-- weightage is set by default from the config side to use 20%. -->
                                     <field name="weightage" required="0" invisible="1"/> 
-                                    <field name="fc_section_id"/> 
+                                    <field name="section_id"/> 
                                     <!-- self rating only for KRAs -->
-                                    <field name="self_rating" force_save="1" invisible="1" required="0"/> 
+<!--                                    <field name="self_rating" force_save="1" invisible="1" required="0"/> -->
                                     <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
                                     <field name="is_functional_manager" force_save="1" invisible="1"/> 
                                     <field name="is_administrative_supervisor" force_save="1" invisible="1"/> 
@@ -144,9 +144,9 @@
                                 <tree string="Leadership Sections" delete="true" editable="bottom">
                                     <field name="name" required="1"/> 
                                     <field name="weightage" required="1"/> 
-                                    <field name="lc_section_id"/> 
+                                    <field name="section_id"/> 
                                     <!-- self rating only for KRAs -->
-                                    <field name="self_rating" force_save="1" invisible="1" required="0"/> 
+<!--                                    <field name="self_rating" force_save="1" invisible="1" required="0"/> -->
                                     <field name="is_functional_manager" force_save="1" invisible="1"/> 
                                     <field name="is_administrative_supervisor" force_save="1" invisible="1"/> 
                                     <field name="is_reviewer" force_save="1" invisible="1"/> 
@@ -168,7 +168,7 @@
 			<field name="name">view.pms.appraisee.tree</field>
 			<field name="model">pms.appraisee</field>
 			<field name="arch" type="xml">
-				<tree string="appraisee">
+				<tree string="appraisee" sample="1" multi_edit="1" create="0">
                     <field name="employee_id" readonly="1"/> 
                     <field name="department_id" readonly="0"/>  
                     <field name="pms_year_id" readonly="1"/>   
