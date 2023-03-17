@@ -3,6 +3,18 @@ from datetime import datetime, date
 from odoo.exceptions import ValidationError
 
 
+class PMS_Kba_description(models.Model):
+    _name = "kba.descriptions"
+
+    name = fields.Char(
+        string="KBA descriptions", 
+        required=True)
+
+    section_line_id = fields.Many2one(
+        'pms.section.line', 
+        string="Section Line ID"
+        )
+    
 class PMS_SectionLine(models.Model):
     _name = "pms.section.line"
     _description= "Section lines"
@@ -22,4 +34,9 @@ class PMS_SectionLine(models.Model):
         'pms.section', 
         string="Section ID"
         )
+    
+    kba_description_ids = fields.One2many(
+        'kba.descriptions',
+        'section_line_id',
+        string="KBA Description",)
       

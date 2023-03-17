@@ -138,6 +138,17 @@
                                                         <field name="section_id" required="0" readonly="1"/> 
                                                     </group>
                                                 </group>
+                                                <notebook>
+                                                    <page string="KBA Description">
+                                                        <field name="kba_description_ids" editable="bottom">
+                                                            <tree string="">
+                                                                <field name="name" required="0" readonly="0"/> 
+                                                                
+                                                            </tree>
+                                                        </field>
+                                                    
+                                                    </page>
+                                                </notebook>
                                             </form>
                                             <tree string="" delete="true">
                                                 <field name="name"/> 

@@ -98,7 +98,7 @@
                                 <tree string="KRA Sections" delete="true" editable="bottom">
                                     <field name="name" required="1"/> 
                                     <field name="weightage" required="1"/> 
-                                    <field name="kra_section_id"/> 
+                                    <field name="kra_section_id" invisible="1"/> 
                                     <!-- self rating only for KRAs -->
                                     <field name="self_rating" force_save="1" invisible="0" required="1"/> 
                                     <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
@@ -109,7 +109,7 @@
                                     <field name="functional_supervisor_rating" required="1" attrs="{'readonly': [('is_administrative_supervisor', '=', False)]}"/> 
                                     <!-- <field name="reviewer_rating" force_save="1" invisible="0" required="1" attrs="{'readonly': [('is_reviewer', '=', False)]}"/> -->
                                     <field name="is_required" force_save="1" invisible="1"/> 
-                                    <field name="section_avg_scale" force_save="1" readonly="1"/> 
+                                    <field name="section_avg_scale" force_save="1" readonly="0"/> 
                                     <field name="weighted_score" force_save="1"/> 
                                 </tree>
                             </field>

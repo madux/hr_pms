@@ -26,7 +26,7 @@
                         <page name="section_line_ids" string="Sections" invisible="0">
                             <field name="section_line_ids" 
                                 required="1" options="{'no_quick_create':True}">
-                                <tree string="Unit standards" delete="true" editable="bottom">
+                                <tree string="" delete="true" editable="bottom">
                                     <field name="name" required="1"/> 
                                     <field name="is_required"/> 
                                     <field name="section_id" invisible="1"/> 

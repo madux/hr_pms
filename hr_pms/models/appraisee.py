@@ -94,15 +94,14 @@ class KRA_SectionLine(models.Model):
     def compute_weighted_score(self):
         # =((admin_rating*0.4 )+(functional_rating *0.6))/4 * weightage
         for rec in self:
-            fc_avg_scale = rec.kra_section_id.section_id[0].section_avg_scale or self.section_avg_scale or 4 # or 5 is set as default in case nothing was provided
-            converted_fc_avg_scale = fc_avg_scale / 100 # i.e 35 / 100 = 0.3
-
+            fc_avg_scale = rec.section_avg_scale or 4 # or 5 is set as default in case nothing was provided
             if rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
-                ar = rec.administrative_supervisor_rating * 0.4
-                f_rating = 0.4 if rec.administrative_supervisor_rating > 0 else 0.6
-                fr = rec.functional_supervisor_rating * f_rating
-                ratings = (ar + fr) / converted_fc_avg_scale
-                rec.weighted_score = (ar + fr) * rec.weightage
+
+                ar = rec.administrative_supervisor_rating * 40
+                f_rating = 60 if rec.administrative_supervisor_rating > 0 else 100
+                fr = rec.functional_supervisor_rating * 60
+                ratings = (ar + fr) / fc_avg_scale
+                rec.weighted_score = ratings * (rec.weightage / 100)
             else:
                 rec.weighted_score = 0
 
@@ -175,10 +174,10 @@ class LC_SectionLine(models.Model):
         administrative supervisor or reviewer
         """
         current_user = self.env.uid 
-        if self.kra_section_id:
-            self.is_functional_manager = True if current_user == self.kra_section_id.employee_id.parent_id.user_id.id else False
-            self.is_administrative_supervisor = True if current_user == self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id else False
-            self.is_reviewer = True if current_user == self.kra_section_id.employee_id.reviewer_id.user_id.id else False
+        if self.lc_section_id:
+            self.is_functional_manager = True if current_user == self.lc_section_id.employee_id.parent_id.user_id.id else False
+            self.is_administrative_supervisor = True if current_user == self.lc_section_id.employee_id.administrative_supervisor_id.user_id.id else False
+            self.is_reviewer = True if current_user == self.lc_section_id.employee_id.reviewer_id.user_id.id else False
         else:
             self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
     
@@ -188,7 +187,7 @@ class LC_SectionLine(models.Model):
         'reviewer_rating')
     def compute_weighted_score(self):
         for rec in self:
-            fc_avg_scale = rec.lc_section_id.section_id[0].section_avg_scale or self.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
+            fc_avg_scale = rec.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
             converted_fc_avg_scale = fc_avg_scale / 100 # i.e 35 / 100 = 0.3
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
                 ar = rec.administrative_supervisor_rating * 0.3
@@ -270,10 +269,10 @@ class FC_SectionLine(models.Model):
         administrative supervisor or reviewer
         """
         current_user = self.env.uid 
-        if self.kra_section_id:
-            self.is_functional_manager = True if current_user == self.kra_section_id.employee_id.parent_id.user_id.id else False
-            self.is_administrative_supervisor = True if current_user == self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id else False
-            self.is_reviewer = True if current_user == self.kra_section_id.employee_id.reviewer_id.user_id.id else False
+        if self.fc_section_id:
+            self.is_functional_manager = True if current_user == self.fc_section_id.employee_id.parent_id.user_id.id else False
+            self.is_administrative_supervisor = True if current_user == self.fc_section_id.employee_id.administrative_supervisor_id.user_id.id else False
+            self.is_reviewer = True if current_user == self.fc_section_id.employee_id.reviewer_id.user_id.id else False
         else:
             self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
     
@@ -286,7 +285,7 @@ class FC_SectionLine(models.Model):
         section_avg_scale: scale configured to be used to divide the ratings
         '''
         for rec in self:
-            fc_avg_scale = rec.fc_section_id.section_id[0].section_avg_scale or self.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
+            fc_avg_scale = rec.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
             converted_fc_avg_scale = fc_avg_scale / 100 # i.e 35 / 100 = 0.3
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
                 ar = rec.administrative_supervisor_rating * 0.3
@@ -381,31 +380,31 @@ class PMS_Appraisee(models.Model):
         # compute="get_appraisal_deadline", 
         store=True)
 
-    overall_score = fields.Date(
+    overall_score = fields.Float(
         string="Overall score", 
         compute="compute_overall_score", 
         store=True)
 
-    final_kra_score = fields.Integer(
+    final_kra_score = fields.Float(
         string='Final KRA Score', 
         store=True,
         compute="compute_final_kra_score"
         )
     
-    final_fc_score = fields.Integer(
+    final_fc_score = fields.Float(
         string='Final FC Score', 
         store=True,
         compute="compute_final_fc_score"
         )
     
-    final_lc_score = fields.Integer(
+    final_lc_score = fields.Float(
         string='Final LC Score', 
         store=True,
         compute="compute_final_lc_score"
         )
     
     # consider removing
-    kra_section_weighted_score = fields.Integer(
+    kra_section_weighted_score = fields.Float(
         string='KRA Weight', 
         readonly=True,
         store=True,

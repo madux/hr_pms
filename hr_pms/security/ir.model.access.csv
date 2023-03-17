@@ -55,3 +55,4 @@ access_id_user_pms_year,access_name_user_pms_year,model_pms_year,hr_pms.group_pm
 access_id_officer_pms_year,access_name_officer_pms_year,model_pms_year,hr_pms.group_pms_officer_id,1,1,1,1
 access_id_manager_pms_year,access_name_manager_pms_year,model_pms_year,hr_pms.group_pms_manager_id,1,1,1,1
 access_id_supervisor_pms_year,access_name_supervisor_pms_year,model_pms_year,hr_pms.group_pms_supervisor,1,0,0,0
+access_id_kba_descriptions,access_name_kba_descriptions,model_kba_descriptions,base.group_user,1,1,1,1
