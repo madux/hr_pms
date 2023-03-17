@@ -71,7 +71,7 @@ class KRA_SectionLine(models.Model):
         else:
             self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
     
-    weighted_score = fields.Integer(
+    weighted_score = fields.Float(
         string='Weighted (%) Score of specific KRA', 
         required=True,
         store=True,
@@ -89,17 +89,18 @@ class KRA_SectionLine(models.Model):
         )
 
     @api.depends(
+        'weightage',
         'administrative_supervisor_rating',
         'functional_supervisor_rating')
     def compute_weighted_score(self):
-        # =((admin_rating*0.4 )+(functional_rating *0.6))/4 * weightage
+        # =(((admin_rating*40 )+(functional_rating *60))/4) * (weightage /100)
         for rec in self:
             fc_avg_scale = rec.section_avg_scale or 4 # or 5 is set as default in case nothing was provided
             if rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
 
                 ar = rec.administrative_supervisor_rating * 40
                 f_rating = 60 if rec.administrative_supervisor_rating > 0 else 100
-                fr = rec.functional_supervisor_rating * 60
+                fr = rec.functional_supervisor_rating * f_rating
                 ratings = (ar + fr) / fc_avg_scale
                 rec.weighted_score = ratings * (rec.weightage / 100)
             else:
@@ -151,7 +152,7 @@ class LC_SectionLine(models.Model):
         default=False,
         compute="compute_user_rating_role"
         )
-    weighted_score = fields.Integer(
+    weighted_score = fields.Float(
         string='Weighted (%) Score of specific KRA', 
         required=True,
         compute="compute_weighted_score"
@@ -184,17 +185,17 @@ class LC_SectionLine(models.Model):
     @api.depends(
         'administrative_supervisor_rating',
         'functional_supervisor_rating',
-        'reviewer_rating')
+        'reviewer_rating',
+        'weightage')
     def compute_weighted_score(self):
         for rec in self:
             fc_avg_scale = rec.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
-            converted_fc_avg_scale = fc_avg_scale / 100 # i.e 35 / 100 = 0.3
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
-                ar = rec.administrative_supervisor_rating * 0.3
-                f_rating = 0.3 if rec.administrative_supervisor_rating > 0 else 0.6
+                ar = rec.administrative_supervisor_rating * 30
+                f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
                 fr = rec.functional_supervisor_rating * f_rating
-                rr = rec.reviewer_rating * 0.4
-                ratings = (ar + fr + rr) / converted_fc_avg_scale
+                rr = rec.reviewer_rating * 40
+                ratings = (ar + fr + rr) / fc_avg_scale
                 rec.weighted_score = ratings * (rec.weightage / 100)
             else:
                 rec.weighted_score = 0
@@ -246,7 +247,7 @@ class FC_SectionLine(models.Model):
         compute="compute_user_rating_role"
         )
     
-    weighted_score = fields.Integer(
+    weighted_score = fields.Float(
         string='Weighted (%) Score of specific KRA', 
         compute="compute_weighted_score"
         )
@@ -286,13 +287,12 @@ class FC_SectionLine(models.Model):
         '''
         for rec in self:
             fc_avg_scale = rec.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
-            converted_fc_avg_scale = fc_avg_scale / 100 # i.e 35 / 100 = 0.3
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
-                ar = rec.administrative_supervisor_rating * 0.3
-                f_rating = 0.3 if rec.administrative_supervisor_rating > 0 else 0.6
+                ar = rec.administrative_supervisor_rating * 30
+                f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
                 fr = rec.functional_supervisor_rating * f_rating
-                rr = rec.reviewer_rating * 0.4
-                ratings = (ar + fr + rr) / converted_fc_avg_scale
+                rr = rec.reviewer_rating * 40
+                ratings = (ar + fr + rr) / fc_avg_scale
                 rec.weighted_score = ratings
             else:
                 rec.weighted_score = 0
