@@ -12,8 +12,8 @@
                             class="oe_highlight" 
                             type="object"
                             states="draft,review" 
-                            comfirm="Are you sure you want to Publish: This action will generate appraisal for employees in your department" 
-                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
+                            confirm="Are you sure you want to Publish: This action will generate appraisal for employees in your department" 
+                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 
                             name="button_cancel" 
@@ -21,7 +21,7 @@
                             class="oe_highlight" 
                             type="object"
                             states="published" 
-                            comfirm="Are you sure you want to cancel: This will cancel sent appraisals" 
+                            confirm="Are you sure you want to cancel: This will cancel sent appraisals" 
                             groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 
@@ -53,7 +53,7 @@
                             <separator string="Details" colspan="4"/>
                             <group>
                                 <field name="sequence" readonly="1"/>
-                                <field name="department_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="department_id" force_save="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="department_manager_id" readonly="1" force_save="1" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                             </group>
                             <group>
@@ -190,8 +190,8 @@
 			<field name="name">Departmental template</field>
 			<field name="res_model">pms.department</field>
 			<field name="view_mode">tree,form</field>
-             <!-- <field name="domain">[]</field>
-             <field name="context">{'default_state': 'draft'}</field> -->
+            <field name="domain">[("state", "in", ["review", "draft", "published"])]</field>
+            <!-- <field name="context">{'default_state': 'draft'}</field> -->
              <field name="search_view_id" ref="hr_pms.view_pms_department_filter" />
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">

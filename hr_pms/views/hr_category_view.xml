@@ -11,8 +11,8 @@
                             string="Publish" 
                             class="oe_highlight" 
                             type="object"
-                            states="draft" 
-                            comfirm="Are you sure you want to Publish: This action will generate appraisal templates for departments" 
+                            states="draft,cancel" 
+                            confirm="Are you sure you want to Publish: This action will generate appraisal templates for departments" 
                             groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 
@@ -21,13 +21,21 @@
                             class="oe_highlight" 
                             type="object"
                             states="published" 
-                            comfirm="Are you sure you want to cancel: This will cancel sent appraisals" 
+                            confirm="Are you sure you want to cancel: This will cancel sent appraisals" 
+                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
+                        />
+                        <button 
+                            name="button_republish" 
+                            string="Re-publish" 
+                            class="oe_highlight" 
+                            type="object" 
+                            states="cancel" 
                             groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 
                             name="button_set_to_draft" 
                             string="Set to Draft" 
-                            class="oe_highlight" 
+                            class="btn-primary" 
                             type="object" 
                             states="cancel" 
                             groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
@@ -165,6 +173,9 @@
                                         <field name="input_weightage"/> 
                                     </tree>
 								</field>
+							</page>
+                            <page name="pms_department_template" string="Department templates" invisible="0">
+								<field name="pms_department_ids"/> 
 							</page>
 						</notebook>
 					</sheet>

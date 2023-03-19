@@ -131,6 +131,10 @@ class PMSDepartment(models.Model):
     # Ensure all the appraisals sent to employees will be activated or published
     def button_publish(self):
         '''Publishing the records to employees of the department'''
+        if not self.section_line_ids:
+            raise ValidationError(
+                """Please ensure section line is added"""
+            )
         Employee = self.env['hr.employee']
         PMS_Appraisee = self.env['pms.appraisee']
         employees = Employee.search([('department_id', '=', self.department_id.id)])
@@ -141,18 +145,24 @@ class PMSDepartment(models.Model):
                     'department_id': self.department_id.id, 
                     'employee_id': emp.id, 
                     'pms_department_id': self.id,
+                    'pms_year_id': self.pms_year_id.id,
+                    'date_from': self.pms_year_id.date_from,
+                    'date_end': self.pms_year_id.date_end,
+                    'deadline': self.deadline,
                 }) 
                 kra_pms_department_section = self.mapped('section_line_ids').filtered(
                     lambda res: res.type_of_section == "KRA")
                 if kra_pms_department_section:
                     kra_section = kra_pms_department_section[0]
                     kra_section_lines = kra_section.section_line_ids
+                    # raise ValidationError(f"Thee scale is {kra_section.section_avg_scale}")
                     pms_appraisee.write({
                         'kra_section_line_ids': [(0, 0, {
                                                     'kra_section_id': pms_appraisee.id,
                                                     'name': secline.name,
                                                     'is_required': secline.is_required,
-                                                    'section_avg_scale': kra_section.section_id.section_avg_scale,
+                                                    # 'section_avg_scale': kra_section.section_id.section_avg_scale,
+                                                    'section_avg_scale': kra_section.section_avg_scale,
                                                     'weightage': 0,
                                                     'administrative_supervisor_rating': 0,
                                                     'functional_supervisor_rating': 0,
@@ -170,7 +180,8 @@ class PMSDepartment(models.Model):
                                                         'fc_section_id': pms_appraisee.id,
                                                         'name': sec.name,
                                                         'is_required': sec.is_required,
-                                                        'section_avg_scale': fc_section.section_id.section_avg_scale,
+                                                        # 'section_avg_scale': fc_section.section_id.section_avg_scale,
+                                                        'section_avg_scale': fc_section.section_avg_scale,
                                                         'administrative_supervisor_rating': 0,
                                                         'functional_supervisor_rating': 0,
                                                         'reviewer_rating': 0,
@@ -182,7 +193,8 @@ class PMSDepartment(models.Model):
                                                         'fc_section_id': pms_appraisee.id,
                                                         'name': 'Functional Competency',
                                                         'is_required': False,
-                                                        'section_avg_scale': fc_section.section_id.section_avg_scale,
+                                                        # 'section_avg_scale': fc_section.section_id.section_avg_scale,
+                                                        'section_avg_scale': fc_section.section_avg_scale,
                                                         'administrative_supervisor_rating': 0,
                                                         'functional_supervisor_rating': 0,
                                                         'reviewer_rating': 0,
@@ -200,7 +212,8 @@ class PMSDepartment(models.Model):
                                                     'lc_section_id': pms_appraisee.id,
                                                     'name': secline.name,
                                                     'is_required': secline.is_required,
-                                                    'section_avg_scale': lc_section.section_id.section_avg_scale,
+                                                    # 'section_avg_scale': lc_section.section_id.section_avg_scale,
+                                                    'section_avg_scale': lc_section.section_avg_scale,
                                                     'weightage': lc_section.section_id.input_weightage,
                                                     'administrative_supervisor_rating': 0,
                                                     'functional_supervisor_rating': 0,

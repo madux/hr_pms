@@ -125,7 +125,8 @@ class PMSJobCategory(models.Model):
                 'email_to': email_to,
                 'reply_to': email_from,
                 'email_cc': reciepients,
-                'body_html': msg
+                'body_html': msg,
+                'state': 'sent'
             }
         mail_id = self.env['mail.mail'].sudo().create(mail_data)
         self.env['mail.mail'].sudo().send(mail_id)
@@ -138,7 +139,7 @@ class PMSJobCategory(models.Model):
 
     def send_mail_notification(self, pms_department_obj):
         subject = "Appraisal Notification"
-        department_manager = pms_department_obj.department_id.parent_id
+        department_manager = pms_department_obj.department_id.manager_id
         if department_manager:
             email_to = department_manager.work_email
             email_cc = [] #[rec.work_email for rec in self.approver_ids]
@@ -149,19 +150,43 @@ class PMSJobCategory(models.Model):
             <br/>Kindly {} to review <br/>\
             Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
                 department_manager.name,
-                self.name, self.employee_id.name,
+                self.name, 
                 self.get_url(pms_department_obj.id, pms_department_obj._name),
                 self.env.user.name,
                 self.env.user.company_id.name,
                 )
             self.action_notify(subject, msg, email_to, email_cc)
+        else:
+
+            raise ValidationError(
+                """
+                There is no work email address found for the
+                department manager- {}:""".format(
+                pms_department_obj.department_id.name)
+            )
+        
+    def check_job_role_without_department(self):
+        jr = self.mapped('job_role_ids').filtered(
+            lambda jr: not jr.department_id)
+        if jr:
+            raise ValidationError("""
+            Please ensure all the selected 
+            job roles has departments setup
+            """)
 
     def button_publish(self):
         # TODO Add publish button with security as PMS Officer,
         # Create record (pms.department) for each job role department
         # i.e if there are 4 job roles, it generates a record for each department
         # forwards the mail notification to the department managers
+        ########## clears generated department
+        cancelled_pms_department_ids = self.mapped('pms_department_ids').filtered(
+            lambda s: s.state == 'cancel')
+        if cancelled_pms_department_ids:
+            self.pms_department_ids = [(3, rec.id) for rec in cancelled_pms_department_ids]
+        #########
         if self.job_role_ids and self.section_ids:
+            self.check_job_role_without_department()
             # filters set of departments to forward generate
             department_ids = set([depart.department_id.id for depart in self.job_role_ids])
             Pms_Department = self.env['pms.department']
@@ -172,6 +197,7 @@ class PMSJobCategory(models.Model):
                     pms_department = Pms_Department.create({
                         'name': self.name,
                         'department_id': department_id.id,
+                        'department_manager_id': department_id.manager_id.id,
                         'pms_year_id': self.pms_year_id.id,
                         'date_from': self.pms_year_id.date_from,
                         'date_end': self.pms_year_id.date_end,
@@ -225,13 +251,22 @@ class PMSJobCategory(models.Model):
     # Ensure all the appraisals sent to employees will be deactivated or cancelled
 
     def button_cancel(self):
-        for rec in self.pms_department_ids:
+        for rec in self.mapped('pms_department_ids').filtered(
+            lambda s: s.state in ['draft', 'review']):
             rec.state = "cancel"
         self.write({
-                'state' 'cancel'
+                'state':'cancel'
+            })
+    
+    def button_republish(self):
+        for rec in self.mapped('pms_department_ids').filtered(
+            lambda s: s.state == 'cancel'):
+            rec.state = "review"
+        self.write({
+                'state':'published'
             })
         
     def button_set_to_draft(self):
         self.write({
-                'state' 'draft'
+                'state':'draft'
             })
