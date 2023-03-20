@@ -46,16 +46,7 @@
                             confirm="Are you sure you want to Submit rating"
                             help="Done by the reviewer: This is the final process that determines the overall score"
                             groups="hr_pms.group_pms_reviewer,hr_pms.group_pms_manager_id"
-                        />
-                        <!-- <button 
-                            name="button_done" 
-                            string="Confirm" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="waiting_approval" 
-                            confirm="Are you sure you want to Approve"
-                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr.group_hr_manager"
-                        /> -->
+                        /> 
                         <button 
                             name="button_withdraw" 
                             string="Withdraw" 
@@ -263,14 +254,14 @@
 			<field name="model">pms.appraisee</field>
 			<field name="arch" type="xml">
 				<tree string="appraisee" create="0">
-                    <field name="employee_id" readonly="1"/> 
-                    <field name="department_id" readonly="0"/>  
-                    <field name="pms_year_id" readonly="1"/>   
-                    <field name="deadline" readonly="1"/> 
-                    <field name="final_kra_score" readonly="1"/> 
-                    <field name="final_fc_score" readonly="1"/> 
-                    <field name="final_lc_score" readonly="1"/> 
-                    <field name="overall_score" readonly="1"/> 
+                    <field name="employee_id" readonly="1" string="Employee"/> 
+                    <field name="department_id" readonly="0" string="Employee"/>  
+                    <field name="pms_year_id" readonly="1" string="Period"/>   
+                    <field name="deadline" readonly="1" string="Deadline"/> 
+                    <field name="final_kra_score" readonly="1" string="KRA Score"/> 
+                    <field name="final_fc_score" readonly="1" string="FC Score"/> 
+                    <field name="final_lc_score" readonly="1" string="LC Score"/> 
+                    <field name="overall_score" readonly="1" string="Final Score"/> 
                     <field name="state" readonly="1"/> 
                 </tree>
 			</field>
@@ -302,7 +293,7 @@
 			<field name="res_model">pms.appraisee</field>
 			<field name="view_mode">tree,form</field>
             <field name="domain">[]</field>
-             <field name="context">{'default_state': 'draft'}</field>
+            <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field>
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">

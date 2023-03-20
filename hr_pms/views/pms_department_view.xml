@@ -12,8 +12,8 @@
                             class="oe_highlight" 
                             type="object"
                             states="draft,review" 
-                            confirm="Are you sure you want to Publish: This action will generate appraisal for employees in your department" 
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
+                            comfirm="Are you sure you want to Publish: This action will generate appraisal for employees in your department" 
+                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 
                             name="button_cancel" 
@@ -21,7 +21,7 @@
                             class="oe_highlight" 
                             type="object"
                             states="published" 
-                            confirm="Are you sure you want to cancel: This will cancel sent appraisals" 
+                            comfirm="Are you sure you want to cancel: This will cancel sent appraisals" 
                             groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 
@@ -53,7 +53,7 @@
                             <separator string="Details" colspan="4"/>
                             <group>
                                 <field name="sequence" readonly="1"/>
-                                <field name="department_id" force_save="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="department_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="department_manager_id" readonly="1" force_save="1" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                             </group>
                             <group>
@@ -158,7 +158,7 @@
                     <field name="state"/>
                 </tree>
 			</field>
-		</record>
+		</record> 
 
 		<record id="view_pms_department_filter" model="ir.ui.view">
 			<field name="name">department</field>
@@ -185,23 +185,19 @@
 			</field>
 		</record>
  
-        <!-- learner. -->
-		<record id="action_pms_department_view" model="ir.actions.act_window">
+		<record id="action_pms_department_view_id" model="ir.actions.act_window">
 			<field name="name">Departmental template</field>
 			<field name="res_model">pms.department</field>
 			<field name="view_mode">tree,form</field>
-            <field name="domain">[("state", "in", ["review", "draft", "published"])]</field>
-            <!-- <field name="context">{'default_state': 'draft'}</field> -->
-             <field name="search_view_id" ref="hr_pms.view_pms_department_filter" />
+              <field name="domain">[]</field>
+             <!-- <field name="search_view_id" ref="hr_pms.view_pms_department_filter" /> -->
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">
 					Click To Create.
 				</p>
 			</field>
-		</record>
-
-    
-    <menuitem id="view_pms_department_menu" name="Department templates" sequence="10" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_department_view"
+		</record> 
+    <menuitem id="view_pms_department_menu" name="Department templates" sequence="10" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_department_view_id"
     groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
 </odoo>
