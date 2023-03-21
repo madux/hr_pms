@@ -12,6 +12,9 @@
                 <field name="parent_id" position="after">
                     <field name="administrative_supervisor_id" string="Administrative supervisor"/>
                     <field name="reviewer_id" string="Reviewer" required="1"/>
+                    <field name="work_unit_id" required="0"/>
+                    <field name="ps_district_id" required="0"/>
+                    <field name="employee_number" required="0"/>
                 </field>
                 <div name="button_box" position="inside">
                     <button name="open_employee_appraisals" class="oe_stat_button" groups="hr.group_hr_user" icon="fa-group" type="object">

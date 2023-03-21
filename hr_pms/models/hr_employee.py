@@ -11,12 +11,37 @@ from lxml import etree
 _logger = logging.getLogger(__name__)
 
 
+class HRUnit(models.Model):
+    _name = "hr.work.unit"
+    _description = "HR work unit"
+
+    name = fields.Many2one(
+        string="Name", 
+        required=True
+        )
+
+
+class HRDistrict(models.Model):
+    _name = "hr.district"
+    _description = "HR district"
+
+    name = fields.Char(
+        string="Name", 
+        required=True
+        )
+
+
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
     # pms_appraisal_ids = fields.Many2many('usl.employee.appraisal', string="Appraisals", readonly=True)
     administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
     reviewer_id = fields.Many2one('hr.employee', string="Reviewer")
+    work_unit_id = fields.Many2one('hr.work.unit', string="Unit/SC/Workshop/Substation")
+    ps_district_id = fields.Many2one('hr.district', string="Employee District")
+    employee_number = fields.Char(
+        string="Staff Number", 
+        )
     pms_number_appraisal = fields.Integer(string="Appraisal",)# compute="_compute_employees_component")
     pms_number_queries = fields.Integer(string="Queries",)# compute="_compute_employees_component")
     pms_number_commendation = fields.Integer(string="Commendation",)# compute="_compute_employees_component")

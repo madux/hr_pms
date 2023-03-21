@@ -482,16 +482,6 @@ class PMS_Appraisee(models.Model):
         help="Used to get the actual kra section scale because it wasnt setup",
         compute="get_kra_section_scale"
         )
-    
-    @api.depends('pms_department_id')
-    def get_kra_section_scale(self):
-        if self.pms_department_id:
-            kra_scale = self.pms_department_id.mapped('section_line_ids').filtered(
-                    lambda res: res.type_of_section == "KRA")
-            scale = kra_scale[0].section_avg_scale if kra_scale else 4
-            self.dummy_kra_section_scale = scale 
-        else:
-            self.dummy_kra_section_scale = 4
             
     employee_id = fields.Many2one(
         'hr.employee', 
@@ -645,6 +635,92 @@ class PMS_Appraisee(models.Model):
         string='Functional Competency Scale', 
         store=True,
         )
+    
+    reviewer_work_unit = fields.Char(
+        string="Reviewer Unit", 
+        related="employee_id.reviewer_id.hr_work_unit"
+        )
+    reviewer_job_title = fields.Char(
+        string="Reviewer Designation", 
+        related="employee_id.reviewer_id.job_title"
+        )
+    reviewer_job_id = fields.Char(
+        string="Reviewer Function",
+        related="employee_id.reviewer_id.job_id" 
+        )
+    reviewer_district = fields.Char(
+        string="Reviewer District", 
+        related="employee_id.reviewer_id.ps_district_id"
+        )
+    reviewer_department = fields.Char(
+        string="Reviewer District", 
+        related="employee_id.reviewer_id.department_id"
+        )
+    reviewer_employee_number = fields.Char(
+        string="Reviewer Employee Number", 
+        related="employee_id.reviewer_id.employee_number"
+        )
+    
+    manager_work_unit = fields.Char(
+        string="Manager Unit", 
+        related="employee_id.parent_id.hr_work_unit"
+        )
+    manager_job_title = fields.Char(
+        string="Manager Designation", 
+        related="employee_id.parent_id.job_title"
+        )
+    manager_job_id = fields.Char(
+        string="Manager Function", 
+        related="employee_id.parent_id.job_id"
+        )
+    manager_district = fields.Char(
+        string="Manager District", 
+        related="employee_id.parent_id.ps_district_id"
+        )
+    manager_department = fields.Char(
+        string="Manager District", 
+        related="employee_id.parent_id.department_id"
+        )
+    manager_employee_number = fields.Char(
+        string="Manager Employee Number", 
+        related="employee_id.parent_id.employee_number"
+        )
+    
+    supervisor_work_unit = fields.Char(
+        string="Supervisor Unit", 
+        related="employee_id.administrative_supervisor_id.hr_work_unit"
+
+        )
+    supervisor_job_title = fields.Char(
+        string="Supervisor Designation", 
+        related="employee_id.administrative_supervisor_id.job_title"
+
+        )
+    supervisor_job_id = fields.Char(
+        string="Supervisor Function", 
+        related="employee_id.administrative_supervisor_id.job_id"
+        )
+    supervisor_district = fields.Char(
+        string="Supervisor District", 
+        related="employee_id.administrative_supervisor_id.department_id"
+        )
+    supervisor_department = fields.Char(
+        string="Supervisor District", 
+        )
+    supervisor_employee_number = fields.Char(
+        string="Supervisor Employee Number", 
+        related="employee_id.administrative_supervisor_id.employee_number"
+        )
+    
+    @api.depends('pms_department_id')
+    def get_kra_section_scale(self):
+        if self.pms_department_id:
+            kra_scale = self.pms_department_id.mapped('section_line_ids').filtered(
+                    lambda res: res.type_of_section == "KRA")
+            scale = kra_scale[0].section_avg_scale if kra_scale else 4
+            self.dummy_kra_section_scale = scale 
+        else:
+            self.dummy_kra_section_scale = 4
       
     @api.depends('kra_section_line_ids')
     def compute_final_kra_score(self):

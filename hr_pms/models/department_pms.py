@@ -229,10 +229,10 @@ class PMSDepartment(models.Model):
     def button_cancel(self):
         for rec in self:
             rec.write({
-                'state' 'cancel'
+                'state':'cancel'
             })
 
     def button_set_to_draft(self):
         self.write({
-                'state' 'draft'
+                'state':'draft'
             })

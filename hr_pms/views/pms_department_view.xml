@@ -13,7 +13,7 @@
                             type="object"
                             states="draft,review" 
                             comfirm="Are you sure you want to Publish: This action will generate appraisal for employees in your department" 
-                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
+                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 
                             name="button_cancel" 

@@ -76,17 +76,40 @@
                             </h1>
                         </div>
                         <group>
-                            <separator string="Employee Appraisal Details" colspan="4"/>
+                            <separator string="Appraisee’s Personal Information" colspan="4"/>
                             <group>
                                 <field name="employee_id" readonly="1" options="{'no_create': True,'no_open': True}"/> 
-                                <field name="department_id" readonly="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
+                                <field name="department_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/>
+                                <field name="ps_district_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="pms_department_id" required="1" invisible="1" options="{'no_create': True,'no_open': True}"/> 
-    <!--                            <field name="section_id" required="1" invisible="1"/> -->
                             </group>
+                            <group>
+                                <field name="employee_number" readonly="1" force_save="1"/>
+                                <field name="job_title" readonly="1" force_save="1" string="Designation"/>
+                                <field name="work_unit_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                            </group>
+                            <separator string="Appraisee’s Personal Information" colspan="4"/>
+                            <group>
+                                <field name="employee_id" readonly="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
+                                <field name="department_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/>
+                                <field name="ps_district_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="pms_department_id" required="1" invisible="1" options="{'no_create': True,'no_open': True}"/> 
+                            </group>
+                            <group>
+                                <field name="employee_number" readonly="1" force_save="1"/>
+                                <field name="job_title" readonly="1" force_save="1" string="Designation"/>
+                                <field name="work_unit_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                            </group>
+
+                            <separator string="Employee Appraisal Details" colspan="4"/>
                             <group>
                                 <field name="pms_year_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="date_from" readonly="1" force_save="1"/> 
-                                <field name="date_end" readonly="1" force_save="1"/> 
+                                <field name="date_end" readonly="1" force_save="1"/>
+                            </group>
+                            <group>
                                 <field name="deadline" readonly="1" force_save="1"/> 
                             </group>
                             <separator string="Score Informations" colspan="4"/>
@@ -255,7 +278,7 @@
 			<field name="arch" type="xml">
 				<tree string="appraisee" create="0">
                     <field name="employee_id" readonly="1" string="Employee"/> 
-                    <field name="department_id" readonly="0" string="Employee"/>  
+                    <field name="department_id" readonly="0" string="Department"/>  
                     <field name="pms_year_id" readonly="1" string="Period"/>   
                     <field name="deadline" readonly="1" string="Deadline"/> 
                     <field name="final_kra_score" readonly="1" string="KRA Score"/> 
@@ -288,12 +311,12 @@
 			</field>
 		</record>
  
-		<record id="action_pms_appraisee_view" model="ir.actions.act_window">
+		<record id="action_pms_appraisee_view_id" model="ir.actions.act_window">
 			<field name="name">Appraisee</field>
 			<field name="res_model">pms.appraisee</field>
 			<field name="view_mode">tree,form</field>
             <field name="domain">[]</field>
-            <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field>
+            <!-- <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field> -->
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">
@@ -303,6 +326,6 @@
 			</field>
 		</record>
 
-    <menuitem id="view_pms_appraisee_menu" name="Appraisee(s)" sequence="1" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_appraisee_view"
-    groups="hr_pms.group_pms_user_id,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor,"/>
+    <menuitem id="view_pms_appraisee_menu" name="Appraisee(s)" sequence="1" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_appraisee_view_id"
+    groups="hr_pms.group_pms_user_id,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
 </odoo>
