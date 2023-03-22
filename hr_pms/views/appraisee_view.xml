@@ -91,16 +91,19 @@
                             </group>
                             <separator string="Appraisee’s Personal Information" colspan="4"/>
                             <group>
-                                <field name="employee_id" readonly="1" options="{'no_create': True,'no_open': True}"/> 
-                                <field name="job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
-                                <field name="department_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/>
-                                <field name="ps_district_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
-                                <field name="pms_department_id" required="1" invisible="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="employee_id" readonly="1" options="{'no_create': True,'no_open': True}">
+                                    <field name="job_id" readonly="1" string="Function"/>
+                                    <field name="department_id" readonly="1"/>
+                                    <field name="ps_district_id" readonly="1"/>
+                                    <field name="pms_department_id" required="1" invisible="1"/>
+                                </field>
                             </group>
                             <group>
-                                <field name="employee_number" readonly="1" force_save="1"/>
-                                <field name="job_title" readonly="1" force_save="1" string="Designation"/>
-                                <field name="work_unit_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="employee_id" readonly="1" options="{'no_create': True,'no_open': True}">
+                                    <field name="employee_number" readonly="1" force_save="1"/>
+                                    <field name="job_title" readonly="1" force_save="1" string="Designation"/>
+                                    <field name="work_unit_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/>
+                                </field>
                             </group>
 
                             <separator string="Employee Appraisal Details" colspan="4"/>

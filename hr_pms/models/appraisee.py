@@ -638,7 +638,7 @@ class PMS_Appraisee(models.Model):
     
     reviewer_work_unit = fields.Char(
         string="Reviewer Unit", 
-        related="employee_id.reviewer_id.hr_work_unit"
+        # related="employee_id.reviewer_id.hr_work_unit"
         )
     reviewer_job_title = fields.Char(
         string="Reviewer Designation", 
@@ -646,15 +646,15 @@ class PMS_Appraisee(models.Model):
         )
     reviewer_job_id = fields.Char(
         string="Reviewer Function",
-        related="employee_id.reviewer_id.job_id" 
+        # related="employee_id.reviewer_id.job_id"
         )
     reviewer_district = fields.Char(
         string="Reviewer District", 
-        related="employee_id.reviewer_id.ps_district_id"
+        # related="employee_id.reviewer_id.ps_district_id"
         )
     reviewer_department = fields.Char(
         string="Reviewer District", 
-        related="employee_id.reviewer_id.department_id"
+        # related="employee_id.reviewer_id.department_id"
         )
     reviewer_employee_number = fields.Char(
         string="Reviewer Employee Number", 
@@ -663,7 +663,7 @@ class PMS_Appraisee(models.Model):
     
     manager_work_unit = fields.Char(
         string="Manager Unit", 
-        related="employee_id.parent_id.hr_work_unit"
+        # related="employee_id.parent_id.hr_work_unit"
         )
     manager_job_title = fields.Char(
         string="Manager Designation", 
@@ -671,15 +671,15 @@ class PMS_Appraisee(models.Model):
         )
     manager_job_id = fields.Char(
         string="Manager Function", 
-        related="employee_id.parent_id.job_id"
+        # related="employee_id.parent_id.job_id"
         )
     manager_district = fields.Char(
         string="Manager District", 
-        related="employee_id.parent_id.ps_district_id"
+        # related="employee_id.parent_id.ps_district_id"
         )
     manager_department = fields.Char(
         string="Manager District", 
-        related="employee_id.parent_id.department_id"
+        # related="employee_id.parent_id.department_id"
         )
     manager_employee_number = fields.Char(
         string="Manager Employee Number", 
@@ -688,7 +688,7 @@ class PMS_Appraisee(models.Model):
     
     supervisor_work_unit = fields.Char(
         string="Supervisor Unit", 
-        related="employee_id.administrative_supervisor_id.hr_work_unit"
+        # related="employee_id.administrative_supervisor_id.hr_work_unit"
 
         )
     supervisor_job_title = fields.Char(
@@ -698,11 +698,11 @@ class PMS_Appraisee(models.Model):
         )
     supervisor_job_id = fields.Char(
         string="Supervisor Function", 
-        related="employee_id.administrative_supervisor_id.job_id"
+        # related="employee_id.administrative_supervisor_id.job_id"
         )
     supervisor_district = fields.Char(
         string="Supervisor District", 
-        related="employee_id.administrative_supervisor_id.department_id"
+        # related="employee_id.administrative_supervisor_id.department_id"
         )
     supervisor_department = fields.Char(
         string="Supervisor District", 

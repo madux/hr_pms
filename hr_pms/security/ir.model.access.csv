@@ -70,4 +70,3 @@ access_id_reviewer_pms_year,access_name_reviewer_pms_year,model_pms_year,hr_pms.
 
 access_id_kba_descriptions,access_name_kba_descriptions,model_kba_descriptions,base.group_user,1,1,1,1
 access_id_hr_work_unit,access_name_hr_work_unit,model_hr_work_unit,base.group_user,1,1,1,1
-access_id_hr_unit,access_name_hr_unit,model_hr_unit,base.group_user,1,1,1,1
