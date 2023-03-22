@@ -76,34 +76,60 @@
                             </h1>
                         </div>
                         <group>
-                            <separator string="Appraisee’s Personal Information" colspan="4"/>
+                            <separator class="alert alert-info" role="alert" string="Appraisee’s Personal Information (employee must have worked for minimum 6 months in the appraisal period)" colspan="4"/>
+                            <!-- <div class="alert alert-info" role="alert">
+                                <b>Appraisee’s Personal Information (employee must have worked for minimum 6 months in the appraisal period)</b>
+                            </div> -->
                             <group>
                                 <field name="employee_id" readonly="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
-                                <field name="department_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/>
-                                <field name="ps_district_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="department_id" readonly="1" string="Department" force_save="1" options="{'no_create': True,'no_open': True}"/>
+                                <field name="ps_district_id" readonly="1" string="District" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="pms_department_id" required="1" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                             </group>
                             <group>
-                                <field name="employee_number" readonly="1" force_save="1"/>
+                                <field name="employee_number" readonly="1" force_save="1" string="Staff ID"/>
                                 <field name="job_title" readonly="1" force_save="1" string="Designation"/>
-                                <field name="work_unit_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="work_unit_id" readonly="1" string="Unit/SC/Workshop/Substation Name" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                             </group>
-                            <separator string="Appraisee’s Personal Information" colspan="4"/>
+                            <separator class="alert alert-info" role="alert" string="Current Functional Appraiser’s (should have supervised appraisee for minimum 3 months) Personal Information" colspan="4"/>
                             <group>
-                                <field name="employee_id" readonly="1" options="{'no_create': True,'no_open': True}"/> 
-                                <field name="job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
-                                <field name="department_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/>
-                                <field name="ps_district_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
-                                <field name="pms_department_id" required="1" invisible="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="manager_id" readonly="1" string="Manager" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="manager_job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
+                                <field name="manager_department" string="Department" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/>
+                                <field name="manager_district" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                             </group>
                             <group>
-                                <field name="employee_number" readonly="1" force_save="1"/>
-                                <field name="job_title" readonly="1" force_save="1" string="Designation"/>
-                                <field name="work_unit_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="manager_employee_number" readonly="1" force_save="1" string="Staff ID"/>
+                                <field name="manager_job_title" readonly="1" force_save="1" string="Designation"/>
+                                <field name="manager_work_unit" readonly="1" string="Unit/SC/Workshop/Substation Name" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                            </group>
+                            <separator class="alert alert-info" role="alert" string="Current Administrative Appraiser’s (should have supervised appraisee for minimum 3 months) Personal Information" colspan="4"/>
+                            <group>
+                                <field name="administrative_supervisor_id" readonly="1" string="Name" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="supervisor_job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
+                                <field name="supervisor_department" string="Department" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/>
+                                <field name="supervisor_district" readonly="1" string="District" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                            </group>
+                            <group>
+                                <field name="supervisor_employee_number" readonly="1" force_save="1" string="Staff ID"/>
+                                <field name="supervisor_job_title" readonly="1" force_save="1" string="Designation"/>
+                                <field name="supervisor_work_unit" readonly="1" string="Unit/SC/Workshop/Substation Name" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                            </group>
+                            <separator class="alert alert-info" role="alert" string="Current Reviewer’s (the supervisor of the current Functional Appraiser) Personal Information" colspan="4"/>
+                            <group>
+                                <field name="reviewer_id" readonly="1" string="Reviewer" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="reviewer_job_id" readonly="1" force_save="1" string="Function" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="reviewer_department" readonly="1" string="Department" force_save="1" options="{'no_create': True,'no_open': True}"/>
+                                <field name="reviewer_district" readonly="1" string="District" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                            </group>
+                            <group>
+                                <field name="reviewer_employee_number" readonly="1" force_save="1" string="Staff ID"/>
+                                <field name="reviewer_job_title" readonly="1" force_save="1" string="Designation"/>
+                                <field name="reviewer_work_unit" readonly="1" string="Unit/SC/Workshop/Substation Name" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                             </group>
 
-                            <separator string="Employee Appraisal Details" colspan="4"/>
+                            <separator string="Appraisal Details" colspan="4"/>
                             <group>
                                 <field name="pms_year_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="date_from" readonly="1" force_save="1"/> 
@@ -113,7 +139,6 @@
                                 <field name="deadline" readonly="1" force_save="1"/> 
                             </group>
                             <separator string="Score Informations" colspan="4"/>
-
                             <group>
                             
                                 <field name="final_kra_score" readonly="1" force_save="1"/> 
