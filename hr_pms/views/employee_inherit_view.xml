@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="hr_view_employee_inherited_form_for_pms" >
+            <field name="name">hr.employee</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form" />
+            <field name="arch" type="xml"> 
+                <field name="parent_id" position="attributes">
+                    <field name="parent_id" string="Functional Manager"/>
+                </field>
+                <field name="parent_id" position="after">
+                    <field name="administrative_supervisor_id" string="Administrative supervisor"/>
+                    <field name="reviewer_id" string="Reviewer" required="1"/>
+                    <field name="work_unit_id" required="0"/>
+                    <field name="ps_district_id" required="0"/>
+                    <field name="employee_number" required="0"/>
+                </field>
+                <div name="button_box" position="inside">
+                    <button name="open_employee_appraisals" class="oe_stat_button" groups="hr.group_hr_user" icon="fa-group" type="object">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="pms_number_appraisal" readonly="1"/>
+                            </span>
+                            <span class="o_stat_text">
+                                Appraisals
+                            </span>
+                        </div>
+                    </button>
+
+                    <button name="stat_button_query" type="object" groups="hr.group_hr_user" class="oe_stat_button" icon="fa-archive">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="pms_number_queries" readonly="1" force_save="1"/>
+                            </span>
+                            <span class="o_stat_text">
+                                Queries
+                            </span>
+                        </div>
+                    </button>
+
+                    <button name="stat_button_warning" type="object" groups="hr.group_hr_user" class="oe_stat_button" icon="fa-archive">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="pms_number_warning" readonly="1" force_save="1"/>
+                            </span>
+                            <span class="o_stat_text">
+                                Warnings
+                            </span>
+                        </div>
+                    </button>
+
+                    <button name="stat_button_absent" type="object" groups="hr.group_hr_user" class="oe_stat_button" icon="fa-archive">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="pms_number_absent" readonly="1" force_save="1"/>
+                            </span>
+                            <span class="o_stat_text">
+                                Absents
+                            </span>
+                        </div>
+                    </button>
+
+                    <button name="stat_button_number_commendation" type="object" groups="hr.group_hr_user" class="oe_stat_button" icon="fa-plus">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="pms_number_commendation" readonly="1" force_save="1"/>
+                            </span>
+                            <span class="o_stat_text">
+                                Commends
+                            </span>
+                        </div>
+                    </button>
+                </div>
+
+            </field>
+        </record>
+
+        <record id="action_employee_district_view_id" model="ir.actions.act_window">
+			<field name="name">District</field>
+			<field name="res_model">hr.district</field>
+			<field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+			<field name="view_id" eval="False"/>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">
+					Click To Create.
+				</p>
+			</field>
+		</record>
+        <record id="action_employee_work_unit_view_id" model="ir.actions.act_window">
+			<field name="name">Units</field>
+			<field name="res_model">hr.work.unit</field>
+			<field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+			<field name="view_id" eval="False"/>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">
+					Click To Create.
+				</p>
+			</field>
+		</record>
+
+    <menuitem id="view_pms_district_menu" name="District" sequence="30" parent="hr_pms.view_hr_pms_config_menu" action="hr_pms.action_employee_district_view_id"
+    groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
+    <menuitem id="view_pms_unit_menu" name="Unit" sequence="31" parent="hr_pms.view_hr_pms_config_menu" action="hr_pms.action_employee_work_unit_view_id"
+    groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
+    </data>
+</odoo>

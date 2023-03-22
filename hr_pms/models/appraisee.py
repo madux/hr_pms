@@ -15,18 +15,19 @@ class KRA_SectionLine(models.Model):
     _name = "kra.section.line"
     _description= "Employee appraisee KRA Section lines"
 
+     
     kra_section_id = fields.Many2one(
         'pms.appraisee',
         string="LC Section"
     )
 
-    name = fields.Integer(
+    name = fields.Char(
         string='Description', 
-        required=True
+        
         )
     weightage = fields.Integer(
         string='Weight (Total 100%) by Appraisee', 
-        required=True
+        
         )
     
     administrative_supervisor_rating = fields.Integer(
@@ -35,10 +36,9 @@ class KRA_SectionLine(models.Model):
     self_rating = fields.Integer(
         string='Self Rating', 
         )
-    
+        
     functional_supervisor_rating = fields.Integer(
         string='FA Rating', 
-        required=True
         )
     is_functional_manager = fields.Boolean(
         string="is functional manager", 
@@ -55,6 +55,72 @@ class KRA_SectionLine(models.Model):
         default=False,
         compute="compute_user_rating_role"
         )
+
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('admin_rating', 'Admin Supervisor'),
+        ('functional_rating', 'Functional Supervisor'),
+        ('reviewer_rating', 'Reviewer'),
+        ('wating_approval', 'HR to Approve'),
+        ('done', 'Done'),
+        ('withdraw', 'Withdrawn'),
+        ], string="Status", default = "draft", readonly=True, related="kra_section_id.state")
+    
+    weighted_score = fields.Float(
+        string='Weighted (%) Score of specific KRA', 
+        store=True,
+        compute="compute_weighted_score"
+        )
+    section_avg_scale = fields.Integer(
+        string='Section Scale',
+        help="Takes in the default scale",
+        )
+    is_required = fields.Boolean(
+        string="Is required", 
+        default=False
+        )
+    
+    @api.onchange(
+        'self_rating', 
+        'functional_supervisor_rating', 
+        'administrative_supervisor_rating')
+    def onchange_rating(self):
+        if self.state == 'functional_rating':
+            if self.kra_section_id.employee_id.parent_id and self.env.user.id != self.kra_section_id.employee_id.parent_id.user_id.id:
+                raise ValidationError(
+                "Ops ! You are not entitled to add a rating \
+                    because you are not the employee's functional manager"
+                )
+        if self.state == 'admin_rating':
+            if self.kra_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id:
+                raise ValidationError(
+                "Ops ! You are not entitled to add a rating \
+                    because you are not the employee's administrative supervisor"
+                )
+            
+        if self.self_rating > 5:
+            self.self_rating = False
+            message = {
+                    'title': 'Invalid Scale',
+                    'message': 'Self rating Scale should be in the range of 1 - 5'
+                }
+            return {'warning': message}
+        if self.functional_supervisor_rating > 5:
+
+            message = {
+                    'title': 'Invalid Scale',
+                    'message': 'Functional supervisor rating Scale should be in the range of 1 - 5'
+                }
+            self.self_rating = False
+            return {'warning': message}
+        
+        if self.administrative_supervisor_rating > 5:
+            self.self_rating = False
+            message = {
+                    'title': 'Invalid Scale',
+                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - 5'
+                }
+            return {'warning': message}
     
     @api.depends('kra_section_id')
     def compute_user_rating_role(self):
@@ -69,40 +135,23 @@ class KRA_SectionLine(models.Model):
             self.is_administrative_supervisor = True if current_user == self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id else False
             self.is_reviewer = True if current_user == self.kra_section_id.employee_id.reviewer_id.user_id.id else False
         else:
-            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = True
+            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
     
-    weighted_score = fields.Integer(
-        string='Weighted (%) Score of specific KRA', 
-        required=True,
-        store=True,
-        compute="compute_weighted_score"
-        )
-    section_avg_scale = fields.Integer(
-        string='Section Scale', 
-        required=True,
-        help="Takes in the default scale",
-        store=True,
-        )
-    is_required = fields.Boolean(
-        string="Is required", 
-        default=False
-        )
-
     @api.depends(
+        'weightage',
         'administrative_supervisor_rating',
         'functional_supervisor_rating')
     def compute_weighted_score(self):
-        # =((admin_rating*0.4)+(functional_rating *0.6))/4 * weightage
+        # =(((admin_rating*40 )+(functional_rating *60))/4) * (weightage /100)
         for rec in self:
-            fc_avg_scale = rec.fc_section_id.section_id.section_avg_scale or self.section_avg_scale or 4 # or 5 is set as default in case nothing was provided
-            converted_fc_avg_scale = fc_avg_scale / 100 # i.e 35 / 100 = 0.3
-
+            fc_avg_scale = rec.section_avg_scale or 4 # or 5 is set as default in case nothing was provided
             if rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
-                ar = rec.administrative_supervisor_rating * 0.4
-                f_rating = 0.4 if rec.administrative_supervisor_rating > 0 else 0.6
+
+                ar = rec.administrative_supervisor_rating * 40
+                f_rating = 60 if rec.administrative_supervisor_rating > 0 else 100
                 fr = rec.functional_supervisor_rating * f_rating
-                ratings = (ar + fr) / converted_fc_avg_scale
-                rec.weighted_score = (ar + fr) * rec.weightage
+                ratings = (ar + fr) / fc_avg_scale
+                rec.weighted_score = ratings * (rec.weightage / 100)
             else:
                 rec.weighted_score = 0
 
@@ -116,13 +165,11 @@ class LC_SectionLine(models.Model):
         string="LC Section"
     )
 
-    name = fields.Integer(
-        string='Description', 
-        required=True
+    name = fields.Char(
+        string='Description',
         )
     weightage = fields.Integer(
         string='Weight (Total 100%)', 
-        required=True,
         default=20,
         readonly=True
         )
@@ -131,12 +178,12 @@ class LC_SectionLine(models.Model):
         string='AA Rating', 
         )
     functional_supervisor_rating = fields.Integer(
-        string='FA Rating', 
-        required=True
+        string='FA Rating',
         )
     reviewer_rating = fields.Integer(
         string='RA Rating',
-        )
+        ) 
+        
     is_functional_manager = fields.Boolean(
         string="is functional manager", 
         default=False,
@@ -152,14 +199,12 @@ class LC_SectionLine(models.Model):
         default=False,
         compute="compute_user_rating_role"
         )
-    weighted_score = fields.Integer(
+    weighted_score = fields.Float(
         string='Weighted (%) Score of specific KRA', 
-        required=True,
         compute="compute_weighted_score"
         )
     section_avg_scale = fields.Integer(
         string='Section Scale', 
-        required=True,
         help="Takes in the default scale",
         store=True,
         )
@@ -167,7 +212,66 @@ class LC_SectionLine(models.Model):
         string="Is required", 
         default=False
         )
-    @api.depends('kra_section_id')
+    
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('admin_rating', 'Admin Supervisor'),
+        ('functional_rating', 'Functional Supervisor'),
+        ('reviewer_rating', 'Reviewer'),
+        ('wating_approval', 'HR to Approve'),
+        ('done', 'Done'),
+        ('withdraw', 'Withdrawn'),
+        ], string="Status", default = "draft", readonly=True, related="lc_section_id.state")
+    
+    @api.onchange(
+        'functional_supervisor_rating', 
+        'administrative_supervisor_rating',
+        'reviewer_rating'
+        )
+    def onchange_rating(self):
+        if self.state == 'functional_rating':
+            if self.lc_section_id.employee_id.parent_id and self.env.user.id != self.lc_section_id.employee_id.parent_id.user_id.id:
+                raise ValidationError(
+                "Ops ! You are not entitled to add a rating \
+                    because you are not the employee's functional manager"
+                )
+        if self.state == 'admin_rating':
+            if self.lc_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.lc_section_id.employee_id.administrative_supervisor_id.user_id.id:
+                raise ValidationError(
+                "Ops ! You are not entitled to add a rating \
+                    because you are not the employee's administrative supervisor"
+                )
+        if self.state == 'reviewer_rating':
+            if self.lc_section_id.employee_id.reviewer_id and self.env.user.id != self.lc_section_id.employee_id.reviewer_id.user_id.id:
+                raise ValidationError(
+                "Ops ! You are not entitled to add a rating \
+                    because you are not the employee's reviewer"
+                )
+            
+        if self.functional_supervisor_rating > 5:
+            message = {
+                    'title': 'Invalid Scale',
+                    'message': 'Functional supervisor rating Scale should be in the range of 1 - 5'
+                }
+            self.functional_supervisor_rating = False
+            return {'warning': message}
+        if self.administrative_supervisor_rating > 5:
+            self.administrative_supervisor_rating = False
+            message = {
+                    'title': 'Invalid Scale',
+                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - 5'
+                }
+            return {'warning': message}
+        if self.reviewer_rating > 5:
+            self.reviewer_rating = False
+            message = {
+                    'title': 'Invalid Scale',
+                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - 5'
+                }
+            return {'warning': message}
+    
+    
+    @api.depends('lc_section_id')
     def compute_user_rating_role(self):
         """
         Used to determine if the current user
@@ -175,27 +279,27 @@ class LC_SectionLine(models.Model):
         administrative supervisor or reviewer
         """
         current_user = self.env.uid 
-        if self.kra_section_id:
-            self.is_functional_manager = True if current_user == self.kra_section_id.employee_id.parent_id.user_id.id else False
-            self.is_administrative_supervisor = True if current_user == self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id else False
-            self.is_reviewer = True if current_user == self.kra_section_id.employee_id.reviewer_id.user_id.id else False
+        if self.lc_section_id:
+            self.is_functional_manager = True if current_user == self.lc_section_id.employee_id.parent_id.user_id.id else False
+            self.is_administrative_supervisor = True if current_user == self.lc_section_id.employee_id.administrative_supervisor_id.user_id.id else False
+            self.is_reviewer = True if current_user == self.lc_section_id.employee_id.reviewer_id.user_id.id else False
         else:
-            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = True
+            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
     
     @api.depends(
         'administrative_supervisor_rating',
-        'functional_supervisor_rating'
-        'reviewer_rating')
+        'functional_supervisor_rating',
+        'reviewer_rating',
+        'weightage')
     def compute_weighted_score(self):
         for rec in self:
-            fc_avg_scale = rec.fc_section_id.section_id.section_avg_scale or self.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
-            converted_fc_avg_scale = fc_avg_scale / 100 # i.e 35 / 100 = 0.3
+            fc_avg_scale = rec.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
-                ar = rec.administrative_supervisor_rating * 0.3
-                f_rating = 0.3 if rec.administrative_supervisor_rating > 0 else 0.6
+                ar = rec.administrative_supervisor_rating * 30
+                f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
                 fr = rec.functional_supervisor_rating * f_rating
-                rr = rec.reviewer_rating * 0.4
-                ratings = (ar + fr + rr) / converted_fc_avg_scale
+                rr = rec.reviewer_rating * 40
+                ratings = (ar + fr + rr) / fc_avg_scale
                 rec.weighted_score = ratings * (rec.weightage / 100)
             else:
                 rec.weighted_score = 0
@@ -211,9 +315,8 @@ class FC_SectionLine(models.Model):
         string="KRA Section"
     )
 
-    name = fields.Integer(
+    name = fields.Char(
         string='Description', 
-        required=True
         )
     weightage = fields.Integer(
         string='Weight (Total 100%)', 
@@ -226,7 +329,6 @@ class FC_SectionLine(models.Model):
         )
     functional_supervisor_rating = fields.Integer(
         string='FA Rating', 
-        required=True
         )
     reviewer_rating = fields.Integer(
         string='RA Rating',
@@ -247,14 +349,12 @@ class FC_SectionLine(models.Model):
         compute="compute_user_rating_role"
         )
     
-    weighted_score = fields.Integer(
+    weighted_score = fields.Float(
         string='Weighted (%) Score of specific KRA', 
-        required=True,
         compute="compute_weighted_score"
         )
     section_avg_scale = fields.Integer(
         string='Section Scale', 
-        required=True,
         help="Takes in the default scale",
         store=True,
         )
@@ -263,7 +363,63 @@ class FC_SectionLine(models.Model):
         default=False
         )
     
-    @api.depends('kra_section_id')
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('admin_rating', 'Admin Supervisor'),
+        ('functional_rating', 'Functional Supervisor'),
+        ('reviewer_rating', 'Reviewer'),
+        ('wating_approval', 'HR to Approve'),
+        ('done', 'Done'),
+        ('withdraw', 'Withdrawn'),
+        ], string="Status", default = "draft", readonly=True, related="fc_section_id.state")
+    
+    @api.onchange(
+        'functional_supervisor_rating', 
+        'administrative_supervisor_rating',
+        'reviewer_rating'
+        )
+    def onchange_rating(self):
+        if self.state == 'functional_rating':
+            if self.fc_section_id.employee_id.parent_id and self.env.user.id != self.fc_section_id.employee_id.parent_id.user_id.id:
+                raise ValidationError(
+                "Ops ! You are not entitled to add a rating \
+                    because you are not the employee's functional manager"
+                )
+        if self.state == 'admin_rating':
+            if self.fc_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.fc_section_id.employee_id.administrative_supervisor_id.user_id.id:
+                raise ValidationError(
+                "Ops ! You are not entitled to add a rating \
+                    because you are not the employee's administrative supervisor"
+                )
+        if self.state == 'reviewer_rating':
+            if self.fc_section_id.employee_id.reviewer_id and self.env.user.id != self.fc_section_id.employee_id.reviewer_id.user_id.id:
+                raise ValidationError(
+                "Ops ! You are not entitled to add a rating \
+                    because you are not the employee's reviewer"
+                )
+        if self.functional_supervisor_rating > 5:
+            message = {
+                    'title': 'Invalid Scale',
+                    'message': 'Functional supervisor rating Scale should be in the range of 1 - 5'
+                }
+            self.functional_supervisor_rating = False
+            return {'warning': message}
+        if self.administrative_supervisor_rating > 5:
+            self.administrative_supervisor_rating = False
+            message = {
+                    'title': 'Invalid Scale',
+                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - 5'
+                }
+            return {'warning': message}
+        if self.reviewer_rating > 5:
+            self.reviewer_rating = False
+            message = {
+                    'title': 'Invalid Scale',
+                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - 5'
+                }
+            return {'warning': message}
+    
+    @api.depends('fc_section_id')
     def compute_user_rating_role(self):
         """
         Used to determine if the current user
@@ -271,17 +427,14 @@ class FC_SectionLine(models.Model):
         administrative supervisor or reviewer
         """
         current_user = self.env.uid 
-        if self.kra_section_id:
-            self.is_functional_manager = True if current_user == self.kra_section_id.employee_id.parent_id.user_id.id else False
-            self.is_administrative_supervisor = True if current_user == self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id else False
-            self.is_reviewer = True if current_user == self.kra_section_id.employee_id.reviewer_id.user_id.id else False
+        if self.fc_section_id:
+            self.is_functional_manager = True if current_user == self.fc_section_id.employee_id.parent_id.user_id.id else False
+            self.is_administrative_supervisor = True if current_user == self.fc_section_id.employee_id.administrative_supervisor_id.user_id.id else False
+            self.is_reviewer = True if current_user == self.fc_section_id.employee_id.reviewer_id.user_id.id else False
         else:
-            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = True
+            self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
     
-    @api.depends(
-        'administrative_supervisor_rating',
-        'functional_supervisor_rating'
-        'reviewer_rating')
+    @api.depends('administrative_supervisor_rating','functional_supervisor_rating','reviewer_rating')
     def compute_weighted_score(self):
         '''
         ar: adminitrative rating
@@ -290,14 +443,13 @@ class FC_SectionLine(models.Model):
         section_avg_scale: scale configured to be used to divide the ratings
         '''
         for rec in self:
-            fc_avg_scale = rec.fc_section_id.section_id.section_avg_scale or self.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
-            converted_fc_avg_scale = fc_avg_scale / 100 # i.e 35 / 100 = 0.3
+            fc_avg_scale = rec.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
-                ar = rec.administrative_supervisor_rating * 0.3
-                f_rating = 0.3 if rec.administrative_supervisor_rating > 0 else 0.6
+                ar = rec.administrative_supervisor_rating * 30
+                f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
                 fr = rec.functional_supervisor_rating * f_rating
-                rr = rec.reviewer_rating * 0.4
-                ratings = (ar + fr + rr) / converted_fc_avg_scale
+                rr = rec.reviewer_rating * 40
+                ratings = (ar + fr + rr) / fc_avg_scale
                 rec.weighted_score = ratings
             else:
                 rec.weighted_score = 0
@@ -312,27 +464,96 @@ class PMS_Appraisee(models.Model):
         string="Description Name", 
         required=True
         )
-    department_id = fields.Manyone(
-        'hr.department', 
-        string="Department ID"
-        )
-    pms_department_id = fields.Manyone(
+    pms_department_id = fields.Many2one(
         'pms.department', 
         string="PMS Department ID"
         )
-    section_id = fields.Manyone(
+    section_id = fields.Many2one(
         'pms.section', 
         string="Section ID",
         )
-    employee_id = fields.Manyone(
+    
+    dummy_kra_section_scale = fields.Integer(
+        string="Dummy KRA Section scale",
+        help="Used to get the actual kra section scale because it wasnt setup",
+        compute="get_kra_section_scale"
+        )
+            
+    employee_id = fields.Many2one(
         'hr.employee', 
         string="Employee"
+        )
+    employee_number = fields.Char( 
+        string="Staff ID",
+        related="employee_id.employee_number"
+        )
+    job_title = fields.Char( 
+        string="Job title",
+        related="employee_id.job_title"
+        )
+    work_unit_id = fields.Many2one(
+        'hr.work.unit',
+        string="Job title",
+        related="employee_id.work_unit_id"
+        )
+    job_id = fields.Many2one(
+        'hr.job',
+        string="Function", 
+        related="employee_id.job_id"
+        )
+    ps_district_id = fields.Many2one(
+        'hr.district',
+        string="District", 
+        related="employee_id.ps_district_id"
+        )
+    department_id = fields.Many2one(
+        'hr.department', 
+        string="Department ID"
+        )
+    reviewer_id = fields.Many2one(
+        'hr.employee', 
+        string="Reviewer",
+        related="employee_id.reviewer_id"
+        )
+    
+    administrative_supervisor_id = fields.Many2one(
+        'hr.employee', 
+        string="Administrative Supervisor",
+        related="employee_id.administrative_supervisor_id"
+        )
+    
+    manager_id = fields.Many2one(
+        'hr.employee', 
+        string="Functional Manager",
+        related="employee_id.parent_id"
+
         )
     approver_ids = fields.Many2many(
         'hr.employee', 
         string="Approvers",
         readonly=True
         )
+    appraisee_comment = fields.Text(
+        string="Appraisee Comment", 
+        )
+    supervisor_comment = fields.Text(
+        string="Supervisor Comment", 
+        )
+    manager_comment = fields.Text(
+        string="Manager Comment", 
+        )
+    reviewer_comment = fields.Text(
+        string="Appraisee Comment", 
+        )
+    appraisee_satisfaction = fields.Selection([
+        ('none', ''),
+        ('satisfied', 'Satisfied'),
+        ('not_satisfied', 'Not Satisfied'),
+        ('agreed', 'Agreed'),
+        ('disagreed', 'Disagreed'),
+        ('agreed', 'Agreed'),
+        ('agreed', 'Agreed'),
+        ], string="Satisfaction", default = "none")
     
     line_manager_id = fields.Many2one(
         'hr.employee', 
@@ -363,7 +584,9 @@ class PMS_Appraisee(models.Model):
 
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('rating', 'Admin Supervisor/Functional Supervisor/Reviewer'),
+        ('admin_rating', 'Admin Supervisor'),
+        ('functional_rating', 'Functional Supervisor'),
+        ('reviewer_rating', 'Reviewer'),
         ('wating_approval', 'HR to Approve'),
         ('done', 'Done'),
         ('withdraw', 'Withdrawn'),
@@ -385,35 +608,31 @@ class PMS_Appraisee(models.Model):
         # compute="get_appraisal_deadline", 
         store=True)
 
-    overall_score = fields.Date(
+    overall_score = fields.Float(
         string="Overall score", 
         compute="compute_overall_score", 
         store=True)
- 
-    
-    final_kra_score = fields.Integer(
+
+    final_kra_score = fields.Float(
         string='Final KRA Score', 
-        required=True,
         store=True,
         compute="compute_final_kra_score"
         )
     
-    final_fc_score = fields.Integer(
+    final_fc_score = fields.Float(
         string='Final FC Score', 
-        required=True,
         store=True,
         compute="compute_final_fc_score"
         )
     
-    final_lc_score = fields.Integer(
+    final_lc_score = fields.Float(
         string='Final LC Score', 
-        required=True,
         store=True,
         compute="compute_final_lc_score"
         )
     
     # consider removing
-    kra_section_weighted_score = fields.Integer(
+    kra_section_weighted_score = fields.Float(
         string='KRA Weight', 
         readonly=True,
         store=True,
@@ -436,18 +655,121 @@ class PMS_Appraisee(models.Model):
         readonly=True,
         store=True,
         )
-    # consider removing
-    lc_section_weighted_score = fields.Integer(
-        string='Leadership Competency Scale', 
-        required=True,
-        store=True,
-        )
+     
     # consider removing
     fc_section_avg_scale = fields.Integer(
         string='Functional Competency Scale', 
-        required=True,
         store=True,
         )
+    
+    reviewer_work_unit = fields.Many2one(
+        'hr.work.unit',
+        string="Reviewer Unit", 
+        related="employee_id.reviewer_id.work_unit_id"
+        )
+    
+    # @api.depends()
+    # def compute_reviewer_details(self):
+    #     reviewer_work_unit=self.employee_id.reviewer_id.hr_work_unit.name
+    #     self.reviewer_work_unit = reviewer_work_unit
+
+    #     reviewer_job_id =self.employee_id.reviewer_id.job_id.name
+    #     self.reviewer_work_unit = reviewer_job_id
+
+    #     reviewer_job_id =self.employee_id.reviewer_id.job_id.name
+    #     self.reviewer_work_unit = reviewer_job_id
+
+    reviewer_job_title = fields.Char(
+        string="Reviewer Designation", 
+        related="employee_id.reviewer_id.job_title"
+        )
+    reviewer_job_id = fields.Many2one(
+        'hr.job',
+        string="Reviewer Function",
+        related="employee_id.reviewer_id.job_id" 
+        )
+    reviewer_district = fields.Many2one(
+        'hr.district',
+        string="Reviewer District", 
+        related="employee_id.reviewer_id.ps_district_id"
+        )
+    reviewer_department = fields.Many2one(
+        'hr.department',
+        string="Reviewer department", 
+        related="employee_id.reviewer_id.department_id"
+        )
+    reviewer_employee_number = fields.Char(
+        string="Reviewer Employee Number", 
+        related="employee_id.reviewer_id.employee_number"
+        )
+    
+    manager_work_unit = fields.Many2one(
+        'hr.work.unit',
+        string="Manager Unit", 
+        related="employee_id.parent_id.work_unit_id"
+        )
+    manager_job_title = fields.Char(
+        string="Manager Designation", 
+        related="employee_id.parent_id.job_title"
+        )
+    manager_job_id = fields.Many2one(
+        'hr.job',
+        string="Manager Function", 
+        related="employee_id.parent_id.job_id"
+        )
+    manager_district = fields.Many2one(
+        'hr.district',
+        string="Manager District", 
+        related="employee_id.parent_id.ps_district_id"
+        )
+    
+    manager_department = fields.Many2one(
+        'hr.department',
+        string="Manager department", 
+        related="employee_id.parent_id.department_id"
+        )
+    manager_employee_number = fields.Char(
+        string="Manager Employee Number", 
+        related="employee_id.parent_id.employee_number"
+        )
+    supervisor_work_unit = fields.Many2one(
+        'hr.work.unit',
+        string="Supervisor Unit", 
+        related="employee_id.administrative_supervisor_id.work_unit_id"
+        )
+    supervisor_job_title = fields.Char(
+        string="Supervisor Designation", 
+        related="employee_id.administrative_supervisor_id.job_title"
+        )
+    supervisor_job_id = fields.Many2one(
+        'hr.job',
+        string="Supervisor Function", 
+        related="employee_id.administrative_supervisor_id.job_id"
+        )
+    supervisor_department = fields.Many2one(
+        'hr.department',
+        string="Supervisor Dept", 
+        related="employee_id.administrative_supervisor_id.department_id"
+        )
+    supervisor_district = fields.Many2one(
+        'hr.district',
+        string="Supervisor District", 
+        related="employee_id.administrative_supervisor_id.ps_district_id"
+        )
+    supervisor_employee_number = fields.Char(
+        string="Supervisor Employee Number", 
+        related="employee_id.administrative_supervisor_id.employee_number"
+        )
+    
+    @api.depends('pms_department_id')
+    def get_kra_section_scale(self):
+        if self.pms_department_id:
+            kra_scale = self.pms_department_id.mapped('section_line_ids').filtered(
+                    lambda res: res.type_of_section == "KRA")
+            scale = kra_scale[0].section_avg_scale if kra_scale else 4
+            self.dummy_kra_section_scale = scale 
+        else:
+            self.dummy_kra_section_scale = 4
       
     @api.depends('kra_section_line_ids')
     def compute_final_kra_score(self):
@@ -484,64 +806,84 @@ class PMS_Appraisee(models.Model):
 
     @api.depends(
             'final_kra_score',
-            'lc_kra_score',
-            'fc_kra_score'
+            'final_lc_score',
+            'final_fc_score'
             ) 
     def compute_overall_score(self):
         for rec in self:
             if rec.final_kra_score and rec.final_lc_score and rec.final_fc_score:
                 kra_section_weighted_score = rec.pms_department_id.hr_category_id.kra_weighted_score 
                 fc_section_weighted_score = rec.pms_department_id.hr_category_id.fc_weighted_score
-                lc_section_weighted_score = rec.rec.pms_department_id.hr_category_id.lc_weighted_score 
+                lc_section_weighted_score = rec.pms_department_id.hr_category_id.lc_weighted_score 
 
                 # rec.section_id.weighted_score
-                # e.g 35 % * kra_final + 60% * lc_final + 15% * fc_final
-                rec.overall_score = kra_section_weighted_score * rec.final_kra_score + \
-                fc_section_weighted_score * rec.final_fc_score + \
-                lc_section_weighted_score * rec.final_lc_score
+                # e.g 35 % * kra_final + 60% * lc_final * 15% + fc_final * 45%
+                # e.g 35 % * kra_final + 0.60% * lc_final * 0.15% + fc_final * 0.45
+
+                rec.overall_score = (kra_section_weighted_score / 100) * rec.final_kra_score + \
+                (fc_section_weighted_score/ 100) * rec.final_fc_score + \
+                (lc_section_weighted_score/ 100) * rec.final_lc_score
             else:
                 rec.overall_score = 0
         
     def check_kra_section_lines(self):
         # if the employee has administrative reviewer, 
         # system should validate to see if they have rated
-        if self.employee_id.administrative_supervisor_id:
-            aa_kra_line_not_rated = self.mapped('kra_section_line_ids').filtered(
-                lambda line: line.administrative_supervisor_id < 1)
-            if aa_kra_line_not_rated:
-                raise ValidationError("Please ensure all the administrative supervisors has rated above 0")
-        # checks if employee is attached to any manager N/B manager is the functional suprv.
-        if not (self.employee_id.department_id.parent_id or self.employee_id.parent_id):
-            fc_kra_line_not_rated = self.mapped('kra_section_line_ids').filtered(
-                lambda line: line.functional_supervisor_rating < 1)
-            if fc_kra_line_not_rated:
-                raise ValidationError("Please ensure all the functional supervisors has rated above 0")
+        if self.state == "admin_rating":
+            if self.mapped('kra_section_line_ids').filtered(
+                lambda line: line.administrative_supervisor_rating < 1):
+                raise ValidationError(
+                    "Ops! Please ensure all administrative supervisor rating is above 1"
+                )
+        elif self.state == "functional_rating":
+            if self.mapped('kra_section_line_ids').filtered(
+                lambda line: line.functional_supervisor_rating < 1):
+                raise ValidationError(
+                    "Ops! Please ensure all functional manager rating is above 1"
+                ) 
             
-    def check_fc_lc_section_lines(self):
-        # if the employee has administrative reviewer, 
-        # system should validate to see if they have rated
-        if self.employee_id.administrative_supervisor_id:
-            aa_fc_line_not_rated = self.mapped('fc_section_line_ids').filtered(
-                lambda line: line.administrative_supervisor_id < 1)
-            if aa_fc_line_not_rated:
-                raise ValidationError("Please ensure all the functional lines are rated above 0")
-        # checks if employee is attached to any manager N/B manager is the functional suprv.
-        if not (self.employee_id.department_id.parent_id or self.employee_id.parent_id):
-            fc_kra_line_not_rated = self.mapped('fc_section_line_ids').filtered(
-                lambda line: line.functional_supervisor_rating < 1)
-            if fc_kra_line_not_rated:
+    def check_fc_section_lines(self):
+        if self.state == "admin_rating":
+            if self.mapped('fc_section_line_ids').filtered(
+                lambda line: line.administrative_supervisor_rating < 1):
                 raise ValidationError(
-                    "Please ensure all the functional lines are rated above 0"
-                    )
-        
-        if self.employee_id.reviewer_id:
-            aa_fc_line_not_rated = self.mapped('fc_section_line_ids').filtered(
-                lambda line: line.reviewer_rating < 1)
-            if aa_fc_line_not_rated:
+                    "Ops! Please ensure all administrative supervisor rating is above 1"
+                )
+        elif self.state == "functional_rating":
+            if self.mapped('fc_section_line_ids').filtered(
+                lambda line: line.functional_supervisor_rating < 1):
                 raise ValidationError(
-                    "Please ensure all the reviwer lines are rated above 0"
-                    )
-        
+                    "Ops! Please ensure all functional manager rating is above 1"
+                )
+
+        elif self.state == "reviewer_rating":
+            if self.mapped('fc_section_line_ids').filtered(
+                lambda line: line.reviewer_rating < 1):
+                raise ValidationError(
+                    "Ops! Please ensure all functional manager rating is above 1"
+                ) 
+            
+    def check_lc_section_lines(self):
+        if self.state == "admin_rating":
+            if self.mapped('lc_section_line_ids').filtered(
+                lambda line: line.administrative_supervisor_rating < 1):
+                raise ValidationError(
+                    "Ops! Please ensure all administrative supervisor's rating is above 1"
+                )
+        elif self.state == "functional_rating":
+            if self.mapped('lc_section_line_ids').filtered(
+                lambda line: line.functional_supervisor_rating < 1):
+                raise ValidationError(
+                    "Ops! Please ensure all functional manager's rating is above 1"
+                )
+
+        elif self.state == "reviewer_rating":
+            if self.mapped('lc_section_line_ids').filtered(
+                lambda line: line.reviewer_rating < 1):
+                raise ValidationError(
+                    "Ops! Please ensure all reviewer's rating is above 1"
+                ) 
+    
     def _get_group_users(self):
         group_obj = self.env['res.groups']
         hr_administrator = self.env.ref('hr.group_hr_manager').id
@@ -558,7 +900,7 @@ class PMS_Appraisee(models.Model):
     
     def submit_mail_notification(self): 
         subject = "Appraisal Notification"
-        department_manager = self.department_id.parent_id or self.employee_id.parent_id
+        department_manager = self.employee_id.parent_id or self.employee_id.parent_id
         supervisor = self.employee_id.administrative_supervisor_id
         reviewer_id = self.employee_id.reviewer_id
         hr_admin, pms_mgr, pms_off = self._get_group_users()
@@ -598,7 +940,7 @@ class PMS_Appraisee(models.Model):
                     self.get_url(self.id, self._name),
                     self.env.user.name,
                     )
-            email_to = ','.join([hr_logins])
+            email_to = ','.join(hr_logins)
             email_cc = [
                     supervisor.work_email, 
                     reviewer_id.work_email,
@@ -626,37 +968,185 @@ class PMS_Appraisee(models.Model):
                     supervisor.work_email, 
                     reviewer_id.work_email,
                 ]
-        self.env['pms.category'].action_notify(
+        self.action_notify(
             subject, 
             msg, 
             email_to, 
             email_cc)
+        
+    def action_notify(self, subject, msg, email_to, email_cc):
+        email_from = self.env.user.email
+        email_ccs = list(filter(bool, email_cc))
+        reciepients = (','.join(items for items in email_ccs)) if email_ccs else False
+        mail_data = {
+                'email_from': email_from,
+                'subject': subject,
+                'email_to': email_to,
+                'reply_to': email_from,
+                'email_cc': reciepients,
+                'body_html': msg,
+                'state': 'sent'
+            }
+        mail_id = self.env['mail.mail'].sudo().create(mail_data)
+        self.env['mail.mail'].sudo().send(mail_id)
+        self.message_post(body=msg)
+    
+    def get_url(self, id, name):
+        base_url = http.request.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        base_url += '/web#id=%d&view_type=form&model=%s' % (id, name)
+        return "<a href={}> </b>Click<a/>. ".format(base_url)
+
+    def send_mail_notification(self, msg):
+        subject = "Appraisal Notification"
+        administrative_supervisor = self.employee_id.administrative_supervisor_id
+        reviewer_id = self.employee_id.reviewer_id
+        # doing this to avoid making calls that will impact optimization
+        department_manager = self.employee_id.parent_id
+        if self.state == "draft":
+            email_to = administrative_supervisor.work_email if self.administrative_supervisor_id.work_email else department_manager.work_email
+            email_cc = [
+            department_manager.work_email,
+            reviewer_id.work_email, 
+            administrative_supervisor.work_email,
+        ]
+        elif self.state == "admin_rating":
+            email_to = department_manager.work_email
+            email_cc = [
+                department_manager.work_email,
+                self.employee_id.work_email
+                ]
+        elif self.state == "functional_rating":
+            email_to = reviewer_id.work_email
+            email_cc = [
+                department_manager.work_email,
+                self.employee_id.work_email,
+                administrative_supervisor.work_email,
+                ]
+        elif self.state == "reviewer_rating":
+            email_to = self.employee_id.work_email,
+            email_cc = [
+                department_manager.work_email,
+                administrative_supervisor.work_email,
+                ]
+        else:
+            email_to = department_manager.work_email,
+            email_cc = [
+                department_manager.work_email,
+                administrative_supervisor.work_email,
+                ]
+        self.action_notify(subject, msg, email_to, email_cc)
 
     def button_submit(self):
         # send notification
-        self.write({
-                'state' 'rating'
+        admin_or_functional_user = self.administrative_supervisor_id.name or self.manager_id.name
+        msg = """Dear {}, <br/> 
+        I wish to notify you that an appraisal for {} \
+        has been submitted for ratings.\
+        <br/>Kindly {} to review <br/>\
+        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+            admin_or_functional_user,
+            self.employee_id.name,
+            self.get_url(self.department_id.id, self._name),
+            self.env.user.name,
+            self.department_id.name,
+            )
+        self.send_mail_notification(msg)
+        
+        if self.employee_id.administrative_supervisor_id:
+            self.write({
+                'state': 'admin_rating',
+                'administrative_supervisor_id': self.employee_id.administrative_supervisor_id.id,
+            })
+        else:
+            self.write({
+                'state': 'functional_rating',
+                'manager_id': self.employee_id.parent_id.id,
             })
             
-    def button_submit_rating(self): #'rating'
+    def button_admin_supervisor_rating(self): 
+        msg = """Dear {}, <br/> 
+        I wish to notify you that an appraisal for {} \
+        has been submitted for functional manager's ratings.\
+        <br/>Kindly {} to review <br/>\
+        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+            self.employee_id.parent_id.name,
+            self.employee_id.name,
+            self.get_url(self.department_id.id, self._name),
+            self.env.user.name,
+            self.administrative_supervisor_id.department_id.name,
+            )
+        if not self.employee_id.parent_id:
+            raise ValidationError(
+                'Ops ! please ensure that a manager is assigned to the employee'
+                )
+        if self.employee_id.administrative_supervisor_id and self.env.user.id != self.administrative_supervisor_id.user_id.id:
+            raise ValidationError(
+                "Ops ! You are not entitled to submit this rating because you are not the employee's administrative supervisor"
+                )
         self.check_kra_section_lines()
-        self.check_fc_lc_section_lines()
-        self.submit_mail_notification()
+        self.check_fc_section_lines()
+        self.check_lc_section_lines()
+        self.send_mail_notification(msg)
         self.write({
-                'state' 'wating_approval'
+                'state': 'functional_rating',
+                'manager_id': self.employee_id.parent_id.id,
+            })
+        
+    def button_functional_manager_rating(self):
+        if not self.employee_id.reviewer_id:
+            raise ValidationError(
+                "Ops ! please ensure that a reviewer is assigned to the employee"
+                )
+        if self.employee_id.parent_id and self.env.user.id != self.employee_id.parent_id.user_id.id:
+            raise ValidationError(
+                "Ops ! You are not entitled to submit this rating because you are not the employee's functional manager"
+                )
+        self.check_kra_section_lines()
+        self.check_fc_section_lines()
+        self.check_lc_section_lines()
+
+        msg = """Dear {}, <br/> 
+        I wish to notify you that an appraisal for {} \
+        has been submitted for reviewer's ratings.\
+        <br/>Kindly {} to review <br/>\
+        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+            self.employee_id.parent_id.name,
+            self.employee_id.name,
+            self.get_url(self.department_id.id, self._name),
+            self.env.user.name,
+            self.manager_id.department_id.name,
+            )
+        self.send_mail_notification(msg)
+        self.write({
+                'state': 'reviewer_rating',
+                'reviewer_id': self.employee_id.reviewer_id.id,
             })
     
-    def button_done(self):
+    def button_reviewer_manager_rating(self):
+        if self.employee_id.reviewer_id and self.env.user.id != self.employee_id.reviewer_id.user_id.id:
+            raise ValidationError(
+                "Ops ! You are not entitled to submit this rating because you are not the employee's reviewing manager"
+                )
+        self.check_fc_section_lines()
+        self.check_lc_section_lines()
+        msg = """Dear {}, <br/> 
+        I wish to notify you that your appraisal has been reviewed successfully.\
+        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+            self.employee_id.name,
+            self.env.user.name,
+            self.reviewer_id.department_id.name,
+            )
+        self.send_mail_notification(msg)
         self.write({
-                'state' 'done'
+                'state': 'done',
             })
         
     def button_withdraw(self):
         self.write({
-                'state' 'withdraw'
+                'state':'withdraw',
             })
         
     def button_set_to_draft(self):
         self.write({
-                'state' 'draft'
+                'state':'draft',
             })

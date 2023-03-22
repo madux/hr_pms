@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from datetiime import datetime, date 
+from datetime import datetime, date
 from odoo.exceptions import ValidationError
 from odoo import http
 
@@ -13,6 +13,7 @@ class PMSJobCategory(models.Model):
         string="Name", 
         placeholder="OFFICER - MGR", 
         required=True)
+    
     sequence = fields.Char(
         string="Sequence")
         
@@ -60,7 +61,7 @@ class PMSJobCategory(models.Model):
         readonly=True, 
         store=True)
     
-    loaded_via_data = fields.Date(
+    loaded_via_data = fields.Boolean(
         string="Loaded via data", 
         readonly=True, 
         default=False, 
@@ -81,32 +82,39 @@ class PMSJobCategory(models.Model):
         'pms.department', 
         'pms_department_category_rel', 
         'department_id', 
-        'cateogry_id', 
+        'category_id',
         string="PMS Department ID")
-    
-    
-    active = fields.Date(
-        string="Active", 
-        readonly=True, 
-        default=True, 
-        store=True)
+
+    # active = fields.Date(
+    #     string="Active",
+    #     readonly=True,
+    #     default=True,
+    #     store=True)
     
     @api.constrains('job_role_ids')
     def _check_lines(self):
-        if not self.loaded_via_data and not self.mapped('job_role_ids'):
+        kra_types = self.mapped('section_ids').filtered(lambda se: se.type_of_section in ['KRA'])
+        fc_types = self.mapped('section_ids').filtered(lambda se: se.type_of_section in ['FC'])
+        lc_types = self.mapped('section_ids').filtered(lambda se: se.type_of_section in ['LC'])
+        if not self.loaded_via_data and not self.mapped('job_role_ids') and not any([kra_types,fc_types,lc_types]):
             raise ValidationError('You must assign at least one job role')
+        
+    @api.constrains('kra_weighted_score', 'fc_weighted_score', 'lc_weighted_score')
+    def check_weights(self):
+        weight_total = self.kra_weighted_score + self.fc_weighted_score + self.lc_weighted_score
+        if weight_total != 100:
+            raise ValidationError("Total of KRA, LC and FC must sum up to 100%")
 
     @api.onchange('pms_year_id')
-    def _onchange_year_id(self):
+    def onchange_year_id(self):
         '''Gets the periodic date interval from the settings'''
         if self.pms_year_id:
-            self.date_from = self.pms_year_id.date_from 
+            self.date_from = self.pms_year_id.date_from
             self.date_end = self.pms_year_id.date_end
         else:
-            self.date_from = False 
-            self.date_end = False 
+            self.date_from = False
+            self.date_end = False
 
-    
     def action_notify(self, subject, msg, email_to, email_cc):
         email_from = self.env.user.email
         email_ccs = list(filter(bool, email_cc))
@@ -117,12 +125,13 @@ class PMSJobCategory(models.Model):
                 'email_to': email_to,
                 'reply_to': email_from,
                 'email_cc': reciepients,
-                'body_html': msg
+                'body_html': msg,
+                'state': 'sent'
             }
         mail_id = self.env['mail.mail'].sudo().create(mail_data)
         self.env['mail.mail'].sudo().send(mail_id)
         self.message_post(body=msg)
-
+    
     def get_url(self, id, name):
         base_url = http.request.env['ir.config_parameter'].sudo().get_param('web.base.url')
         base_url += '/web#id=%d&view_type=form&model=%s' % (id, name)
@@ -130,7 +139,7 @@ class PMSJobCategory(models.Model):
 
     def send_mail_notification(self, pms_department_obj):
         subject = "Appraisal Notification"
-        department_manager = pms_department_obj.department_id.parent_id
+        department_manager = pms_department_obj.department_id.manager_id
         if department_manager:
             email_to = department_manager.work_email
             email_cc = [] #[rec.work_email for rec in self.approver_ids]
@@ -141,19 +150,43 @@ class PMSJobCategory(models.Model):
             <br/>Kindly {} to review <br/>\
             Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
                 department_manager.name,
-                self.name, self.employee_id.name,
+                self.name, 
                 self.get_url(pms_department_obj.id, pms_department_obj._name),
                 self.env.user.name,
                 self.env.user.company_id.name,
                 )
-        self.action_notify(subject, msg, email_to, email_cc)
+            self.action_notify(subject, msg, email_to, email_cc)
+        else:
+
+            raise ValidationError(
+                """
+                There is no work email address found for the
+                department manager- {}:""".format(
+                pms_department_obj.department_id.name)
+            )
+        
+    def check_job_role_without_department(self):
+        jr = self.mapped('job_role_ids').filtered(
+            lambda jr: not jr.department_id)
+        if jr:
+            raise ValidationError("""
+            Please ensure all the selected 
+            job roles has departments setup
+            """)
 
     def button_publish(self):
         # TODO Add publish button with security as PMS Officer,
         # Create record (pms.department) for each job role department
         # i.e if there are 4 job roles, it generates a record for each department
         # forwards the mail notification to the department managers
+        ########## clears generated department
+        cancelled_pms_department_ids = self.mapped('pms_department_ids').filtered(
+            lambda s: s.state == 'cancel')
+        if cancelled_pms_department_ids:
+            self.pms_department_ids = [(3, rec.id) for rec in cancelled_pms_department_ids]
+        #########
         if self.job_role_ids and self.section_ids:
+            self.check_job_role_without_department()
             # filters set of departments to forward generate
             department_ids = set([depart.department_id.id for depart in self.job_role_ids])
             Pms_Department = self.env['pms.department']
@@ -164,12 +197,15 @@ class PMSJobCategory(models.Model):
                     pms_department = Pms_Department.create({
                         'name': self.name,
                         'department_id': department_id.id,
+                        'department_manager_id': department_id.manager_id.id,
                         'pms_year_id': self.pms_year_id.id,
                         'date_from': self.pms_year_id.date_from,
                         'date_end': self.pms_year_id.date_end,
                         'deadline': self.deadline,
+                        'state': 'review',
                         'hr_category_id': self.id,
                         'section_line_ids': [(0, 0, {
+                            # 'pms_department_id': dep.id,
                             'section_id': sec.id,
                             'name': sec.name,
                             'max_line_number': sec.max_line_number,
@@ -179,21 +215,20 @@ class PMSJobCategory(models.Model):
                             'section_avg_scale': sec.section_avg_scale,
                             'section_line_ids': [(0, 0, {
                                 'name': sec_line.name,
-                                'section_id': sec_line.section_id.id,
+                                'section_id': sec.id,
                                 'is_required': sec_line.is_required,
+                                'description': sec_line.description,
                             }) for sec_line in sec.section_line_ids]
                         }) for sec in self.section_ids],
                     })
                     # after generating the record, send notification email
                     self.write({
-                        'pms_department_ids': [(4, pms_department.id)],
-                        'published_date': fields.Date.today(),
-                        'state': 'review'
-
+                        'pms_department_ids': [(4, pms_department.id)], 
                         })
                     self.send_mail_notification(pms_department)
             self.write({
-                'state' 'published'
+                'state':'published',
+                'published_date': fields.Date.today(),
             })
         else:
             raise ValidationError('Please add sections and job roles')
@@ -216,13 +251,22 @@ class PMSJobCategory(models.Model):
     # Ensure all the appraisals sent to employees will be deactivated or cancelled
 
     def button_cancel(self):
-        for rec in self.pms_department_ids:
+        for rec in self.mapped('pms_department_ids').filtered(
+            lambda s: s.state in ['draft', 'review']):
             rec.state = "cancel"
         self.write({
-                'state' 'cancel'
+                'state':'cancel'
+            })
+    
+    def button_republish(self):
+        for rec in self.mapped('pms_department_ids').filtered(
+            lambda s: s.state == 'cancel'):
+            rec.state = "review"
+        self.write({
+                'state':'published'
             })
         
     def button_set_to_draft(self):
         self.write({
-                'state' 'draft'
+                'state':'draft'
             })

@@ -13,7 +13,7 @@
                             type="object"
                             states="draft,review" 
                             comfirm="Are you sure you want to Publish: This action will generate appraisal for employees in your department" 
-                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
+                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 
                             name="button_cancel" 
@@ -39,9 +39,12 @@
 					</header>
 					<sheet>
                         <div class="oe_button_box" name="button_box"/>
-                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                        <widget name="web_ribbon" title="Draft" bg_color="bg-danger" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <widget name="web_ribbon" title="Published" bg_color="bg-success" attrs="{'invisible': [('state', '!=', 'publish')]}"/>
+                        
+<!--                                attrs="{'invisible': [('active', '=', True)]}"/>-->
                         <div class="oe_title">
-                            <field name="active" invisible="1"/>
+<!--                            <field name="active" invisible="1"/>-->
                             <h1>
                                 <field name="name" default_focus="1" required="1" placeholder="Name" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             </h1>
@@ -52,10 +55,10 @@
                                 <field name="sequence" readonly="1"/>
                                 <field name="department_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="department_manager_id" readonly="1" force_save="1" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
-                            <group>
+                            </group>
                             <group>
                                 <field name="hr_category_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/> 
-                            <group>
+                            </group>
                             <separator string="Periods" colspan="4"/>
                             <group>
                                 <field name="pms_year_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
@@ -70,7 +73,6 @@
                             </div>
                             <newline/>
 						</group>
-								<!-- context="{'default_learner_id': active_id}"  -->
 						<notebook>
 							<page name="section_line_ids" string="Sections" invisible="0">
 								<field name="section_line_ids" 
@@ -132,7 +134,7 @@
 					</sheet>
 					<div class="oe_chatter">
 						<field name="message_follower_ids" widget="mail_followers"/>
-						<field name="activity_ids" widget="mail_activity"/>
+						
 						<field name="message_ids" widget="mail_thread"/>
 					</div>
 				</form>
@@ -143,7 +145,7 @@
 			<field name="name">view.pms.department.tree</field>
 			<field name="model">pms.department</field>
 			<field name="arch" type="xml">
-				<tree string="department" sample="1" multi_edit="1" create="0">
+				<tree string="department">
                     <field name="sequence" readonly="1"/>
                     <field name="name"/>
                     <field name="department_id"/>
@@ -156,7 +158,7 @@
                     <field name="state"/>
                 </tree>
 			</field>
-		</record>
+		</record> 
 
 		<record id="view_pms_department_filter" model="ir.ui.view">
 			<field name="name">department</field>
@@ -183,23 +185,19 @@
 			</field>
 		</record>
  
-        <!-- learner. -->
-		<record id="action_pms_department_view" model="ir.actions.act_window">
+		<record id="action_pms_department_view_id" model="ir.actions.act_window">
 			<field name="name">Departmental template</field>
 			<field name="res_model">pms.department</field>
 			<field name="view_mode">tree,form</field>
-             <field name="domain">[]</field>
-             <field name="context">{'default_state': 'draft'}</field>
-             <field name="search_view_id" ref="hr_pms.view_pms_department_filter" />
+              <field name="domain">[]</field>
+             <!-- <field name="search_view_id" ref="hr_pms.view_pms_department_filter" /> -->
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">
 					Click To Create.
 				</p>
 			</field>
-		</record>
-
-    
-    <menuitem id="view_pms_department_menu" name="Department templates" sequence="10" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_department_view"
+		</record> 
+    <menuitem id="view_pms_department_menu" name="Department templates" sequence="10" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_department_view_id"
     groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
 </odoo>
