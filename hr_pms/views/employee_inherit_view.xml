@@ -75,5 +75,35 @@
 
             </field>
         </record>
+
+        <record id="action_employee_district_view_id" model="ir.actions.act_window">
+			<field name="name">District</field>
+			<field name="res_model">hr.district</field>
+			<field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+			<field name="view_id" eval="False"/>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">
+					Click To Create.
+				</p>
+			</field>
+		</record>
+        <record id="action_employee_work_unit_view_id" model="ir.actions.act_window">
+			<field name="name">Units</field>
+			<field name="res_model">hr.work.unit</field>
+			<field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+			<field name="view_id" eval="False"/>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">
+					Click To Create.
+				</p>
+			</field>
+		</record>
+
+    <menuitem id="view_pms_district_menu" name="District" sequence="30" parent="hr_pms.view_hr_pms_config_menu" action="hr_pms.action_employee_district_view_id"
+    groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
+    <menuitem id="view_pms_unit_menu" name="Unit" sequence="31" parent="hr_pms.view_hr_pms_config_menu" action="hr_pms.action_employee_work_unit_view_id"
+    groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
     </data>
 </odoo>

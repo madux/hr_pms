@@ -15,7 +15,7 @@ class HRUnit(models.Model):
     _name = "hr.work.unit"
     _description = "HR work unit"
 
-    name = fields.Many2one(
+    name = fields.Char(
         string="Name", 
         required=True
         )
