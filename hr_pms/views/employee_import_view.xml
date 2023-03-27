@@ -5,6 +5,8 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+<!--                    <button name="your_button_function" type="object" string="Pop up"-->
+<!--                            class="oe_action_button" style="background:rgba(46, 210, 162,0.2);"/>-->
                     <field name="state" widget="statusbar" statusbar_visible="new,loaded,imported"/>
                 </header>
                 <sheet>
@@ -16,7 +18,8 @@
                             <field name="file"/>
                         </div>
                         <div>
-                            <button name="action_import_employees" type="object" string="Import Employees" class="oe_action_button" style="background:rgba(46, 210, 162,0.2);"/>
+                            <button name="action_import_employees" type="object" string="Import Employees"
+                                    class="oe_action_button" style="background:rgba(46, 210, 162,0.2);"/>
                         </div>
                     </group>
                 </sheet>

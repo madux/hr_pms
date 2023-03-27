@@ -153,3 +153,15 @@ class HrEmployee(models.Model):
         def _onchange_garden(self):
             if self.file:
                 self.state = 'loaded'
+
+        # def your_button_function(self):
+        #     return {
+        #         'name': 'My Window',
+        #         'domain': [],
+        #         'res_model': 'employee.import',
+        #         'type': 'ir.actions.act_window',
+        #         'view_mode': 'form',
+        #         'view_type': 'form',
+        #         'context': {},
+        #         'target': 'new',
+        #     }
