@@ -7,3 +7,4 @@ from . import section_line
 from . import department_pms
 from . import hr_employee
 from . import appraisee
+from . import employee_import

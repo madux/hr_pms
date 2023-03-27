@@ -33,5 +33,8 @@
         <field name="view_mode">form</field>
     </record>
 
-    <menuitem id="employee_import_menu_form" name="Import Employees" parent="hr_pms.view_hr_pms_menu" sequence="32" action="employee_import_action"/>
+    <menuitem id="employee_import_menu_form" name="Import Employees" parent="hr_pms.view_hr_pms_menu"
+              sequence="32" action="employee_import_action"/>
+    <menuitem id="menu_hr_import" name="Import Employees"
+              parent="hr.menu_hr_root" action="employee_import_action" sequence="40"/>
 </odoo>
