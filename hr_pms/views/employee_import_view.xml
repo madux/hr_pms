@@ -8,6 +8,9 @@
                     <field name="state" widget="statusbar" statusbar_visible="new,loaded,imported"/>
                 </header>
                 <sheet>
+                    <h1>
+                        <field name="description"/>
+                    </h1>
                     <group>
                         <div>
                             <field name="file"/>

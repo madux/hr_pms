@@ -94,6 +94,7 @@ class HrEmployee(models.Model):
         _name = 'employee.import'
 
         file = fields.Binary(string="Excel File", required=True)
+        description = fields.Char(max_length="255", readonly=True)
         state = fields.Selection(
             selection=[
                 ("new", "New"),
@@ -143,6 +144,8 @@ class HrEmployee(models.Model):
                 employee = self.env['hr.employee'].create(employee_vals)
 
                 self.state = 'imported'
+
+                self.description = "%s employees successfully imported" % row
 
             return {'type': 'ir.actions.act_window_close'}
 

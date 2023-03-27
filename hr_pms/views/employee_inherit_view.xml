@@ -105,5 +105,8 @@
     groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
     <menuitem id="view_pms_unit_menu" name="Unit" sequence="31" parent="hr_pms.view_hr_pms_config_menu" action="hr_pms.action_employee_work_unit_view_id"
     groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
+
+        <menuitem id="menu_hr_import" name="Import Employees"
+                  parent="hr.menu_hr_root" action="employee_import_action" sequence="40"/>
     </data>
 </odoo>
