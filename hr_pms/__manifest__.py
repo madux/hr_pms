@@ -20,6 +20,7 @@
             'views/section_view.xml',
             'views/appraisee_view.xml',
             'views/employee_inherit_view.xml',
+            'views/employee_import_view.xml'
     ],
     'css': [],
     'js': [],

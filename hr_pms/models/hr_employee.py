@@ -7,6 +7,7 @@ from odoo.exceptions import ValidationError
 from odoo import http
 import logging
 from lxml import etree
+import xlrd
 
 _logger = logging.getLogger(__name__)
 
@@ -16,9 +17,9 @@ class HRUnit(models.Model):
     _description = "HR work unit"
 
     name = fields.Char(
-        string="Name", 
+        string="Name",
         required=True
-        )
+    )
 
 
 class HRDistrict(models.Model):
@@ -26,9 +27,9 @@ class HRDistrict(models.Model):
     _description = "HR district"
 
     name = fields.Char(
-        string="Name", 
+        string="Name",
         required=True
-        )
+    )
 
 
 class HrEmployee(models.Model):
@@ -40,13 +41,13 @@ class HrEmployee(models.Model):
     work_unit_id = fields.Many2one('hr.work.unit', string="Unit/SC/Workshop/Substation")
     ps_district_id = fields.Many2one('hr.district', string="Employee District")
     employee_number = fields.Char(
-        string="Staff Number", 
-        )
-    pms_number_appraisal = fields.Integer(string="Appraisal",)# compute="_compute_employees_component")
-    pms_number_queries = fields.Integer(string="Queries",)# compute="_compute_employees_component")
-    pms_number_commendation = fields.Integer(string="Commendation",)# compute="_compute_employees_component")
-    pms_number_warning = fields.Integer(string="Queries", )#compute="_compute_employees_component")
-    pms_number_absent = fields.Integer(string="Absent", )#compute="_compute_employees_component")
+        string="Staff Number",
+    )
+    pms_number_appraisal = fields.Integer(string="Appraisal", )  # compute="_compute_employees_component")
+    pms_number_queries = fields.Integer(string="Queries", )  # compute="_compute_employees_component")
+    pms_number_commendation = fields.Integer(string="Commendation", )  # compute="_compute_employees_component")
+    pms_number_warning = fields.Integer(string="Queries", )  # compute="_compute_employees_component")
+    pms_number_absent = fields.Integer(string="Absent", )  # compute="_compute_employees_component")
 
     # @api.depends('appraisal_ids')
     # def _compute_employees_component(self):
@@ -88,3 +89,64 @@ class HrEmployee(models.Model):
 
     # def stat_button_total_appraisal(self):
     #     pass
+
+    class EmployeeImport(models.Model):
+        _name = 'employee.import'
+
+        file = fields.Binary(string="Excel File", required=True)
+        state = fields.Selection(
+            selection=[
+                ("new", "New"),
+                ("loaded", "Loaded"),
+                ("imported", "Imported"),
+            ],
+            string="Status",
+            required=True,
+            copy=False,
+            default="new",
+        )
+
+        def action_import_employees(self):
+            data = xlrd.open_workbook(file_contents=base64.decodebytes(self.file))
+
+            sheet = data.sheet_by_index(0)
+            for row in range(1, sheet.nrows):
+                employee_vals = {}
+                employee_vals['employee_number'] = sheet.cell(row, 0).value
+                employee_vals['name'] = sheet.cell(row, 1).value
+                employee_vals['work_phone'] = sheet.cell(row, 2).value
+                employee_vals['work_email'] = sheet.cell(row, 3).value
+
+                try:
+                    employee_vals['department_id'] = self.env[
+                        'hr.department'
+                    ].search([('name', '=', sheet.cell(row, 4).value)]).id
+                except Exception:
+                    print('Could not find department')
+
+                try:
+                    employee_vals['job_id'] = self.env[
+                        'hr.job'
+                    ].search([('name', '=', sheet.cell(row, 5).value)]).id
+                except Exception:
+                    print('Could not find job')
+
+                try:
+                    employee_vals['parent_id'] = self.env[
+                        'hr.employee'
+                    ].search([('employee_number', '=', int(sheet.cell(row, 6).value))]).id
+                except Exception:
+                    print('Could not find employee')
+
+                # raise ValidationError(employee_vals['parent_id'])
+
+                employee = self.env['hr.employee'].create(employee_vals)
+
+                self.state = 'imported'
+
+            return {'type': 'ir.actions.act_window_close'}
+
+        @api.onchange('file')
+        def _onchange_garden(self):
+            if self.file:
+                self.state = 'loaded'

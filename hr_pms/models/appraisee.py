@@ -764,7 +764,7 @@ class PMS_Appraisee(models.Model):
     @api.depends('pms_department_id')
     def get_kra_section_scale(self):
         if self.pms_department_id:
-            kra_scale = self.pms_department_id.mapped('section_line_ids').filtered(
+            kra_scale = self.pms_department_id.sudo().mapped('section_line_ids').filtered(
                     lambda res: res.type_of_section == "KRA")
             scale = kra_scale[0].section_avg_scale if kra_scale else 4
             self.dummy_kra_section_scale = scale 
