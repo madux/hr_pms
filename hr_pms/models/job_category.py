@@ -190,6 +190,7 @@ class PMSJobCategory(models.Model):
             # filters set of departments to forward generate
             department_ids = set([depart.department_id.id for depart in self.job_role_ids])
             Pms_Department = self.env['pms.department']
+            # raise ValidationError(self.section_ids[1].input_weightage)
             if department_ids:
                 # create pms.department record
                 for dep in department_ids:
@@ -206,21 +207,49 @@ class PMSJobCategory(models.Model):
                         'hr_category_id': self.id,
                         'section_line_ids': [(0, 0, {
                             # 'pms_department_id': dep.id,
+                            # creating pms.department.section
                             'section_id': sec.id,
+                            'dep_input_weightage': sec.input_weightage,
                             'name': sec.name,
                             'max_line_number': sec.max_line_number,
                             'type_of_section': sec.type_of_section,
                             'pms_category_id': self.id,
                             # 'weighted_score': sec.weighted_score,
                             'section_avg_scale': sec.section_avg_scale,
+                            # creating pms.department.section.line
                             'section_line_ids': [(0, 0, {
                                 'name': sec_line.name,
+                                'section_line_id': sec_line.id,
                                 'section_id': sec.id,
                                 'is_required': sec_line.is_required,
                                 'description': sec_line.description,
                             }) for sec_line in sec.section_line_ids]
                         }) for sec in self.section_ids],
+                        
                     })
+                    # for sec in self.section_ids:
+                    #     vals = {
+                    #         'pms_department_id': pms_department.id,
+                    #         'section_id': sec.id,
+                    #         'input_weightage': sec.input_weightage,
+                    #         'name': sec.name + 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                    #         'max_line_number': sec.max_line_number,
+                    #         'type_of_section': sec.type_of_section,
+                    #         'pms_category_id': self.id,
+                    #         # 'weighted_score': sec.weighted_score,
+                    #         'section_avg_scale': sec.section_avg_scale,
+                    #     }
+                    #     pms_dep_section_id = self.env['pms.department.section'].create(vals)
+                    #     for sec_line in sec.mapped('section_line_ids'):
+                    #         vals = {
+                    #             'pms_department_section_id': pms_dep_section_id.id,
+                    #             'name': sec_line.name + 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                    #             'section_id': sec.id,
+                    #             'is_required': sec_line.is_required,
+                    #             'description': sec_line.description,
+                    #         }
+                    #         self.env['pms.department.section.line'].create(vals)
+
                     # after generating the record, send notification email
                     self.write({
                         'pms_department_ids': [(4, pms_department.id)], 

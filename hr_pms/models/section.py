@@ -39,13 +39,27 @@ class PmsSection(models.Model):
         help="Used to set default scale",
         store=True,
         )
-    input_weightage = fields.Integer(
-        string='Weightage (20%)', 
-        placeholder="eg. 20",
-        default=1,
+    input_weightage = fields.Float(
+        string='Weightage (100%)', 
+        default=100,
         help="Used to set default weight for appraisee",
         store=True,
+        compute="compute_section_weight"
         )
+    
+    @api.depends('section_line_ids')
+    def compute_section_weight(self):
+        """
+        If section_line_ids, the system should determine 
+        and divide 100% by the number of lines added
+        """
+        if self.section_line_ids:
+            numb_of_lines = len(self.section_line_ids) # eg 4
+            self.input_weightage = 100 / numb_of_lines if numb_of_lines > 0 else 100 # safe eva
+        else:
+            self.input_weightage = 100
+
+        
     section_line_ids = fields.One2many(
         "pms.section.line",
         "section_id",
