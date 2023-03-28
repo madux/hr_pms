@@ -2,6 +2,83 @@
 <odoo>
     <data noupdate="1">
         <!-- SECTION STARTS -->
+        <record model="pms.instruction" id="pms_instruction_1">
+            <field name="name">Instruction 1</field>
+            <field name="description">
+                <!-- <br style="font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; line-height: normal; text-align: -webkit-auto; text-size-adjust: auto;">
+                    <p>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <font style="font-size: 14px;">
+                                            <b>Novice(1)</b>
+                                        </font>
+                                    </td>
+                                    <td>
+                                        <font style="font-size: 14px;">
+                                            <b>Basic(2)</b>
+                                        </font>
+                                    </td>
+                                    <td>
+                                        <span style="font-size: 14px; font-weight: bolder;">
+                                            Intermidate(3)
+                                        </span>
+                                        <br/>
+                                    </td>
+                                    <td>
+                                        <span style="font-size: 14px; font-weight: bolder;">
+                                            Advance(4)
+                                        </span>
+                                        <br/>
+                                    </td>
+                                    <td>
+                                        <span style="font-size: 14px; font-weight: bolder;">
+                                            Expert(5)
+                                        </span>
+                                        <br/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="text-align: justify;">
+                                            <span class="fontstyle0" style="font-family: inherit; font-style: inherit; font-variant-caps: inherit; font-variant-ligatures: inherit; font-weight: inherit; text-align: inherit;">
+                                                <p>Demonstrate only a few of the behavior now and there<br/>
+                                                </p>
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <br/>
+                                    </td>
+                                    <td style="text-align: justify;">
+                                    </td>
+                                    <td><br/>
+                                    </td>
+                                    <td><br/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <br/>
+                                    </td>
+                                    <td>
+                                        <br/>
+                                    </td>
+                                    <td><br/>
+                                    </td>
+                                    <td>
+                                        <br/>
+                                    </td>
+                                    <td><br/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </p>
+                </br> -->
+            </field>
+        </record>
         <record model="pms.section" id="pms_kra_section_1">
             <field name="name">SECTION A: KRAs &amp; Achivements</field>
             <field name="max_line_number">0</field>
@@ -200,6 +277,85 @@
         </record> -->
 
         <!-- JOB CATEGORY ENDS --> 
- 
+
+        <!-- Asessment config data -->
+        <record model="assessment.description" id="assessment_description_1">
+            <field name="name">ORDINARY</field>
+            <field name="desc">Performance is well below standard.
+            Whether the person can improve to 
+            meet the minimum standard is questionable
+            </field>
+            <field name="type">current</field>
+        </record>
+        <record model="assessment.description" id="assessment_description_2">
+            <field name="name">DILIGENT</field>
+            <field name="desc">Performance is well below standard.
+            Whether the person can improve to 
+            meet the minimum standard is questionable
+            </field>
+            <field name="type">current</field>
+        </record>
+        <record model="assessment.description" id="assessment_description_3">
+            <field name="name">FANTASTIC</field>
+            <field name="desc">Performance &amp; Competence is
+            largely meeting expected
+            standards. This level is what
+            satisfies the bosses / company
+            to retain the talent even if it
+            needs extra walking in normal
+            circumstances
+            </field>
+            <field name="type">current</field>
+        </record>
+        <record model="assessment.description" id="assessment_description_4">
+            <field name="name">SUPERB</field>
+            <field name="desc">The person is so successful at
+            his/her job &amp; competencies
+            criteria that special note should
+            be made, and performance ranks
+            in the top percentile. A top talent,
+            someone to be retained at any
+            cost!
+            </field>
+            <field name="type">current</field>
+        </record>
+
+        <record model="assessment.description" id="assessment_description_potential_1">
+            <field name="name">LOW POTENTIAL</field>
+            <field name="desc">Potential in current job is
+            below expectation; needs
+            more development &amp;
+            dedication
+            </field>
+            <field name="type">potential</field>
+        </record>
+
+        <record model="assessment.description" id="assessment_description_potential_2">
+            <field name="name">MEDIUM POTENTIAL</field>
+            <field name="desc">Shows good potential in
+            current job, but needs more
+            development &amp; grooming
+            for future / higher roles.
+            </field>
+            <field name="type">potential</field>
+        </record>
+        <record model="assessment.description" id="assessment_description_potential_3">
+            <field name="name">HIGH POTENTIAL</field>
+            <field name="desc">Shows high proficiency in
+            current job(s); and is capable
+            of handling higher/future
+            role with guidance
+            </field>
+            <field name="type">potential</field>
+        </record>
+        <record model="assessment.description" id="assessment_description_potential_4">
+            <field name="name">READY TO GO</field>
+            <field name="desc">Has overgrown
+            current role, and is
+            fully potent to take up
+            higher/future role
+            </field>
+            <field name="type">potential</field>
+        </record>
     </data>
 </odoo>
