@@ -106,127 +106,127 @@
         </record>
         <!-- PMS YEAR -->
         <record model="pms.year" id="pms_year_2023_qrt1">
-            <field name="name">Jan-Mar 2023</field>
-            <field name="date_from">2023-01-01</field>
-            <field name="date_end">2023-03-30</field>
+            <field name="name">April 2023 [Quarterly]</field>
+            <field name="date_from">2023-04-01</field>
+            <field name="date_end">2023-04-30</field>
         </record>
         <record model="pms.year" id="pms_year_2023_qrt2">
-            <field name="name">April-June 2023</field>
-            <field name="date_from">2023-04-01</field>
-            <field name="date_end">2023-06-30</field>
+            <field name="name">July 2023 [Quarterly]</field>
+            <field name="date_from">2023-07-01</field>
+            <field name="date_end">2023-07-31</field>
         </record>
         <record model="pms.year" id="pms_year_2023_qrt3">
-            <field name="name">July-Sept 2023</field>
-            <field name="date_from">2023-07-01</field>
-            <field name="date_end">2023-09-30</field>
+            <field name="name">Oct 2023 [Quarterly]</field>
+            <field name="date_from">2023-10-01</field>
+            <field name="date_end">2023-12-31</field>
         </record>
         <record model="pms.year" id="pms_year_2023_qrt4">
-            <field name="name">Oct-Dec 2023</field>
-            <field name="date_from">2023-10-01</field>
-            <field name="date_end">2023-12-30</field>
+            <field name="name">Dec 2023 [End of year appraisal]</field>
+            <field name="date_from">2023-12-01</field>
+            <field name="date_end">2023-12-31</field>
         </record>
 
         <record model="pms.year" id="pms_year_2024_qrt1">
-            <field name="name">Jan-Mar 2024</field>
-            <field name="date_from">2024-01-01</field>
-            <field name="date_end">2024-03-30</field>
+            <field name="name">April 2024 [Quarterly]</field>
+            <field name="date_from">2024-04-01</field>
+            <field name="date_end">2024-04-30</field>
         </record>
         <record model="pms.year" id="pms_year_2024_qrt2">
-            <field name="name">April-June 2024</field>
-            <field name="date_from">2024-04-01</field>
-            <field name="date_end">2024-06-30</field>
+            <field name="name">July 2024 [Quarterly]</field>
+            <field name="date_from">2024-07-01</field>
+            <field name="date_end">2024-07-31</field>
         </record>
         <record model="pms.year" id="pms_year_2024_qrt3">
-            <field name="name">July-Sept 2024</field>
-            <field name="date_from">2024-07-01</field>
-            <field name="date_end">2024-09-30</field>
+            <field name="name">Oct 2024 [Quarterly]</field>
+            <field name="date_from">2024-10-01</field>
+            <field name="date_end">2024-10-31</field>
         </record>
         <record model="pms.year" id="pms_year_2024_qrt4">
-            <field name="name">Oct-Dec 2024</field>
-            <field name="date_from">2024-10-01</field>
-            <field name="date_end">2024-12-30</field>
+            <field name="name">Dec 2024 [End of year appraisal]</field>
+            <field name="date_from">2024-12-01</field>
+            <field name="date_end">2024-12-31</field>
         </record>
 
         <record model="pms.year" id="pms_year_2025_qrt1">
-            <field name="name">Jan-Mar 2025</field>
-            <field name="date_from">2025-01-01</field>
-            <field name="date_end">2025-03-30</field>
+            <field name="name">April 2025 [Quarterly]</field>
+            <field name="date_from">2025-04-01</field>
+            <field name="date_end">2025-04-30</field>
         </record>
         <record model="pms.year" id="pms_year_2025_qrt2">
-            <field name="name">April-June 2025</field>
-            <field name="date_from">2025-04-01</field>
-            <field name="date_end">2025-06-30</field>
+            <field name="name">July 2025 [Quarterly]</field>
+            <field name="date_from">2025-07-01</field>
+            <field name="date_end">2025-07-31</field>
         </record>
         <record model="pms.year" id="pms_year_2025_qrt3">
-            <field name="name">July-Sept 2025</field>
-            <field name="date_from">2025-07-01</field>
-            <field name="date_end">2025-09-30</field>
+            <field name="name">Oct 2025 [Quarterly]</field>
+            <field name="date_from">2025-10-01</field>
+            <field name="date_end">2025-10-31</field>
         </record>
         <record model="pms.year" id="pms_year_2025_qrt4">
-            <field name="name">Oct-Dec 2025</field>
-            <field name="date_from">2025-10-01</field>
-            <field name="date_end">2025-12-30</field>
+            <field name="name">Dec 2025 [End of year appraisal]</field>
+            <field name="date_from">2025-12-01</field>
+            <field name="date_end">2025-12-31</field>
         </record>
 
         <record model="pms.year" id="pms_year_2026_qrt1">
-            <field name="name">Jan-Mar 2026</field>
-            <field name="date_from">2026-01-01</field>
-            <field name="date_end">2026-03-30</field>
+            <field name="name">April 2026 [Quarterly]</field>
+            <field name="date_from">2026-04-01</field>
+            <field name="date_end">2026-04-30</field>
         </record>
         <record model="pms.year" id="pms_year_2026_qrt2">
-            <field name="name">April-June 2026</field>
-            <field name="date_from">2026-04-01</field>
-            <field name="date_end">2026-06-30</field>
+            <field name="name">July 2026 [Quarterly]</field>
+            <field name="date_from">2026-07-01</field>
+            <field name="date_end">2026-07-31</field>
         </record>
         <record model="pms.year" id="pms_year_2026_qrt3">
-            <field name="name">July-Sept 2026</field>
-            <field name="date_from">2026-07-01</field>
-            <field name="date_end">2026-09-30</field>
+            <field name="name">Oct 2026 [Quarterly]</field>
+            <field name="date_from">2026-10-01</field>
+            <field name="date_end">2026-10-31</field>
         </record>
         <record model="pms.year" id="pms_year_2026_qrt4">
-            <field name="name">Oct-Dec 2026</field>
-            <field name="date_from">2026-10-01</field>
-            <field name="date_end">2026-12-30</field>
+            <field name="name">Dec 2026 [End of year appraisal]</field>
+            <field name="date_from">2026-12-01</field>
+            <field name="date_end">2026-12-31</field>
         </record>
         <record model="pms.year" id="pms_year_2027_qrt1">
-            <field name="name">Jan-Mar 2027</field>
-            <field name="date_from">2027-01-01</field>
-            <field name="date_end">2027-03-30</field>
+            <field name="name">April 2027 [Quarterly]</field>
+            <field name="date_from">2027-04-01</field>
+            <field name="date_end">2027-04-30</field>
         </record>
         <record model="pms.year" id="pms_year_2027_qrt2">
-            <field name="name">April-June 2027</field>
-            <field name="date_from">2027-04-01</field>
-            <field name="date_end">2027-06-30</field>
+            <field name="name">July 2027 [Quarterly]</field>
+            <field name="date_from">2027-07-01</field>
+            <field name="date_end">2027-07-31</field>
         </record>
         <record model="pms.year" id="pms_year_2027_qrt3">
-            <field name="name">July-Sept 2027</field>
-            <field name="date_from">2027-07-01</field>
-            <field name="date_end">2027-09-30</field>
+            <field name="name">Oct 2027 [Quarterly]</field>
+            <field name="date_from">2027-10-01</field>
+            <field name="date_end">2027-10-31</field>
         </record>
         <record model="pms.year" id="pms_year_2027_qrt4">
-            <field name="name">Oct-Dec 2027</field>
-            <field name="date_from">2027-10-01</field>
-            <field name="date_end">2027-12-30</field>
+            <field name="name">Dec 2027 [End of year appraisal]</field>
+            <field name="date_from">2027-12-01</field>
+            <field name="date_end">2027-12-31</field>
         </record>
         <record model="pms.year" id="pms_year_2028_qrt1">
-            <field name="name">Jan-Mar 2028</field>
-            <field name="date_from">2028-01-01</field>
-            <field name="date_end">2028-03-30</field>
+            <field name="name">April 2028 [Quarterly]</field>
+            <field name="date_from">2028-04-01</field>
+            <field name="date_end">2028-04-30</field>
         </record>
         <record model="pms.year" id="pms_year_2028_qrt2">
-            <field name="name">April-June 2028</field>
-            <field name="date_from">2028-04-01</field>
-            <field name="date_end">2028-06-30</field>
+            <field name="name">July 2028 [Quarterly]</field>
+            <field name="date_from">2028-07-01</field>
+            <field name="date_end">2028-07-31</field>
         </record>
         <record model="pms.year" id="pms_year_2028_qrt3">
-            <field name="name">July-Sept 2028</field>
-            <field name="date_from">2028-07-01</field>
-            <field name="date_end">2028-09-30</field>
+            <field name="name">Oct 2028 [Quarterly]</field>
+            <field name="date_from">2028-10-01</field>
+            <field name="date_end">2028-10-31</field>
         </record>
         <record model="pms.year" id="pms_year_2028_qrt4">
-            <field name="name">Oct-Dec 2028</field>
-            <field name="date_from">2028-10-01</field>
-            <field name="date_end">2028-12-30</field>
+            <field name="name">Dec 2028 [End of year appraisal]</field>
+            <field name="date_from">2028-12-01</field>
+            <field name="date_end">2028-12-31</field>
         </record>
         <!-- PMS YEAR ENDS  -->
         <!-- JOB CATEGORY -->
