@@ -86,37 +86,37 @@ class KRA_SectionLine(models.Model):
         if self.state == 'functional_rating':
             if self.kra_section_id.employee_id.parent_id and self.env.user.id != self.kra_section_id.employee_id.parent_id.user_id.id:
                 raise ValidationError(
-                "Ops ! You are not entitled to add a rating \
-                    because you are not the employee's functional manager"
+                """Ops ! You are not entitled to add a rating 
+                because you are not the employee's functional manager"""
                 )
         if self.state == 'admin_rating':
             if self.kra_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id:
                 raise ValidationError(
-                "Ops ! You are not entitled to add a rating \
-                    because you are not the employee's administrative supervisor"
+                """Ops ! You are not entitled to add a rating 
+                because you are not the employee's administrative supervisor"""
                 )
             
-        if self.self_rating > 5:
+        if self.self_rating > self.section_avg_scale:
             self.self_rating = False
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Self rating Scale should be in the range of 1 - 5'
+                    'message': 'Self rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
-        if self.functional_supervisor_rating > 5:
+        if self.functional_supervisor_rating > self.section_avg_scale:
 
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Functional supervisor rating Scale should be in the range of 1 - 5'
+                    'message': 'Functional supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             self.self_rating = False
             return {'warning': message}
         
-        if self.administrative_supervisor_rating > 5:
+        if self.administrative_supervisor_rating > self.section_avg_scale:
             self.self_rating = False
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - 5'
+                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
     
@@ -179,7 +179,7 @@ class LC_SectionLine(models.Model):
         string='FA Rating',
         )
     reviewer_rating = fields.Integer(
-        string='RA Rating',
+        string='Reviewer Ratings',
         ) 
         
     is_functional_manager = fields.Boolean(
@@ -234,41 +234,39 @@ class LC_SectionLine(models.Model):
         if self.state == 'functional_rating':
             if self.lc_section_id.employee_id.parent_id and self.env.user.id != self.lc_section_id.employee_id.parent_id.user_id.id:
                 raise ValidationError(
-                "Ops ! You are not entitled to add a rating \
-                    because you are not the employee's functional manager"
+                """Ops ! You are not entitled to add a rating because you are not the employee's functional manager"""
                 )
         if self.state == 'admin_rating':
             if self.lc_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.lc_section_id.employee_id.administrative_supervisor_id.user_id.id:
                 raise ValidationError(
-                "Ops ! You are not entitled to add a rating \
-                    because you are not the employee's administrative supervisor"
+                """Ops ! You are not entitled to add a rating 
+                because you are not the employee's administrative supervisor"""
                 )
         if self.state == 'reviewer_rating':
             if self.lc_section_id.employee_id.reviewer_id and self.env.user.id != self.lc_section_id.employee_id.reviewer_id.user_id.id:
                 raise ValidationError(
-                "Ops ! You are not entitled to add a rating \
-                    because you are not the employee's reviewer"
+                """Ops ! You are not entitled to add a rating because you are not the employee's reviewer"""
                 )
             
-        if self.functional_supervisor_rating > 5:
+        if self.functional_supervisor_rating > self.section_avg_scale:
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Functional supervisor rating Scale should be in the range of 1 - 5'
+                    'message': 'Functional supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             self.functional_supervisor_rating = False
             return {'warning': message}
-        if self.administrative_supervisor_rating > 5:
+        if self.administrative_supervisor_rating > self.section_avg_scale:
             self.administrative_supervisor_rating = False
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - 5'
+                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
-        if self.reviewer_rating > 5:
+        if self.reviewer_rating > self.section_avg_scale:
             self.reviewer_rating = False
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - 5'
+                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
     
@@ -333,7 +331,7 @@ class FC_SectionLine(models.Model):
         string='FA Rating', 
         )
     reviewer_rating = fields.Integer(
-        string='RA Rating',
+        string='Reviewer Ratings',
         )
     is_functional_manager = fields.Boolean(
         string="is functional manager", 
@@ -384,40 +382,40 @@ class FC_SectionLine(models.Model):
         if self.state == 'functional_rating':
             if self.fc_section_id.employee_id.parent_id and self.env.user.id != self.fc_section_id.employee_id.parent_id.user_id.id:
                 raise ValidationError(
-                "Ops ! You are not entitled to add a rating \
-                    because you are not the employee's functional manager"
+                """Ops ! You are not entitled to add a rating 
+                because you are not the employee's functional manager"""
                 )
         if self.state == 'admin_rating':
             if self.fc_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.fc_section_id.employee_id.administrative_supervisor_id.user_id.id:
                 raise ValidationError(
-                "Ops ! You are not entitled to add a rating \
-                    because you are not the employee's administrative supervisor"
+                """Ops ! You are not entitled to add a rating 
+                because you are not the employee's administrative supervisor"""
                 )
         if self.state == 'reviewer_rating':
             if self.fc_section_id.employee_id.reviewer_id and self.env.user.id != self.fc_section_id.employee_id.reviewer_id.user_id.id:
                 raise ValidationError(
-                "Ops ! You are not entitled to add a rating \
-                    because you are not the employee's reviewer"
+                """Ops ! You are not entitled to add a rating
+                    because you are not the employee's reviewer"""
                 )
-        if self.functional_supervisor_rating > 5:
+        if self.functional_supervisor_rating > self.section_avg_scale:
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Functional supervisor rating Scale should be in the range of 1 - 5'
+                    'message': 'Functional supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             self.functional_supervisor_rating = False
             return {'warning': message}
-        if self.administrative_supervisor_rating > 5:
+        if self.administrative_supervisor_rating > self.section_avg_scale:
             self.administrative_supervisor_rating = False
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - 5'
+                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
-        if self.reviewer_rating > 5:
+        if self.reviewer_rating > self.section_avg_scale:
             self.reviewer_rating = False
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - 5'
+                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
     
