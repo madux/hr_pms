@@ -281,50 +281,155 @@
                                     </form>
                                 </field>
                                 <separator string="Overall Current Assessment" colspan="4"/>
-							    <p style="color: red;">*N/B: to be filled by the Current Appraiser based on discussions with
-the appraisee covering various above-mentioned Sections of A-to-E </p>
+							    <p style="color: red;">* Instruction: Appraisee to be rated by the Current Appraisee's and review officer</p>
+                                <div class="row">
+                                    <table class="table table-bordered table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th style="color: #000000; background-color: #FF0000;">ORDINARY</th>
+                                                <th style="color: #000000; background-color: #89CFF0;">DILIGENT</th>
+                                                <th style="color: #000000; background-color: #9FE2BF;">FANTASTIC</th>
+                                                <th style="color: #000000; background-color: #00A36C;">SUPERB</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                    Performance is well below standard. <br/>
+                                                    Whether the person can improve to meet <br/>
+                                                    the minimum standard is questionable<br/>
+                                                </th>
+                                                <th>
+                                                    Performance is well below standard.<br/>
+                                                    Whether the person can improve to meet<br/>
+                                                    the minimum standard is questionable
+                                                </th>
+                                                <th>Performance &amp; Competence is largely<br/>
+                                                    meeting expected standards. This level is<br/>
+                                                    what satisfies the bosses / company to retain<br/>
+                                                    the talent even if it needs extra walking<br/>
+                                                    in normal ircumstances
+                                                </th>
+                                                <th>The person is so successful at his/her job <br/>
+                                                    &amp; competencies criteria that special note<br/>
+                                                    should be made, and performance ranks in <br/>
+                                                    the top percentile. A top talent, someone <br/>
+                                                    to be retained at any cost!
+                                                </th>
+                                            </tr>
+                                        </tbody>
+                                    </table><br/>
+                                </div>
                                 <field name="current_assessment_section_line_ids" 
                                     required="0" attrs="{'readonly': [('state', 'in', ['draft'])]}">
-                                    <tree string="Current Assessment" delete="true" create="true" editable="bottom">
-                                        <field name="name" string="Title" required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
+                                    <tree string="Current Assessment" delete="false" create="false" editable="bottom">
+                                        <field name="name" string="Assessment By" required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
+                                        <field name="state" invisible="1"/> 
+                                        <field name="current_assessment_section_id" invisible="1"/> 
+                                        <field name="assessment_type" required="1"/>
+                                        <field name="administrative_supervisor_rating" invisible="1"/> 
+                                        <!-- attrs="{'readonly': [('state', '!=', 'admin_rating')],
+                                        'invisible': [('state', '!=', 'admin_rating')]}"/>  -->
+                                        <field name="functional_supervisor_rating" invisible="1"/>
+                                        <!-- attrs="{'readonly': [('state', '!=', 'functional_rating')],
+                                        'invisible': [('state', '!=', 'functional_rating')]}"/>  -->
+                                        <field name="reviewer_rating" force_save="1" invisible="1"/>
+                                         <!-- attrs="{'readonly': [('state', '!=', 'reviewer_rating')],
+                                        'invisible': [('state', '!=', 'reviewer_rating')]}"/> -->
+                                        <!-- <field name="name" string="Title" required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
                                         <field name="desc" string="Description " readonly="1" options="{'no_create':True, 'no_open': False}"/>
                                         <field name="state" invisible="1"/> 
-                                        <field name="weightage" readonly="1"/>
+                                        <field name="weightage" invisible="1"/>
                                         <field name="current_assessment_section_id" invisible="1"/> 
                                         <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],
                                         'required': [('state', '=', 'admin_rating')]}"/> 
                                         <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],
                                         'required': [('state', '=', 'functional_rating')]}"/> 
                                         <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],
-                                        'required': [('state', '=', 'reviewer_rating')]}"/> 
+                                        'required': [('state', '=', 'reviewer_rating')]}"/>  -->
                                         <!-- <field name="section_avg_scale" force_save="1" readonly="1" invisible="1"/> 
                                         <field name="weighted_score" force_save="1" invisible="1"/>  -->
                                     </tree>
                                     <form string="">
                                         <group>
                                             <group>
-                                                <field name="name" readonly="1"/>
-                                                <field name="desc" readonly="1" options="{'no_create':True, 'no_open': False}"/>
+                                                <field name="name" string="Assessment By" required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
                                                 <field name="state" invisible="1"/> 
-
+                                                <field name="current_assessment_section_id" invisible="1"/>
+                                                <field name="assessment_type" required="1"/> 
                                             </group>
                                             <group>
+                                                 
                                                 <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],
-                                                'required': [('state', '=', 'admin_rating')]}"/> 
+                                                'invisible': [('state', '!=', 'admin_rating')]}"/> 
                                                 <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],
-                                                'required': [('state', '=', 'functional_rating')]}"/> 
+                                                'invisible': [('state', '!=', 'functional_rating')]}"/> 
                                                 <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],
-                                                'required': [('state', '=', 'reviewer_rating')]}"/> 
+                                                'invisible': [('state', '!=', 'reviewer_rating')]}"/> 
                                             </group>
                                         </group>
                                     </form>
                                 </field>
                                 <separator string="Potential Assessment" colspan="4"/>
-							    <p style="color: red;">*N/B: It's majorly about the 'future', not the past performance </p>
+							    <p style="color: red;">* Instruction It's majorly about the 'future', not the past performance </p>
+                                <div class="row">
+                                    <table class="table table-bordered table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th style="color: #ffffff; background-color: #000000;">LOW POTENTIAL</th>
+                                                <th style="color: #ffffff; background-color: #000000;">MEDIUM POTENTIAL</th>
+                                                <th style="color: #ffffff; background-color: #000000;">HIGH POTENTIAL</th>
+                                                <th style="color: #ffffff; background-color: #000000;">READY TO GO</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                    Potential in current job is
+                                                    below expectation; needs
+                                                    more development &amp;
+                                                    dedication
+                                                </th>
+                                                <th>
+                                                    Shows good potential in
+                                                    current job, but needs more
+                                                    development &amp; grooming
+                                                    for future / higher roles.
+                                                </th>
+                                                <th>Shows high proficiency in
+                                                    current job(s); and is capable
+                                                    of handling higher/future
+                                                    role with guidance
+                                                </th>
+                                                <th>Has overgrown 
+                                                    current role, and is
+                                                    fully potent to take up
+                                                    higher/future role
+                                                </th>
+                                            </tr>
+                                        </tbody>
+                                    </table><br/>
+                                </div>
                                 <field name="potential_assessment_section_line_ids" 
                                     required="0" attrs="{'readonly': [('state', 'in', ['draft'])]}">
-                                    <tree string="Potential Assessment" delete="true" create="true" editable="bottom">
-                                        <field name="name" string="Title " required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
+                                    <tree string="Potential Assessment" delete="false" create="false" editable="bottom">
+                                        <field name="name" string="Assessment By" required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
+                                        <field name="state" invisible="1"/> 
+                                        <field name="potential_section_id" invisible="1"/> 
+                                        <field name="assessment_type" required="1"/>
+                                        <field name="administrative_supervisor_rating" invisible="1"/> 
+                                        <field name="functional_supervisor_rating" invisible="1"/>
+                                        <field name="reviewer_rating" force_save="1" invisible="1"/>
+
+                                        <!-- <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],
+                                        'invisible': [('state', '!=', 'admin_rating')]}"/> 
+                                        <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],
+                                        'invisible': [('state', '!=', 'functional_rating')]}"/> 
+                                        <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],
+                                        'invisible': [('state', '!=', 'reviewer_rating')]}"/> -->
+
+
+                                        <!-- <field name="name" string="Title " required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
                                         <field name="desc" string="Description " readonly="1" options="{'no_create':True, 'no_open': False}"/>
                                         <field name="state" invisible="1"/> 
                                         <field name="potential_section_id" invisible="1"/> 
@@ -334,7 +439,7 @@ the appraisee covering various above-mentioned Sections of A-to-E </p>
                                         <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],
                                         'required': [('state', '=', 'functional_rating')]}"/> 
                                         <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],
-                                        'required': [('state', '=', 'reviewer_rating')]}"/> 
+                                        'required': [('state', '=', 'reviewer_rating')]}"/>  -->
                                         <!-- <field name="is_required" force_save="1" invisible="1"/> 
                                         <field name="section_avg_scale" force_save="1" readonly="1" invisible="1"/> 
                                         <field name="weighted_score" force_save="1" invisible="1"/>  -->
@@ -342,23 +447,25 @@ the appraisee covering various above-mentioned Sections of A-to-E </p>
                                     <form string="">
                                         <group>
                                             <group>
-                                                <field name="name" readonly="1"/> 
-                                                <field name="desc" readonly="1" options="{'no_create':True, 'no_open': False}"/>
+                                                <field name="name" string="Assessment By" required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
                                                 <field name="state" invisible="1"/> 
+                                                <field name="potential_section_id" invisible="1"/> 
+                                                <field name="assessment_type" required="1"/>
                                             </group>
                                             <group>
+                                            
                                             <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],
-                                            'required': [('state', '=', 'admin_rating')]}"/> 
+                                            'invisible': [('state', '!=', 'admin_rating')]}"/> 
                                             <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],
-                                            'required': [('state', '=', 'functional_rating')]}"/> 
+                                            'invisible': [('state', '!=', 'functional_rating')]}"/> 
                                             <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],
-                                            'required': [('state', '=', 'reviewer_rating')]}"/> 
+                                            'invisible': [('state', '!=', 'reviewer_rating')]}"/> 
                                             </group>
                                         </group>
                                     </form>
                                 </field>
                                 <separator string="Quality checks" colspan="4"/>
-							    <p style="color: red;">*N/B: Quality checks &amp; due diligence to be done by the HR Team </p>
+							    <p style="color: red;">* Instruction Quality checks &amp; due diligence to be done by the HR Team </p>
                                 <field name="qualitycheck_section_line_ids" 
                                     required="0" attrs="{'readonly': [('state', 'in', ['draft'])]}">
                                     <tree string="Quality checks" delete="true" create="true" editable="bottom">
@@ -398,7 +505,10 @@ the appraisee covering various above-mentioned Sections of A-to-E </p>
                                         </group>
                                         <group>
                                             <field name="overall_score" readonly="1" force_save="1"/> 
-                                            <field name="approver_ids" required="0" widget="many2many_tags"/> 
+                                            <field name="current_assessment_score" readonly="1"/>
+                                            <field name="potential_assessment_score"/>
+                                            <field name="post_normalization_score"/>
+                                            <field name="approver_ids" invisible="1" required="0" widget="many2many_tags"/> 
                                             <field name="line_manager_id" readonly="1" invisible="1"/> 
                                             <field name="directed_user_id" readonly="1" invisible="1"/> 
                                             <field name="dummy_kra_section_scale" force_save="1" readonly="1" invisible="1"/> 

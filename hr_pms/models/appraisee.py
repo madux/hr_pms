@@ -184,6 +184,18 @@ class PMS_Appraisee(models.Model):
         string="Overall score", 
         compute="compute_overall_score", 
         store=True)
+    
+    current_assessment_score = fields.Float(
+        string="Current Assessment score", 
+        compute="compute_current_assessment_score", 
+        store=True)
+    potential_assessment_score = fields.Float(
+        string="Potential Assessment score", 
+        compute="compute_potential_assessment_score", 
+        store=True)
+    post_normalization_score = fields.Float(
+        string="Post normalization score", 
+        store=True)
 
     final_kra_score = fields.Float(
         string='Final KRA Score', 
@@ -406,6 +418,60 @@ class PMS_Appraisee(models.Model):
                 (lc_section_weighted_score/ 100) * rec.final_lc_score
             else:
                 rec.overall_score = 0
+    
+    @api.depends(
+            'current_assessment_section_line_ids',
+            )
+    def compute_current_assessment_score(self):
+        'get the lines for appraisers and compute'
+        ar_rating = 0
+        fa_rating = 0
+        fr_rating = 0
+        ar = self.mapped('current_assessment_section_line_ids').filtered(
+            lambda s: s.state == 'admin_rating'
+        )
+        fa = self.mapped('current_assessment_section_line_ids').filtered(
+            lambda s: s.state == 'functional_rating'
+        )
+        fr = self.mapped('current_assessment_section_line_ids').filtered(
+            lambda s: s.state == 'reviewer_rating'
+        )
+        if ar:
+            ar_rating = ar[0].administrative_supervisor_rating or 1
+        if fa:
+            fa_rating = fa[0].functional_supervisor_rating or 1
+        if fr:
+            fr_rating = fr[0].reviewer_rating or 1 
+        fr_rt = 30 if self.employee_id.administrative_supervisor_id else 60
+        weightage = (ar_rating * 30) + (fa_rating * fr_rt) + (fr_rating * 40)
+        self.current_assessment_score = weightage / 4
+
+    @api.depends(
+        'potential_assessment_section_line_ids',
+        )
+    def compute_potential_assessment_score(self):
+        'get the lines for appraisers and compute'
+        ar_rating = 0
+        fa_rating = 0
+        fr_rating = 0
+        ar = self.mapped('potential_assessment_section_line_ids').filtered(
+            lambda s: s.state == 'admin_rating'
+        )
+        fa = self.mapped('potential_assessment_section_line_ids').filtered(
+            lambda s: s.state == 'functional_rating'
+        )
+        fr = self.mapped('potential_assessment_section_line_ids').filtered(
+            lambda s: s.state == 'reviewer_rating'
+        )
+        if ar:
+            ar_rating = ar[0].administrative_supervisor_rating or 1
+        if fa:
+            fa_rating = fa[0].functional_supervisor_rating or 1
+        if fr:
+            fr_rating = fr[0].reviewer_rating or 1 
+        fr_rt = 30 if self.employee_id.administrative_supervisor_id else 60
+        weightage = (ar_rating * 30) + (fa_rating * fr_rt) + (fr_rating * 40)
+        self.potential_assessment_score = weightage / 4
 
     def check_kra_section_lines(self):
         # if the employee has administrative reviewer, 
@@ -725,8 +791,8 @@ class PMS_Appraisee(models.Model):
         self.check_kra_section_lines()
         self.check_fc_section_lines()
         self.check_lc_section_lines()
-        self.check_current_assessment_section_lines()
-        self.check_potential_assessment_section_lines()
+        # self.check_current_assessment_section_lines()
+        # self.check_potential_assessment_section_lines()
         self.send_mail_notification(msg)
         self.write({
                 'state': 'functional_rating',
@@ -745,8 +811,8 @@ class PMS_Appraisee(models.Model):
         self.check_kra_section_lines()
         self.check_fc_section_lines()
         self.check_lc_section_lines()
-        self.check_current_assessment_section_lines()
-        self.check_potential_assessment_section_lines()
+        # self.check_current_assessment_section_lines()
+        # self.check_potential_assessment_section_lines()
         msg = """Dear {}, <br/> 
         I wish to notify you that an appraisal for {} \
         has been submitted for reviewer's ratings.\
@@ -771,8 +837,8 @@ class PMS_Appraisee(models.Model):
                 )
         self.check_fc_section_lines()
         self.check_lc_section_lines()
-        self.check_current_assessment_section_lines()
-        self.check_potential_assessment_section_lines()
+        # self.check_current_assessment_section_lines()
+        # self.check_potential_assessment_section_lines()
         msg = """Dear {}, <br/> 
         I wish to notify you that your appraisal has been reviewed successfully.\
         Yours Faithfully<br/>{}<br/>HR Department ({})""".format(

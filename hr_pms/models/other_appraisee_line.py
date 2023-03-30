@@ -61,7 +61,7 @@ class currentAssessmentSectionLine(models.Model):
         string='FA Rating', 
         )
     reviewer_rating = fields.Integer(
-        string='RA Rating',
+        string='Reviewer Ratings',
         ) 
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -71,7 +71,8 @@ class currentAssessmentSectionLine(models.Model):
         ('wating_approval', 'HR to Approve'),
         ('done', 'Done'),
         ('withdraw', 'Withdrawn'),
-        ], string="Status", default = "draft", readonly=True, related="current_assessment_section_id.state")
+        ], string="Status", default = "draft", readonly=True)
+    # , related="current_assessment_section_id.state")
     
     weighted_score = fields.Float(
         string='Weighted (%) Score', 
@@ -83,6 +84,45 @@ class currentAssessmentSectionLine(models.Model):
         help="Takes in the default scale",
         default=5
         )
+    assessment_type = fields.Selection([
+        ('Ordinary', 'Ordinary'),
+        ('Diligent', 'Diligent'),
+        ('Fantastic', 'Fantastic'),
+        ('Superb', 'Superb'),
+        ], string="Choose", default = "", readonly=False)
+    
+    @api.onchange('assessment_type')
+    def onchange_assessment_type(self):
+        if self.assessment_type == 'Ordinary':
+            rating = 1
+        elif self.assessment_type == 'Diligent':
+            rating = 2
+        elif self.assessment_type == 'Fantastic':
+            rating = 3
+        elif self.assessment_type == 'Superb':
+            rating = 4 
+        else:
+            rating = 0
+        self.administrative_supervisor_rating = rating
+        self.functional_supervisor_rating = rating
+        self.reviewer_rating = rating
+    
+    # @api.depends(
+    #     'administrative_supervisor_rating',
+    #     'functional_supervisor_rating',
+    #     'reviewer_rating')
+    # def compute_weighted_score(self):
+    #     for rec in self:
+    #         fc_avg_scale = 4 # or 5 is set as default in case nothing was provided
+    #         if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
+    #             ar = rec.administrative_supervisor_rating * 30
+    #             f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+    #             fr = rec.functional_supervisor_rating * f_rating
+    #             rr = rec.reviewer_rating * 40
+    #             ratings = (ar + fr + rr) / fc_avg_scale
+    #             rec.weighted_score = ratings
+    #         else:
+    #             rec.weighted_score = 0
     
     @api.onchange(
         'functional_supervisor_rating', 
@@ -157,7 +197,7 @@ class PotentialSectionLine(models.Model):
         string='FA Rating', 
         )
     reviewer_rating = fields.Integer(
-        string='RA Rating',
+        string='Reviewer Ratings',
         ) 
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -167,7 +207,8 @@ class PotentialSectionLine(models.Model):
         ('wating_approval', 'HR to Approve'),
         ('done', 'Done'),
         ('withdraw', 'Withdrawn'),
-        ], string="Status", default = "draft", readonly=True, related="potential_section_id.state")
+        ], string="Status", default = "draft", readonly=True)
+    # , related="potential_section_id.state")
     
     weighted_score = fields.Float(
         string='Weighted (%) Score', 
@@ -179,6 +220,46 @@ class PotentialSectionLine(models.Model):
         help="Takes in the default scale",
         default=5
         )
+    assessment_type = fields.Selection([
+        ('Ordinary', 'Ordinary'),
+        ('Diligent', 'Diligent'),
+        ('Fantastic', 'Fantastic'),
+        ('Superb', 'Superb'),
+        ], string="Choose", default = "", readonly=False)
+    
+    @api.onchange('assessment_type')
+    def onchange_assessment_type(self):
+        if self.assessment_type == 'Ordinary':
+            rating = 1
+        elif self.assessment_type == 'Diligent':
+            rating = 2
+        elif self.assessment_type == 'Fantastic':
+            rating = 3
+        elif self.assessment_type == 'Superb':
+            rating = 4 
+        else:
+            rating = 0
+        self.administrative_supervisor_rating = rating
+        self.functional_supervisor_rating = rating
+        self.reviewer_rating = rating
+    
+    # @api.depends(
+    #     'administrative_supervisor_rating',
+    #     'functional_supervisor_rating',
+    #     'reviewer_rating')
+    # def compute_weighted_score(self):
+    #     for rec in self:
+    #         fc_avg_scale = 4 # or 5 is set as default in case nothing was provided
+    #         if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
+    #             ar = rec.administrative_supervisor_rating * 30
+    #             f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+    #             fr = rec.functional_supervisor_rating * f_rating
+    #             rr = rec.reviewer_rating * 40
+    #             ratings = (ar + fr + rr) / fc_avg_scale
+    #             rec.weighted_score = ratings
+    #         else:
+    #             rec.weighted_score = 0
+
     @api.onchange(
         'functional_supervisor_rating', 
         'administrative_supervisor_rating',

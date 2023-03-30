@@ -136,32 +136,45 @@ class PMSDepartment(models.Model):
     #             rec.is_department_head = False 
 
     def get_current_assessment_lines(self, appraisee):
-        vals = self.env['assessment.description'].search([
-            ('type', '=', 'current')
-        ])
-        if vals:
-            appraisee.sudo().write({
-                'current_assessment_section_line_ids': [(0, 0, {
-                    'name': value.name, 
-                    'desc': value.desc,
-                    'weightage': 100/len(vals), # divided the num of lines to get 100% eg. 100/4
-                    'current_assessment_section_id': appraisee.id
-                    }) for value in vals]
-            })
+        # vals = self.env['assessment.description'].search([
+        #     ('type', '=', 'current')
+        # ])
+        # if vals:
+        vals = [
+            'Administrative Appraiser',
+            'Functional Appraiser',
+            'Functional Reviewer',
+            ]
+        appraisee.sudo().write({
+            'current_assessment_section_line_ids': [(0, 0, {
+                'name': value,
+                'state': 'admin_rating' if value == 'Administrative Appraiser' else 'functional_rating' if value == 'Functional Appraiser' else 'reviewer_rating', 
+                # 'desc': value.desc,
+                # 'weightage': 100/len(vals), # divided the num of lines to get 100% eg. 100/4
+                'current_assessment_section_id': appraisee.id
+                }) for value in vals]
+        })
     
     def get_potential_assessment_lines(self, appraisee):
-        vals = self.env['assessment.description'].search([
-            ('type', '=', 'potential')
-        ])
-        if vals:
-            appraisee.sudo().write({
-                'potential_assessment_section_line_ids': [(0, 0, {
-                    'name': value.name, 
-                    'desc': value.desc,
-                    'weightage': 100/len(vals), # divided the num of lines to get 100% eg. 100/4
-                    'potential_section_id': appraisee.id
-                    }) for value in vals]
-            })
+        # vals = self.env['assessment.description'].search([
+        #     ('type', '=', 'potential')
+        # ])
+        # if vals:
+        vals = [
+            'Administrative Appraiser',
+            'Functional Appraiser',
+            'Functional Reviewer',
+            ]
+    
+        appraisee.sudo().write({
+            'potential_assessment_section_line_ids': [(0, 0, {
+                'name': value, 
+                'state': 'admin_rating' if value == 'Administrative Appraiser' else 'functional_rating' if value == 'Functional Appraiser' else 'reviewer_rating', 
+                # 'desc': value.desc,
+                # 'weightage': 100/len(vals), # divided the num of lines to get 100% eg. 100/4
+                'potential_section_id': appraisee.id
+                }) for value in vals]
+        })
 
     def get_url(self, id, name):
         base_url = http.request.env['ir.config_parameter'].sudo().get_param('web.base.url')
