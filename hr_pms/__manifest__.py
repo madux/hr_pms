@@ -31,7 +31,7 @@
     "active": False,
     'application': True,
     "sequence": 6,
-    "images": ['images/images.jpg'],
+    # "images": ['images/images.jpg'],
     "price": 60,
     "currency": 'EUR',
 }
