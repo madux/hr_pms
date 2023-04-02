@@ -16,6 +16,11 @@
                     <field name="ps_district_id" required="0"/>
                     <field name="employee_number" required="0"/>
                 </field>
+
+                <!-- 'work_unit_id': vals.get('sub_unit_id'),
+                        'employment_date': vals.get('employment_date'),
+                        'grade_id': vals.get('grade_id'),
+                        'level_id -->
                 <div name="button_box" position="inside">
                     <button name="open_employee_appraisals" class="oe_stat_button" groups="hr.group_hr_user" icon="fa-group" type="object">
                         <div class="o_field_widget o_stat_info">

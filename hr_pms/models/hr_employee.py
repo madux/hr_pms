@@ -30,6 +30,33 @@ class HRDistrict(models.Model):
         required=True
         )
 
+class HRLevel(models.Model):
+    _name = "hr.level"
+    _description = "HR level"
+
+    name = fields.Char(
+        string="Name", 
+        required=True
+        )
+    
+class HRUNIT(models.Model):
+    _name = "hr.unit"
+    _description = "HR Unit"
+
+    name = fields.Char(
+        string="Name", 
+        required=True
+        )
+    
+class HRgrade(models.Model):
+    _name = "hr.grade"
+    _description = "HR grade"
+
+    name = fields.Char(
+        string="Name", 
+        required=True
+        )
+    
 
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
@@ -37,10 +64,17 @@ class HrEmployee(models.Model):
     # pms_appraisal_ids = fields.Many2many('usl.employee.appraisal', string="Appraisals", readonly=True)
     administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
     reviewer_id = fields.Many2one('hr.employee', string="Reviewer")
+    employment_date = fields.Date(string="Employement date")
+    level_id = fields.Many2one('hr.level', string="Level")
+    grade_id = fields.Many2one('hr.grade', string="Grade")
     work_unit_id = fields.Many2one('hr.work.unit', string="Unit/SC/Workshop/Substation")
+    unit_id = fields.Many2one('hr.unit', string="Unit")
     ps_district_id = fields.Many2one('hr.district', string="Employee District")
     employee_number = fields.Char(
         string="Staff Number", 
+        )
+    migrated_password = fields.Char(
+        string="migrated password", 
         )
     pms_number_appraisal = fields.Integer(string="Appraisal",)# compute="_compute_employees_component")
     pms_number_queries = fields.Integer(string="Queries",)# compute="_compute_employees_component")
