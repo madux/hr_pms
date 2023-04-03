@@ -57,28 +57,28 @@ class HRgrade(models.Model):
         required=True
         )
 
-class HrEmployeePublicInherit(models.Model):
-    _inherit = "hr.employee.public"
+# class HrEmployeePublicInherit(models.Model):
+#     _inherit = "hr.employee.public"
     
-    administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
-    reviewer_id = fields.Many2one('hr.employee', string="Reviewer")
-    employment_date = fields.Date(string="Employement date")
-    level_id = fields.Many2one('hr.level', string="Level")
-    grade_id = fields.Many2one('hr.grade', string="Grade")
-    work_unit_id = fields.Many2one('hr.work.unit', string="Unit/SC/Workshop/Substation")
-    unit_id = fields.Many2one('hr.unit', string="Unit")
-    ps_district_id = fields.Many2one('hr.district', string="Employee District")
-    employee_number = fields.Char(
-        string="Staff Number", 
-        )
-    migrated_password = fields.Char(
-        string="migrated password", 
-        ) 
-    pms_number_appraisal = fields.Integer(string="Appraisal",)# compute="_compute_employees_component")
-    pms_number_queries = fields.Integer(string="Queries",)# compute="_compute_employees_component")
-    pms_number_commendation = fields.Integer(string="Commendation",)# compute="_compute_employees_component")
-    pms_number_warning = fields.Integer(string="Queries", )#compute="_compute_employees_component")
-    pms_number_absent = fields.Integer(string="Absent", )#compute="_compute_employees_component")
+#     administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
+#     reviewer_id = fields.Many2one('hr.employee', string="Reviewer")
+#     employment_date = fields.Date(string="Employement date")
+#     level_id = fields.Many2one('hr.level', string="Level")
+#     grade_id = fields.Many2one('hr.grade', string="Grade")
+#     work_unit_id = fields.Many2one('hr.work.unit', string="Unit/SC/Workshop/Substation")
+#     unit_id = fields.Many2one('hr.unit', string="Unit")
+#     ps_district_id = fields.Many2one('hr.district', string="Employee District")
+#     employee_number = fields.Char(
+#         string="Staff Number", 
+#         )
+#     migrated_password = fields.Char(
+#         string="migrated password", 
+#         ) 
+#     pms_number_appraisal = fields.Integer(string="Appraisal",)# compute="_compute_employees_component")
+#     pms_number_queries = fields.Integer(string="Queries",)# compute="_compute_employees_component")
+#     pms_number_commendation = fields.Integer(string="Commendation",)# compute="_compute_employees_component")
+#     pms_number_warning = fields.Integer(string="Queries", )#compute="_compute_employees_component")
+#     pms_number_absent = fields.Integer(string="Absent", )#compute="_compute_employees_component")
     
 
 class HrEmployee(models.Model):
