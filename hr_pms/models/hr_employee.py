@@ -56,6 +56,29 @@ class HRgrade(models.Model):
         string="Name", 
         required=True
         )
+
+class HrEmployeePublic(models.Model):
+    _inherit = ["hr.employee.public"]
+    
+    administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
+    reviewer_id = fields.Many2one('hr.employee', string="Reviewer")
+    employment_date = fields.Date(string="Employement date")
+    level_id = fields.Many2one('hr.level', string="Level")
+    grade_id = fields.Many2one('hr.grade', string="Grade")
+    work_unit_id = fields.Many2one('hr.work.unit', string="Unit/SC/Workshop/Substation")
+    unit_id = fields.Many2one('hr.unit', string="Unit")
+    ps_district_id = fields.Many2one('hr.district', string="Employee District")
+    employee_number = fields.Char(
+        string="Staff Number", 
+        )
+    migrated_password = fields.Char(
+        string="migrated password", 
+        )
+    pms_number_appraisal = fields.Integer(string="Appraisal",)# compute="_compute_employees_component")
+    pms_number_queries = fields.Integer(string="Queries",)# compute="_compute_employees_component")
+    pms_number_commendation = fields.Integer(string="Commendation",)# compute="_compute_employees_component")
+    pms_number_warning = fields.Integer(string="Queries", )#compute="_compute_employees_component")
+    pms_number_absent = fields.Integer(string="Absent", )#compute="_compute_employees_component")
     
 
 class HrEmployee(models.Model):
@@ -81,6 +104,68 @@ class HrEmployee(models.Model):
     pms_number_commendation = fields.Integer(string="Commendation",)# compute="_compute_employees_component")
     pms_number_warning = fields.Integer(string="Queries", )#compute="_compute_employees_component")
     pms_number_absent = fields.Integer(string="Absent", )#compute="_compute_employees_component")
+    
+    # def _message_post(self, template):
+    #     """Wrapper method for message_post_with_template
+
+    #     Args:
+    #         template (str): email template
+    #     """
+    #     if template:
+    #         self.message_post_with_template(
+    #             template.id, composition_mode='comment',
+    #             model='hr.employee', res_id=self.id,
+    #             email_layout_xmlid='mail.mail_notification_light',
+    #         )
+
+    def send_credential_notification(self):
+        MAIL_TEMPLATE = self.env.ref(
+        'hr_pms.mail_template_pms_notification', raise_if_not_found=False)
+        # self.with_context(allow_write=True)._message_post(
+        #     MAIL_TEMPLATE) 
+        rec_ids = self.env.context.get('active_ids', [])
+        for rec in rec_ids:
+            record = self.env['hr.employee'].browse([rec])
+            if record.work_email or record.private_email:
+                email_to = record.work_email or record.private_email 
+                ir_model_data = self.env['ir.model.data']
+                template_id = ir_model_data.get_object_reference('hr_pms', 'mail_template_pms_notification')[1]         
+                if template_id:
+                    ctx = dict()
+                    ctx.update({
+                        'default_model': 'hr.employee',
+                        'default_res_id': record.id,
+                        'default_use_template': bool(template_id),
+                        'default_template_id': template_id,
+                        'default_composition_mode': 'comment',
+                    })
+                    template_rec = self.env['mail.template'].browse(template_id)
+                    if email_to:
+                        template_rec.write({'email_to': email_to})
+                    template_rec.with_context(ctx).send_mail(record.id, True)
+                # record.action_send_mail(
+                #     'mail_template_pms_notification', 
+                #     [record.work_email, record.private_email],
+                #     )
+    
+    # def action_send_mail(self, with_template_id, email_items= None, email_from=None):
+    #     '''Email_to = [lists of emails], Contexts = {Dictionary} '''
+    #     email_to = (','.join([m for m in email_items])) if email_items else False
+    #     ir_model_data = self.env['ir.model.data']
+    #     template_id = ir_model_data.get_object_reference('hr_pms', 'mail_template_pms_notification')[1]         
+    #     if template_id:
+    #         ctx = dict()
+    #         ctx.update({
+    #             'default_model': 'hr.employee',
+    #             'default_res_id': self.id,
+    #             'default_use_template': bool(template_id),
+    #             'default_template_id': template_id,
+    #             'default_composition_mode': 'comment',
+    #         })
+    #         template_rec = self.env['mail.template'].browse(template_id)
+    #         if email_to:
+    #             template_rec.write({'email_to': email_to})
+    #         template_rec.with_context(ctx).send_mail(self.id, True)
 
     # @api.depends('appraisal_ids')
     # def _compute_employees_component(self):
