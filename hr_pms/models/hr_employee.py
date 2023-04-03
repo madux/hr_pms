@@ -57,8 +57,8 @@ class HRgrade(models.Model):
         required=True
         )
 
-class HrEmployeePublic(models.Model):
-    _inherit = ["hr.employee.public"]
+class HrEmployeePublicInherit(models.Model):
+    _inherit = "hr.employee.public"
     
     administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
     reviewer_id = fields.Many2one('hr.employee', string="Reviewer")
@@ -73,7 +73,7 @@ class HrEmployeePublic(models.Model):
         )
     migrated_password = fields.Char(
         string="migrated password", 
-        )
+        ) 
     pms_number_appraisal = fields.Integer(string="Appraisal",)# compute="_compute_employees_component")
     pms_number_queries = fields.Integer(string="Queries",)# compute="_compute_employees_component")
     pms_number_commendation = fields.Integer(string="Commendation",)# compute="_compute_employees_component")
