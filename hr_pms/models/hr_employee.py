@@ -81,8 +81,8 @@ class HRgrade(models.Model):
 #     pms_number_absent = fields.Integer(string="Absent", )#compute="_compute_employees_component")
     
 
-class HrEmployee(models.Model):
-    _inherit = "hr.employee"
+class HrEmployee(models.AbstractModel):
+    _inherit = "hr.employee.base"
 
     # pms_appraisal_ids = fields.Many2many('usl.employee.appraisal', string="Appraisals", readonly=True)
     administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
