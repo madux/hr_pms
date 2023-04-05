@@ -92,7 +92,8 @@ class ImportRecords(models.TransientModel):
         if self.data_file:
             file_datas = base64.decodestring(self.data_file)
             workbook = xlrd.open_workbook(file_contents=file_datas)
-            sheet = workbook.sheet_by_index(0)
+            sheet_index = int(self.index) if self.index else 0
+            sheet = workbook.sheet_by_index(sheet_index)
             data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
             data.pop(0)
             file_data = data
@@ -153,11 +154,10 @@ class ImportRecords(models.TransientModel):
                     appraiser.user_id.sudo().write({'groups_id':group_list})
 
         def create_employee(vals):
-            user, password = generate_user(vals)
             employee_id = self.env['hr.employee'].sudo().create({
                         'name': vals.get('fullname'),
                         'employee_number': vals.get('staff_number'),
-                        'employee_identification_code': vals.get('staff_number'),
+                        # 'employee_identification_code': vals.get('staff_number'),
                         'ps_district_id': vals.get('district'),
                         'gender': vals.get('gender'),
                         'department_id': vals.get('department_id'),
@@ -175,12 +175,13 @@ class ImportRecords(models.TransientModel):
                         'mobile_phone': vals.get('work_phone'),
                         'phone': vals.get('phone'),
                         'job_id': vals.get('job_id'),
-                        'user_id': user.id,
-                        'migrated_password': password,
                         # 'emergency_phone': vals.get('emergency_phone'),
                     })
+            user, password = generate_user(vals)
             employee_id.sudo().write({
-                                      'work_email': vals.get('email')
+                        'user_id': user.id if user else False,
+                        'work_email': vals.get('email'),
+                        'migrated_password': password,
             })
 
         def generate_user(
@@ -194,8 +195,9 @@ class ImportRecords(models.TransientModel):
                 ['|','|','|',
                  ('name', '=', 'Contact Creation'),
                  ('name','=','Portal'),
-                 ('name','=','Manual Attendance'),
                  ('id', 'in', [
+                self.env.ref('hr_attendance.group_hr_attendance_manager').id,
+                self.env.ref('hr_attendance.group_hr_attendance_user').id,
                 self.env.ref('hr.group_hr_manager').id,
                 self.env.ref('hr.group_hr_user').id,]),
                  ])
@@ -204,6 +206,7 @@ class ImportRecords(models.TransientModel):
                 group_list.append(tup)
             email = vals.get('email') or vals.get('private_emaill')
             fullname = vals.get('fullname')
+            user, password = False, False
             if email:
                 password = ''.join(random.choice('eedcpasswodforxyzusers1234567') for _ in range(10))
                 # '{}-{}'.format(fullname[:2].upper(), str(uuid.uuid4())[:8]), # MA-2132ERER
@@ -222,15 +225,24 @@ class ImportRecords(models.TransientModel):
                 _logger.info('Adding user to group ...')
                 user.sudo().write({'groups_id':group_list})
                 return user, password
+            return user, password
                      
         if self.import_type == "employee":
             for row in file_data:
                 # try:
-                appt_date = '01-Jan-2014'
+                static_emp_date = '01/01/2014'
+                emp_date = datetime.strptime(static_emp_date, '%d/%m/%Y')
+                appt_date = None
                 if row[14]:
                     pref = row[14].strip()[0:7] # 12-Jul-
                     suff = '20'+ row[14].strip()[-2:] # 2022
-                    appt_date = pref + suff 
+                    appt_date = pref + suff
+                    try:
+                        appt_date = datetime.strptime(appt_date, '%d-%b-%Y') if row[14].strip() else False
+                    except Exception as e:
+                        pass 
+                dt = appt_date or emp_date
+
                 vals = dict(
                     serial = row[0],
                     staff_number = str(int(row[1])),
@@ -241,7 +253,7 @@ class ImportRecords(models.TransientModel):
                     department_id = self.create_department(row[11]),
                     unit_id = self.get_unit_id(row[12].strip()),
                     sub_unit_id = self.get_sub_unit_id(row[13].strip()),
-                    employment_date = datetime.strptime(appt_date, '%m-%b-%Y') if row[14].strip() else False,
+                    employment_date = dt,# datetime.strptime(appt_date, '%m-%b-%Y') if row[14].strip() else False,
                     # employment_date = datetime.strptime(row[14], '%m/%d/%Y') if row[14] else False,
                     grade_id = self.get_grade_id(row[15].strip()),
                     job_id = self.get_designation_id(row[16]),
@@ -251,8 +263,10 @@ class ImportRecords(models.TransientModel):
                     functional_reviewer_id = find_existing_employee(str(row[22])),
                     email = row[24].strip() or row[26].strip(),
                     private_email = row[26].strip(),
-                    work_phone = row[25] or row[28] or 27,
-                    phone = row[27] or row[25],
+                    # work_phone = row[25] or row[28] or 27,
+                    # phone = row[27] or row[25],
+                    work_phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False or '0'+str(int(row[28])) if row[28] and type(row[28]) in [float] else row[27] if row[27] else False,
+                    phone = '0'+str(int(row[27])) if type(row[27]) in [float] else row[25] if row[25] else False
                     )
                 create_employee(vals)
                 count += 1
@@ -267,14 +281,21 @@ class ImportRecords(models.TransientModel):
             for row in file_data:
                 ########################### This is for update purposes:
                 employee_code = str(int(row[1])) if type(row[1]) == float else row[1]
-                appt_date = '01-Jan-2014'
+                static_emp_date = '01/01/2014'
+                emp_date = datetime.strptime(static_emp_date, '%d/%m/%Y')
+                appt_date = None
                 if row[14]:
                     pref = row[14].strip()[0:7] # 12-Jul-
                     suff = '20'+ row[14].strip()[-2:] # 2022
-                    appt_date = pref + suff 
+                    appt_date = pref + suff
+                    try:
+                        appt_date = datetime.strptime(appt_date, '%d-%b-%Y') if row[14].strip() else False
+                    except Exception as e:
+                        pass 
+                dt = appt_date or emp_date
                 employee_vals = dict(
                     employee_number = str(int(row[1])),
-                    employee_identification_code = employee_code,
+                    # employee_identification_code = employee_code,
                     name = row[2].capitalize(),
                     ps_district_id = self.get_district_id(row[3].strip()),
                     level_id = self.get_level_id(row[5].strip()),
@@ -282,23 +303,23 @@ class ImportRecords(models.TransientModel):
                     department_id = self.create_department(row[11]),
                     unit_id = self.get_unit_id(row[12].strip()),
                     work_unit_id = self.get_sub_unit_id(row[13].strip()),
-                    employment_date = datetime.strptime(appt_date, '%m-%b-%Y') if row[14].strip() else False,
+                    employment_date = dt,
                     # employment_date = datetime.strptime(row[14], '%m/%d/%Y') if row[14] else False,
                     grade_id = self.get_grade_id(row[15].strip()),
                     job_id = self.get_designation_id(row[16]), 
                     work_email = row[24].strip() or row[26].strip(),
                     private_email = row[26].strip(),
-                    work_phone = str(int(row[25])) if type(row[25]) in [float] else row[25] or str(int(row[28])) if type(row[28]) in [float] else row[28],
-                    phone = str(int(row[27])) if type(row[27]) in [float] else row[25] or row[25],
+                    work_phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False or '0'+str(int(row[28])) if row[28] and type(row[28]) in [float] else row[27] if row[27] else False,
+                    phone = '0'+str(int(row[27])) if type(row[27]) in [float] else row[25] if row[25] else False
                     )
                 # ######################################
                 # THIS IS TO UPDATE THE EMPLOYEE DEPARTMENTAL MANAGER AND APPRAISERS 
-                aa, fa, rr = row[18],row[20],row[22]
+                aa, fa, rr = row[20],row[18],row[22]
                 vals = dict(
                     staff_number = employee_code,
-                    functional_appraiser_id = row[18],
-                    administrative_supervisor_id = row[20],
-                    functional_reviewer_id = row[22], 
+                    functional_appraiser_id = fa,
+                    administrative_supervisor_id = aa,
+                    functional_reviewer_id = rr, 
                     )
                     ## if fa, add, fr get the employee id, add the 
                     ## attributes to employee, also update the femployee user
@@ -307,9 +328,13 @@ class ImportRecords(models.TransientModel):
                 '|', ('employee_number', '=', employee_code), 
                 ('barcode', '=', employee_code)], limit = 1)
                 if employee_id:
+                    ## update employee job_id.department_id to the employee department
+                    employee_id.job_id.sudo().write({
+                        'department_id': employee_id.department_id.id
+                    })
                     if aa:
                         administrative_supervisor_id = str(int(vals.get('administrative_supervisor_id'))) \
-                        if type(row[20]) == float else row[20]
+                        if type(aa) == float else aa
                         generate_emp_appraiser(
                             employee_id, 
                             administrative_supervisor_id, 
@@ -317,7 +342,7 @@ class ImportRecords(models.TransientModel):
                             )
                     if fa:
                         functional_appraiser_id = str(int(vals.get('functional_appraiser_id'))) \
-                        if type(row[18]) == float else row[18]
+                        if type(fa) == float else fa
                         generate_emp_appraiser(
                             employee_id, 
                             functional_appraiser_id, 
