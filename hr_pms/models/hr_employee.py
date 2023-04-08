@@ -11,6 +11,17 @@ from lxml import etree
 _logger = logging.getLogger(__name__)
 
 
+class HrRegion(models.Model):
+    _name = "hr.region"
+    _description = "HR work unit"
+
+    name = fields.Char(
+        string="Name", 
+        required=True
+        )
+
+
+
 class HRUnit(models.Model):
     _name = "hr.work.unit"
     _description = "HR work unit"
@@ -87,6 +98,7 @@ class HrEmployee(models.AbstractModel):
     # pms_appraisal_ids = fields.Many2many('usl.employee.appraisal', string="Appraisals", readonly=True)
     administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
     reviewer_id = fields.Many2one('hr.employee', string="Reviewer")
+    hr_region_id = fields.Many2one('hr.region', string="Region")
     employment_date = fields.Date(string="Employement date")
     level_id = fields.Many2one('hr.level', string="Level")
     grade_id = fields.Many2one('hr.grade', string="Grade")

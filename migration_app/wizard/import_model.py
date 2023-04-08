@@ -47,10 +47,10 @@ class ImportRecords(models.TransientModel):
             depart_rec = department_obj.search([('name', '=', name.strip())], limit = 1)
             department_id = department_obj.create({
                         "name": name
-                    }).id if not depart_rec else depart_rec.id
+                    }).id if not depart_rec else depart_rec.id # refactor code here
             return department_id
         else:
-            return None
+            return False
 
     def get_level_id(self, name):
         if not name:
@@ -75,6 +75,12 @@ class ImportRecords(models.TransientModel):
             return False
         designationId = self.env['hr.job'].search([('name', '=', name)], limit=1)
         return designationId.id if designationId else self.env['hr.job'].create({'name': name}).id
+    
+    def get_region_id(self, name):
+        if not name:
+            return False
+        rec = self.env['hr.region'].search([('name', '=', name)], limit=1)
+        return rec.id if rec else self.env['hr.region'].create({'name': name}).id
 
     def get_unit_id(self, name):
         if not name:
@@ -154,45 +160,23 @@ class ImportRecords(models.TransientModel):
                     appraiser.user_id.sudo().write({'groups_id':group_list})
 
         def create_employee(vals):
-            employee_id = self.env['hr.employee'].sudo().create({
-                        'name': vals.get('fullname'),
-                        'employee_number': vals.get('staff_number'),
-                        # 'employee_identification_code': vals.get('staff_number'),
-                        'ps_district_id': vals.get('district'),
-                        'gender': vals.get('gender'),
-                        'department_id': vals.get('department_id'),
-                        'unit_id': vals.get('unit_id'),
-                        'work_unit_id': vals.get('sub_unit_id'),
-                        'employment_date': vals.get('employment_date'),
-                        'grade_id': vals.get('grade_id'),
-                        'level_id': vals.get('level_id'),
-                        # 'administrative_supervisor_id': vals.get('administrative_supervisor_id'),
-                        # 'parent_id': vals.get('functional_appraiser_id'),
-                        # 'reviewer_id': vals.get('functional_reviewer_id'),
-                        'work_email': vals.get('email'),
-                        'private_email': vals.get('private_email'),
-                        'work_phone': vals.get('work_phone'),
-                        'mobile_phone': vals.get('work_phone'),
-                        'phone': vals.get('phone'),
-                        'job_id': vals.get('job_id'),
-                        # 'emergency_phone': vals.get('emergency_phone'),
-                    })
+            employee_id = self.env['hr.employee'].sudo().create(vals)
             user, password = generate_user(vals)
             employee_id.sudo().write({
-                        'user_id': user.id if user else False,
-                        'work_email': vals.get('email'),
-                        'migrated_password': password,
-            })
+                    'user_id': user.id if user else False,
+                    # 'work_email': vals.get('worK_email'),
+                    'migrated_password': password
+                })
 
         def generate_user(
                 vals,
                 ):
             emp_group = self.env.ref("hr_pms.group_pms_user_id")
             Group = self.env['res.groups'].sudo()
-            group_list = [(4, emp_group.id)]
+            group_list = [(4, emp_group.id)]  # Changed 4 to 6
             ## Removing Contact Creation and Employee group from Org. relateduser.
             groups_to_remove = Group.search(
-                ['|','|','|',
+                ['|','|',
                  ('name', '=', 'Contact Creation'),
                  ('name','=','Portal'),
                  ('id', 'in', [
@@ -204,26 +188,28 @@ class ImportRecords(models.TransientModel):
             for group in groups_to_remove:
                 tup = (3,group.id)
                 group_list.append(tup)
-            email = vals.get('email') or vals.get('private_emaill')
-            fullname = vals.get('fullname')
+            email = vals.get('worK_email')# or vals.get('private_emaill')
+            fullname = vals.get('name')
+            staffno = vals.get('employee_number')
             user, password = False, False
-            if email:
+            if staffno:
                 password = ''.join(random.choice('eedcpasswodforxyzusers1234567') for _ in range(10))
+                password = "1234"
                 # '{}-{}'.format(fullname[:2].upper(), str(uuid.uuid4())[:8]), # MA-2132ERER
                 user_vals = {
 				'name' : fullname,
-				'login' : email,
+				'login' : staffno,
 				'password': password,
                 }
-                _logger.info("Creating employee Rep User...")
+                #_logger.info(f"Creating employee Rep User... {vals.get('serial')}")
                 User = self.env['res.users'].sudo()
-                user = User.search([('login', '=', email)],limit=1)
+                user = User.search([('login', '=', staffno)],limit=1)
                 if user:
                     pass # user.write(user_vals)
                 else:
                     user = User.create(user_vals)
-                _logger.info('Adding user to group ...')
-                user.sudo().write({'groups_id':group_list})
+                    _logger.info('Adding user to group ...')
+                    user.sudo().write({'groups_id':group_list})
                 return user, password
             return user, password
                      
@@ -234,43 +220,79 @@ class ImportRecords(models.TransientModel):
                 emp_date = datetime.strptime(static_emp_date, '%d/%m/%Y')
                 appt_date = None
                 if row[14]:
-                    pref = row[14].strip()[0:7] # 12-Jul-
-                    suff = '20'+ row[14].strip()[-2:] # 2022
-                    appt_date = pref + suff
                     try:
-                        appt_date = datetime.strptime(appt_date, '%d-%b-%Y') if row[14].strip() else False
+                        str_date = row[14].strip()
+                        appt_date = datetime.strptime(str_date,'%d-%b-%y').date() if str_date else False
                     except Exception as e:
                         pass 
                 dt = appt_date or emp_date
+                # raise UserError(f"Name: {row[2]} Employment Date: {appt_date} Row value: {str(row[14])}")
 
                 vals = dict(
-                    serial = row[0],
-                    staff_number = str(int(row[1])),
-                    fullname = row[2].capitalize(),
-                    district = self.get_district_id(row[3].strip()),
-                    level_id = self.get_level_id(row[5].strip()),
+                    # serial = row[0],
+                    employee_number = str(int(row[1])),
+                    name = row[2].capitalize(),
                     gender = 'male' if row[10] in ['m', 'M'] else 'female' if row[10] in ['f', 'F'] else 'other',
-                    department_id = self.create_department(row[11]),
-                    unit_id = self.get_unit_id(row[12].strip()),
-                    sub_unit_id = self.get_sub_unit_id(row[13].strip()),
-                    employment_date = dt,# datetime.strptime(appt_date, '%m-%b-%Y') if row[14].strip() else False,
-                    # employment_date = datetime.strptime(row[14], '%m/%d/%Y') if row[14] else False,
-                    grade_id = self.get_grade_id(row[15].strip()),
-                    job_id = self.get_designation_id(row[16]),
-                    functional_appraiser_id = find_existing_employee(row[18]),
-                    administrative_supervisor_name = row[19],
-                    administrative_supervisor_id = find_existing_employee(str(row[20])),
-                    functional_reviewer_id = find_existing_employee(str(row[22])),
-                    email = row[24].strip() or row[26].strip(),
-                    private_email = row[26].strip(),
-                    # work_phone = row[25] or row[28] or 27,
-                    # phone = row[27] or row[25],
-                    work_phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False or '0'+str(int(row[28])) if row[28] and type(row[28]) in [float] else row[27] if row[27] else False,
-                    phone = '0'+str(int(row[27])) if type(row[27]) in [float] else row[25] if row[25] else False
-                    )
+                    employment_date = dt,
+                    work_email = row[24].strip(),
+                    private_email = row[24].strip(),
+                    work_phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False,
+                    phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False # possible duplicate
+                )
+
+                try:
+                    temp = self.get_level_id(row[3].strip())
+                    if temp:
+                        vals.update({"level_id": temp})
+
+                    temp = self.get_district_id(row[9].strip())
+                    if temp:
+                        vals.update({"ps_district_id": temp})
+                
+                    temp = self.create_department(row[11])
+                    if temp:
+                        vals.update({"department_id": temp})
+                    
+                    temp = self.get_unit_id(row[12].strip())
+                    if temp:
+                        vals.update({"unit_id": temp})
+
+                    temp = self.get_sub_unit_id(row[13].strip())
+                    if temp:
+                        vals.update({"work_unit_id": temp})
+                
+                    temp = self.get_grade_id(row[15].strip())
+                    if temp:
+                        vals.update({"grade_id": temp})
+
+                    temp = self.get_designation_id(row[16])
+                    if temp:
+                        vals.update({"job_id": temp})
+
+                    # temp = find_existing_employee(row[18])
+                    # if temp:
+                    #     vals.update({"functional_appraiser_id": temp})
+                
+                    # temp = find_existing_employee(str(row[20]))
+                    # if temp:
+                    #     vals.update({"administrative_supervisor_id": temp})
+
+                    # temp = find_existing_employee(str(row[22]))
+                    # if temp:
+                    #     vals.update({"functional_reviewer_id": temp})
+
+                    temp = self.get_region_id(row[26].strip())
+                    if temp:
+                        vals.update({"hr_region_id": temp})
+                except:
+                    pass
+                    
+            
+                print(f'REEE=====> {row[0]}')
+                logging.error('It is now row %d', row[0])
                 create_employee(vals)
                 count += 1
-                success_records.append(vals.get('fullname'))
+                success_records.append(vals.get('name'))
             errors.append('Successful Import(s): '+str(count)+' Record(s): See Records Below \n {}'.format(success_records))
             errors.append('Unsuccessful Import(s): '+str(unsuccess_records)+' Record(s)')
             if len(errors) > 1:
@@ -297,8 +319,8 @@ class ImportRecords(models.TransientModel):
                     employee_number = str(int(row[1])),
                     # employee_identification_code = employee_code,
                     name = row[2].capitalize(),
-                    ps_district_id = self.get_district_id(row[3].strip()),
-                    level_id = self.get_level_id(row[5].strip()),
+                    ps_district_id = self.get_district_id(row[9].strip()),
+                    level_id = self.get_level_id(row[3].strip()),
                     gender = 'male' if row[10] in ['m', 'M'] else 'female' if row[10] in ['f', 'F'] else 'other',
                     department_id = self.create_department(row[11]),
                     unit_id = self.get_unit_id(row[12].strip()),
@@ -307,10 +329,11 @@ class ImportRecords(models.TransientModel):
                     # employment_date = datetime.strptime(row[14], '%m/%d/%Y') if row[14] else False,
                     grade_id = self.get_grade_id(row[15].strip()),
                     job_id = self.get_designation_id(row[16]), 
-                    work_email = row[24].strip() or row[26].strip(),
-                    private_email = row[26].strip(),
-                    work_phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False or '0'+str(int(row[28])) if row[28] and type(row[28]) in [float] else row[27] if row[27] else False,
-                    phone = '0'+str(int(row[27])) if type(row[27]) in [float] else row[25] if row[25] else False
+                    work_email = row[24].strip(),
+                    #private_email = row[26].strip(),
+                    work_phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False,
+                    phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False,
+                    hr_region_id = self.get_region_id(row[26].strip()),
                     )
                 # ######################################
                 # THIS IS TO UPDATE THE EMPLOYEE DEPARTMENTAL MANAGER AND APPRAISERS 
