@@ -215,23 +215,19 @@ class ImportRecords(models.TransientModel):
                      
         if self.import_type == "employee":
             for row in file_data:
-                # try:
-                static_emp_date = '01/01/2014'
-                emp_date = datetime.strptime(static_emp_date, '%d/%m/%Y')
-                appt_date = None
+                appt_date = False
                 if row[14]:
                     try:
                         str_date = row[14].strip()
                         appt_date = datetime.strptime(str_date,'%d-%b-%y').date() if str_date else False
                     except Exception as e:
                         pass 
-                dt = appt_date or emp_date
-                # raise UserError(f"Name: {row[2]} Employment Date: {appt_date} Row value: {str(row[14])}")
-
+                dt = appt_date
+            
                 vals = dict(
                     # serial = row[0],
                     employee_number = str(int(row[1])),
-                    name = row[2].capitalize(),
+                    name = row[2].title(),
                     gender = 'male' if row[10] in ['m', 'M'] else 'female' if row[10] in ['f', 'F'] else 'other',
                     employment_date = dt,
                     work_email = row[24].strip(),
@@ -241,6 +237,9 @@ class ImportRecords(models.TransientModel):
                 )
 
                 try:
+                    if dt:
+                        vals.update({"employment_date": dt})
+
                     temp = self.get_level_id(row[3].strip())
                     if temp:
                         vals.update({"level_id": temp})
@@ -303,22 +302,20 @@ class ImportRecords(models.TransientModel):
             for row in file_data:
                 ########################### This is for update purposes:
                 employee_code = str(int(row[1])) if type(row[1]) == float else row[1]
-                static_emp_date = '01/01/2014'
-                emp_date = datetime.strptime(static_emp_date, '%d/%m/%Y')
-                appt_date = None
+
+                appt_date = False
                 if row[14]:
-                    pref = row[14].strip()[0:7] # 12-Jul-
-                    suff = '20'+ row[14].strip()[-2:] # 2022
-                    appt_date = pref + suff
                     try:
-                        appt_date = datetime.strptime(appt_date, '%d-%b-%Y') if row[14].strip() else False
+                        str_date = row[14].strip()
+                        appt_date = datetime.strptime(str_date,'%d-%b-%y').date() if str_date else False
                     except Exception as e:
                         pass 
-                dt = appt_date or emp_date
+                dt = appt_date
+                
                 employee_vals = dict(
                     employee_number = str(int(row[1])),
                     # employee_identification_code = employee_code,
-                    name = row[2].capitalize(),
+                    name = row[2].title(),
                     ps_district_id = self.get_district_id(row[9].strip()),
                     level_id = self.get_level_id(row[3].strip()),
                     gender = 'male' if row[10] in ['m', 'M'] else 'female' if row[10] in ['f', 'F'] else 'other',
@@ -330,7 +327,7 @@ class ImportRecords(models.TransientModel):
                     grade_id = self.get_grade_id(row[15].strip()),
                     job_id = self.get_designation_id(row[16]), 
                     work_email = row[24].strip(),
-                    #private_email = row[26].strip(),
+                    #private_email = row[24].strip(),
                     work_phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False,
                     phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False,
                     hr_region_id = self.get_region_id(row[26].strip()),
