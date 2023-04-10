@@ -516,12 +516,7 @@
                                     </group>
                                 </form>
                             </page>
-
-
-
-
-
-                            <page name="app_section" string="Appraisee Section" invisible="0">
+                            <page name="app_section" string="Appraisee Comment" invisible="0">
                                 <separator string="Appraisee Section" colspan="4"/>
                                 <form string="">
                                     <group>
@@ -530,39 +525,69 @@
                                         </group>
                                         <group>
                                             <field name="appraisee_satisfaction"/> 
+                                            <field name="appraisee_attachement_ids" domain="[('id', '=', None)]"> 
+                                                <form string="-" editable="bottom">
+                                                    <field name="name" string="Description"/> 
+                                                    <field name="datas" string="Upload file"/> 
+                                                </form>
+                                                <tree string="-" editable="bottom">
+                                                    <field name="name" string="Description"/> 
+                                                    <field name="datas" string="Upload file"/> 
+                                                </tree>
+                                            </field>
                                         </group>
                                     </group>
                                 </form>
                             </page>
-                            <page name="manager_section" string="Manager's Section" invisible="0"
+                            <page name="manager_section" string="Manager's Comment" invisible="0"
                             groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer"
                             >
-                                <separator string="Manager's Section" colspan="4"/>
+                                <separator string="Manager's Comment" colspan="4"/>
                                 <form string="">
                                     <group>
                                         <group>
                                             <field name="manager_comment"/> 
                                         </group>
                                         <group>
+                                            <field name="manager_attachement_ids" domain="[('id', '=', None)]">
+                                                <form string="-" editable="bottom">
+                                                    <field name="name" string="Description"/> 
+                                                    <field name="datas" string="Upload file"/> 
+                                                </form>
+                                                <tree string="-" editable="bottom">
+                                                    <field name="name" string="Description"/> 
+                                                    <field name="datas" string="Upload file"/> 
+                                                </tree>
+                                            </field> 
                                         </group>
                                     </group>
                                 </form>
                             </page>
-                            <page name="supervisor_section" string="Supervisor's Section" invisible="0"
+                            <page name="supervisor_section" string="Supervisor's Comment" invisible="0"
                             groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer"
                             >
-                                <separator string="Supervisor's Section" colspan="4"/>
+                                <separator string="Supervisor's Comment" colspan="4"/>
                                 <form string="">
                                     <group>
                                         <group>
                                             <field name="supervisor_comment"/> 
                                         </group>
                                         <group>
+                                            <field name="supervisor_attachement_ids" domain="[('id', '=', None)]">
+                                                <form string="-" editable="bottom">
+                                                    <field name="name" string="Description"/> 
+                                                    <field name="datas" string="Upload file"/> 
+                                                </form>
+                                                <tree string="-" editable="bottom">
+                                                    <field name="name" string="Description"/> 
+                                                    <field name="datas" string="Upload file"/> 
+                                                </tree>
+                                            </field>  
                                         </group>
                                     </group>
                                 </form>
                             </page>
-                            <page name="reviewer_comment" string="Reviewer's Section" invisible="0"
+                            <page name="reviewer_comment" string="Reviewer's Comment" invisible="0"
                             groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer"
                             >
                                 <separator string="Reviewer's Section" colspan="4"/>
@@ -572,6 +597,17 @@
                                             <field name="reviewer_comment"/> 
                                         </group>
                                         <group>
+                                            <field name="reviewer_attachement_ids" domain="[('id', '=', None)]">
+                                                <form string="-" editable="bottom">
+                                                    <field name="name" string="Description"/> 
+                                                    <field name="datas" string="Upload file"/> 
+                                                </form>
+                                                <tree string="-" editable="bottom">
+                                                    <field name="name" string="Description"/> 
+                                                    <field name="datas" string="Upload file"/> 
+                                                </tree>
+                                                
+                                            </field>  
                                         </group>
                                     </group>
                                 </form>
@@ -595,10 +631,10 @@
                     <field name="department_id" readonly="0" string="Department"/>  
                     <field name="pms_year_id" readonly="1" string="Period"/>   
                     <field name="deadline" readonly="1" string="Deadline"/> 
-                    <field name="final_kra_score" readonly="1" string="KRA Score"/> 
+                    <!-- <field name="final_kra_score" readonly="1" string="KRA Score"/> 
                     <field name="final_fc_score" readonly="1" string="FC Score"/> 
-                    <field name="final_lc_score" readonly="1" string="LC Score"/> 
-                    <field name="overall_score" readonly="1" string="Final Score"/> 
+                    <field name="final_lc_score" readonly="1" string="LC Score"/>  -->
+                    <field name="overall_score" readonly="1" string="Overall Score"/> 
                     <field name="state" readonly="1"/> 
                 </tree>
 			</field>
@@ -610,7 +646,12 @@
 			<field name="arch" type="xml">
 				<search string="Search appraisee">
                     <field name="employee_id"/>
+                    <field name="employee_number"/>
                     <field name="department_id"/>
+                    <field name="job_id"/>
+                    <field name="manager_id" string='Manager'/>
+                    <field name="administrative_supervisor_id" string='Administrative Supervisor'/>
+                    <field name="reviewer_id" string='Reviewer'/>
                     <field name="pms_year_id" readonly="0"/>
                     <field name="deadline" readonly="0"/>
                     <filter string="Score: 0 - 19" name="score_0_10" domain="[('overall_score','&lt;', 20)]"/>
@@ -627,6 +668,9 @@
                         <filter name="department_id" string='Department' domain="[]" context="{'group_by' : 'department_id'}"/>
                         <filter name="employee_id" string='Employee' domain="[]" context="{'group_by' : 'employee_id'}"/>
                         <filter name="pms_year_id" string='Period' domain="[]" context="{'group_by' : 'pms_year_id'}"/>
+                        <filter name="manager_id" string='Manager' domain="[]" context="{'group_by' : 'manager_id'}"/>
+                        <filter name="administrative_supervisor_id" string='Administrative Supervisor' domain="[]" context="{'group_by' : 'administrative_supervisor_id'}"/>
+                        <filter name="reviewer_id" string='Reviewer' domain="[]" context="{'group_by' : 'reviewer_id'}"/>
                         <filter name="overall_score" string='Overall Score' domain="[]" context="{'group_by' : 'overall_score'}"/>
                         <filter name="appraisee_satisfaction" string='Appraisee Satisfaction' domain="[]" context="{'group_by' : 'appraisee_satisfaction'}"/>
                         <filter name="state" string='Status' domain="[]" context="{'group_by' : 'state'}"/>

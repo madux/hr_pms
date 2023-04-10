@@ -134,7 +134,8 @@ class PMSJobCategory(models.Model):
     
     def get_url(self, id, name):
         base_url = http.request.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        base_url += '/web#id=%d&view_type=form&model=%s' % (id, name)
+        base_url += '/web'
+        # base_url += '/web#id=%d&view_type=form&model=%s' % (id, name)
         return "<a href={}> </b>Click<a/>. ".format(base_url)
 
     def send_mail_notification(self, pms_department_obj):
@@ -158,12 +159,13 @@ class PMSJobCategory(models.Model):
             self.action_notify(subject, msg, email_to, email_cc)
         else:
 
-            raise ValidationError(
-                """
-                There is no work email address found for the
-                department manager- {}:""".format(
-                pms_department_obj.department_id.name)
-            )
+            # raise ValidationError(
+            #     """
+            #     There is no work email address found for the
+            #     department manager- {}:""".format(
+            #     pms_department_obj.department_id.name)
+            # )
+            pass
         
     def check_job_role_without_department(self):
         jr = self.mapped('job_role_ids').filtered(
