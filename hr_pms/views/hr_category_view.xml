@@ -74,7 +74,7 @@
                                 <field name="lc_weighted_score" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             </group>
                             <group>
-                                <field name="loaded_via_data" invisible="0" readonly="0"/>
+                                <field name="loaded_via_data" invisible="1" readonly="0"/>
                             </group>
                             <div class="alert alert-info" role="alert">
                                 You are required to provide the Section <br/>
@@ -100,7 +100,7 @@
 										</group>
 										</form>
 										<tree string="Job Functions / Position" delete="true" create="true">
-                                            <field name="name" required="1"/>   
+                                            <field name="name" required="1" string="Job Position"/>   
 											<field name="department_id" required="1"/> 
 											<field name="description" string="Job description"/>
 										</tree>

@@ -156,8 +156,8 @@ class PMS_Appraisee(models.Model):
     )
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('admin_rating', 'Admin Supervisor'),
-        ('functional_rating', 'Functional Supervisor'),
+        ('admin_rating', 'Administrative Appraiser'),
+        ('functional_rating', 'Functional Appraiser'),
         ('reviewer_rating', 'Reviewer'),
         ('wating_approval', 'HR to Approve'),
         ('done', 'Done'),
@@ -675,24 +675,26 @@ class PMS_Appraisee(models.Model):
         
     def action_notify(self, subject, msg, email_to, email_cc):
         email_from = self.env.user.email
-        email_ccs = list(filter(bool, email_cc))
-        reciepients = (','.join(items for items in email_ccs)) if email_ccs else False
-        mail_data = {
-                'email_from': email_from,
-                'subject': subject,
-                'email_to': email_to,
-                'reply_to': email_from,
-                'email_cc': reciepients,
-                'body_html': msg,
-                'state': 'sent'
-            }
-        mail_id = self.env['mail.mail'].sudo().create(mail_data)
-        self.env['mail.mail'].sudo().send(mail_id)
-        self.message_post(body=msg)
+        if email_to and email_from:
+            email_ccs = list(filter(bool, email_cc))
+            reciepients = (','.join(items for items in email_ccs)) if email_ccs else False
+            mail_data = {
+                    'email_from': email_from,
+                    'subject': subject,
+                    'email_to': email_to,
+                    'reply_to': email_from,
+                    'email_cc': reciepients,
+                    'body_html': msg,
+                    'state': 'sent'
+                }
+            mail_id = self.env['mail.mail'].sudo().create(mail_data)
+            self.env['mail.mail'].sudo().send(mail_id)
+            self.message_post(body=msg)
     
     def get_url(self, id, name):
         base_url = http.request.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        base_url += '/web#id=%d&view_type=form&model=%s' % (id, name)
+        base_url += '/web'
+        # base_url += '/web#id=%d&view_type=form&model=%s' % (id, name)
         return "<a href={}> </b>Click<a/>. ".format(base_url)
 
     def send_mail_notification(self, msg):

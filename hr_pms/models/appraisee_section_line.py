@@ -24,7 +24,7 @@ class KRA_SectionLine(models.Model):
         
         )
     weightage = fields.Float(
-        string='Weight (Total 100%) by Appraisee', 
+        string='Weight (Total 100%)', 
         
         )
     
@@ -119,6 +119,17 @@ class KRA_SectionLine(models.Model):
                     'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
+
+    @api.onchange('weightage',)
+    def onchange_weightage(self):
+        if self.weightage > 0 and self.weightage not in range (5, 21):
+            message = {
+                'title': 'Invalid Weight',
+                'message': 'Weightage must not be within the range of 5 to 20'
+            }
+            self.weightage = False
+            return {'warning': message}
+
     
     @api.depends('kra_section_id')
     def compute_user_rating_role(self):
@@ -233,20 +244,33 @@ class LC_SectionLine(models.Model):
     def onchange_rating(self):
         if self.state == 'functional_rating':
             if self.lc_section_id.employee_id.parent_id and self.env.user.id != self.lc_section_id.employee_id.parent_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating because you are not the employee's functional manager"""
-                )
+                self.functional_supervisor_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """
+                    Ops ! You are not entitled to add a rating because you are not the employee's functional manager
+                    """
+                }
+
         if self.state == 'admin_rating':
             if self.lc_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.lc_section_id.employee_id.administrative_supervisor_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating 
-                because you are not the employee's administrative supervisor"""
-                )
+                self.administrative_supervisor_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """
+                    Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor
+                    """
+                }
+                 
         if self.state == 'reviewer_rating':
             if self.lc_section_id.employee_id.reviewer_id and self.env.user.id != self.lc_section_id.employee_id.reviewer_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating because you are not the employee's reviewer"""
-                )
+                self.reviewer_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """
+                    Ops ! You are not entitled to add a rating because you are not the employee's reviewer
+                    """
+                }
             
         if self.functional_supervisor_rating > self.section_avg_scale:
             message = {
@@ -381,22 +405,30 @@ class FC_SectionLine(models.Model):
     def onchange_rating(self):
         if self.state == 'functional_rating':
             if self.fc_section_id.employee_id.parent_id and self.env.user.id != self.fc_section_id.employee_id.parent_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating 
-                because you are not the employee's functional manager"""
-                )
+                self.functional_supervisor_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """
+                    Ops ! You are not entitled to add a rating because you are not the employee's reviewer
+                    """
+                }
         if self.state == 'admin_rating':
             if self.fc_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.fc_section_id.employee_id.administrative_supervisor_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating 
-                because you are not the employee's administrative supervisor"""
-                )
+                self.administrative_supervisor_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """
+                    Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor
+                    """
+                }
         if self.state == 'reviewer_rating':
             if self.fc_section_id.employee_id.reviewer_id and self.env.user.id != self.fc_section_id.employee_id.reviewer_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating
-                    because you are not the employee's reviewer"""
-                )
+                self.reviewer_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """Ops ! You are not entitled to add a rating because you are not the employee's reviewer
+                    """
+                }
         if self.functional_supervisor_rating > self.section_avg_scale:
             message = {
                     'title': 'Invalid Scale',
