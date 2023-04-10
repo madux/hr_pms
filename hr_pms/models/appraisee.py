@@ -90,15 +90,43 @@ class PMS_Appraisee(models.Model):
     appraisee_comment = fields.Text(
         string="Appraisee Comment", 
         )
+    appraisee_attachement_ids = fields.Many2many(
+        'ir.attachment', 
+        'ir_pms_appraisee_attachment_rel',
+        'pms_appraisee_attachment_id',
+        'attachment_id',
+        string="Attachment"
+    )
     supervisor_comment = fields.Text(
         string="Supervisor Comment", 
         )
+    supervisor_attachement_ids = fields.Many2many(
+        'ir.attachment', 
+        'ir_pms_supervisor_attachment_rel',
+        'pms_supervisor_attachment_id',
+        'attachment_id',
+        string="Attachment"
+    )
     manager_comment = fields.Text(
         string="Manager Comment", 
         )
+    manager_attachement_ids = fields.Many2many(
+        'ir.attachment', 
+        'ir_pms_attachment_rel',
+        'pms_manager_attachment_id',
+        'attachment_id',
+        string="Attachment"
+    )
     reviewer_comment = fields.Text(
         string="Appraisee Comment", 
         )
+    reviewer_attachement_ids = fields.Many2many(
+        'ir.attachment', 
+        'ir_pms_reviewer_attachment_rel',
+        'pms_reviewer_attachment_id',
+        'attachment_id',
+        string="Attachment"
+    )
     appraisee_satisfaction = fields.Selection([
         ('none', ''),
         ('fully_agreed', 'Fully Agreed'),
