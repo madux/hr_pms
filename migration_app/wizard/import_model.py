@@ -215,7 +215,7 @@ class ImportRecords(models.TransientModel):
             email = vals.get('email') or vals.get('private_emaill')
             fullname = vals.get('fullname')
             user, password = False, False
-            login = email if '@enugudisco' in email else vals.get('staff_number')
+            login = email if email.endswith('@enugudisco.com') else vals.get('staff_number') 
             if login:
                 empdate = datetime.strftime(vals.get('employment_date'), '%d-%m-Y')
                 employement_date = empdate.split('-') 
