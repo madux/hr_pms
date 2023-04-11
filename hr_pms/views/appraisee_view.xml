@@ -358,8 +358,7 @@
                                                 <field name="current_assessment_section_id" invisible="1"/>
                                                 <field name="assessment_type" required="1"/> 
                                             </group>
-                                            <group>
-                                                 
+                                            <group> 
                                                 <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],
                                                 'invisible': [('state', '!=', 'admin_rating')]}"/> 
                                                 <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],
@@ -493,7 +492,8 @@
                                     </form>
                                 </field>
                             </page>
-                            <page name="scoreInfo" string="Score &amp; Informations">
+                            <page name="scoreInfo" string="Score &amp; Informations"
+                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer">
                                 <form string="">
                                     <group>
                                         <separator string="Score Informations" colspan="4"/>
@@ -540,8 +540,7 @@
                                 </form>
                             </page>
                             <page name="manager_section" string="Manager's Comment" invisible="0"
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer"
-                            >
+                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer">
                                 <separator string="Manager's Comment" colspan="4"/>
                                 <form string="">
                                     <group>
@@ -564,7 +563,7 @@
                                 </form>
                             </page>
                             <page name="supervisor_section" string="Supervisor's Comment" invisible="0"
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer"
+                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer"
                             >
                                 <separator string="Supervisor's Comment" colspan="4"/>
                                 <form string="">
@@ -654,6 +653,7 @@
                     <field name="reviewer_id" string='Reviewer'/>
                     <field name="pms_year_id" readonly="0"/>
                     <field name="deadline" readonly="0"/>
+                    
                     <filter string="Score: 0 - 19" name="score_0_10" domain="[('overall_score','&lt;', 20)]"/>
                     <filter string="Score: 20 - 29" name="score_0_20" domain="[('overall_score','&gt;', 19),('overall_score','&lt;', 30)]"/>
                     <filter string="Score: 30 - 39" name="score_0_30" domain="[('overall_score','&gt;', 29),('overall_score','&lt;', 40)]"/>
@@ -674,6 +674,10 @@
                         <filter name="overall_score" string='Overall Score' domain="[]" context="{'group_by' : 'overall_score'}"/>
                         <filter name="appraisee_satisfaction" string='Appraisee Satisfaction' domain="[]" context="{'group_by' : 'appraisee_satisfaction'}"/>
                         <filter name="state" string='Status' domain="[]" context="{'group_by' : 'state'}"/>
+                        <filter name="overall_score" string='Overall score' domain="[]" context="{'group_by' : 'overall_score'}"/> 
+                        <filter name="current_assessment_score" string='Current Assessment score' domain="[]" context="{'group_by' : 'current_assessment_score'}"/>
+                        <filter name="potential_assessment_score" string='Potential Assessment Score' domain="[]" context="{'group_by' : 'potential_assessment_score'}"/>
+                        <filter name="post_normalization_score" string='Post Normalization Score' domain="[]" context="{'group_by' : 'post_normalization_score'}"/>
                     </group>
 				</search>
 			</field>
