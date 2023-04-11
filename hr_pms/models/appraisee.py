@@ -42,16 +42,19 @@ class PMS_Appraisee(models.Model):
         )
     employee_number = fields.Char( 
         string="Staff ID",
-        related="employee_id.employee_number"
+        related="employee_id.employee_number",
+        store=True
         )
     job_title = fields.Char( 
         string="Job title",
-        related="employee_id.job_title"
+        related="employee_id.job_title",
+        store=True
         )
     work_unit_id = fields.Many2one(
         'hr.work.unit',
         string="Job title",
-        related="employee_id.work_unit_id"
+        related="employee_id.work_unit_id",
+        store=True
         )
     job_id = fields.Many2one(
         'hr.job',
@@ -61,7 +64,8 @@ class PMS_Appraisee(models.Model):
     ps_district_id = fields.Many2one(
         'hr.district',
         string="District", 
-        related="employee_id.ps_district_id"
+        related="employee_id.ps_district_id",
+        store=True
         )
     department_id = fields.Many2one(
         'hr.department', 
@@ -70,17 +74,20 @@ class PMS_Appraisee(models.Model):
     reviewer_id = fields.Many2one(
         'hr.employee', 
         string="Reviewer",
-        related="employee_id.reviewer_id"
+        related="employee_id.reviewer_id",
+        store=True
         )
     administrative_supervisor_id = fields.Many2one(
         'hr.employee', 
         string="Administrative Supervisor",
-        related="employee_id.administrative_supervisor_id"
+        related="employee_id.administrative_supervisor_id",
+        store=True
         )
     manager_id = fields.Many2one(
         'hr.employee', 
         string="Functional Manager",
-        related="employee_id.parent_id"
+        related="employee_id.parent_id",
+        store=True
         )
     approver_ids = fields.Many2many(
         'hr.employee', 
@@ -286,7 +293,8 @@ class PMS_Appraisee(models.Model):
     reviewer_work_unit = fields.Many2one(
         'hr.work.unit',
         string="Reviewer Unit", 
-        related="employee_id.reviewer_id.work_unit_id"
+        related="employee_id.reviewer_id.work_unit_id",
+        store=True
         )
     
     # @api.depends()
@@ -302,84 +310,101 @@ class PMS_Appraisee(models.Model):
 
     reviewer_job_title = fields.Char(
         string="Reviewer Designation", 
-        related="employee_id.reviewer_id.job_title"
+        related="employee_id.reviewer_id.job_title",
+        store=True
         )
     reviewer_job_id = fields.Many2one(
         'hr.job',
         string="Reviewer Function",
-        related="employee_id.reviewer_id.job_id" 
+        related="employee_id.reviewer_id.job_id",
+        store=True
         )
     reviewer_district = fields.Many2one(
         'hr.district',
         string="Reviewer District", 
-        related="employee_id.reviewer_id.ps_district_id"
+        related="employee_id.reviewer_id.ps_district_id",
+        store=True
         )
     reviewer_department = fields.Many2one(
         'hr.department',
         string="Reviewer department", 
-        related="employee_id.reviewer_id.department_id"
+        related="employee_id.reviewer_id.department_id",
+        store=True
         )
     reviewer_employee_number = fields.Char(
         string="Reviewer Employee Number", 
-        related="employee_id.reviewer_id.employee_number"
+        related="employee_id.reviewer_id.employee_number",
+        store=True
         )
     
     manager_work_unit = fields.Many2one(
         'hr.work.unit',
         string="Manager Unit", 
-        related="employee_id.parent_id.work_unit_id"
+        related="employee_id.parent_id.work_unit_id",
+        store=True
         )
     manager_job_title = fields.Char(
         string="Manager Designation", 
-        related="employee_id.parent_id.job_title"
+        related="employee_id.parent_id.job_title",
+        store=True
         )
     manager_job_id = fields.Many2one(
         'hr.job',
         string="Manager Function", 
-        related="employee_id.parent_id.job_id"
+        related="employee_id.parent_id.job_id",
+        store=True
         )
     manager_district = fields.Many2one(
         'hr.district',
         string="Manager District", 
-        related="employee_id.parent_id.ps_district_id"
+        related="employee_id.parent_id.ps_district_id",
+        store=True
         )
     
     manager_department = fields.Many2one(
         'hr.department',
         string="Manager department", 
-        related="employee_id.parent_id.department_id"
+        related="employee_id.parent_id.department_id",
+        store=True
         )
     manager_employee_number = fields.Char(
         string="Manager Employee Number", 
-        related="employee_id.parent_id.employee_number"
+        related="employee_id.parent_id.employee_number",
+        store=True
         )
     supervisor_work_unit = fields.Many2one(
         'hr.work.unit',
         string="Supervisor Unit", 
-        related="employee_id.administrative_supervisor_id.work_unit_id"
+        related="employee_id.administrative_supervisor_id.work_unit_id",
+        store=True
         )
     supervisor_job_title = fields.Char(
         string="Supervisor Designation", 
-        related="employee_id.administrative_supervisor_id.job_title"
+        related="employee_id.administrative_supervisor_id.job_title",
+        store=True
         )
     supervisor_job_id = fields.Many2one(
         'hr.job',
         string="Supervisor Function", 
-        related="employee_id.administrative_supervisor_id.job_id"
+        related="employee_id.administrative_supervisor_id.job_id",
+        store=True
         )
     supervisor_department = fields.Many2one(
         'hr.department',
         string="Supervisor Dept", 
-        related="employee_id.administrative_supervisor_id.department_id"
+        related="employee_id.administrative_supervisor_id.department_id",
+        store=True
         )
     supervisor_district = fields.Many2one(
         'hr.district',
         string="Supervisor District", 
-        related="employee_id.administrative_supervisor_id.ps_district_id"
+        related="employee_id.administrative_supervisor_id.ps_district_id",
+        store=True
         )
     supervisor_employee_number = fields.Char(
         string="Supervisor Employee Number", 
-        related="employee_id.administrative_supervisor_id.employee_number"
+        related="employee_id.administrative_supervisor_id.employee_number",
+        store=True
         )
     
     @api.depends('pms_department_id')

@@ -106,7 +106,7 @@
         </record>
         <!-- PMS YEAR -->
         <record model="pms.year" id="pms_year_2022_qrt2">
-            <field name="name">Dec 2022 [4th Quarter]</field>
+            <field name="name">Oct - Dec 2022 [4th Quarter]</field>
             <field name="date_from">2022-10-01</field>
             <field name="date_end">2023-12-31</field>
         </record>
