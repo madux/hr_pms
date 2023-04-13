@@ -10,6 +10,49 @@ from lxml import etree
 
 _logger = logging.getLogger(__name__)
 
+class HRLevelcategory(models.Model):
+    _name = "hr.level.category"
+    _rec_name = "category"
+    _description = "HR level category"
+
+    category = fields.Selection([
+        ('Junior Management', 'Junior Management'),
+        ('Middle Management', 'Middle Management'),
+        ('Senior Management', 'Senior Management'),
+        ], string="Category", default = "", required=True)
+    
+    job_role_ids = fields.Many2many(
+        'hr.job',
+        'hr_job_level_rel',
+        'hr_level_id',
+        'hr_job_id',
+        string="Job roles",
+        required=True
+    )
+
+    def action_set_job_role(self):
+        'this is just for the migration of existing records'
+        if self.category:
+            Employee = self.env['hr.employee']
+            domain = []
+            if self.category == "Junior Management":
+                domain = [('level_id.name', 'in', ['JM', 'Junior Management', 'Junior Mgt', 'Junior'])]
+            elif self.category == "Middle Management":
+                domain = [('level_id.name', 'in', ['MM', 'Middle Management', 'Middle Mgt', 'Middle'])]
+            elif self.category == "Senior Management":
+                domain = [('level_id.name', 'in', ['SM', 'Senior Management', 'Senior Mgt', 'Senior'])]
+            employees = Employee.search(domain)
+            self.job_role_ids = False 
+            if employees:
+                for rec in employees:
+                    self.job_role_ids = [(4, rec.job_id.id)]
+
+    @api.constrains('category')
+    def check_category(self):
+        exists = self.env['hr.level.category'].search([('category', '=', self.category)])
+        if len(exists) > 1:
+            raise ValidationError(f'You have already create level category using {self.category}')
+
 class HRUnit(models.Model):
     _name = "hr.region"
     _description = "HR Region"

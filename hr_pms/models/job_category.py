@@ -14,6 +14,7 @@ class PMSJobCategory(models.Model):
         placeholder="OFFICER - MGR", 
         required=True)
     
+    category = fields.Many2one('hr.level.category', string="Category")
     sequence = fields.Char(
         string="Sequence")
         
@@ -90,7 +91,21 @@ class PMSJobCategory(models.Model):
     #     readonly=True,
     #     default=True,
     #     store=True)
-    
+    @api.onchange('category')
+    def onchange_category(self):
+        if self.category:
+            job_role_ids = self.category.job_role_ids
+            self.job_role_ids = job_role_ids
+
+    # @api.constrains('category')
+    # def check_category(self):
+    #     exists = self.env['pms.category'].search([
+    #         ('category', '=', self.category.id), 
+    #         ('pms_year_id', '=', self.pms_year_id.id)
+    #         ])
+    #     if len(exists) > 1:
+    #         raise ValidationError(f'You have already created a template with level category and same period using {self.category}')
+
     @api.constrains('job_role_ids')
     def _check_lines(self):
         kra_types = self.mapped('section_ids').filtered(lambda se: se.type_of_section in ['KRA'])

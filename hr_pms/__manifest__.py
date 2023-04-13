@@ -21,6 +21,7 @@
             'views/section_view.xml',
             'views/appraisee_view.xml',
             'views/employee_inherit_view.xml',
+            'views/hr_level_category.xml',
             # 'views/hr_employee_public_inherited.xml',
             'views/pms_instruction_view.xml',
             'views/section_line_view.xml',

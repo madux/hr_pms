@@ -220,9 +220,10 @@ class ImportRecords(models.TransientModel):
                 empdate = datetime.strftime(vals.get('employment_date'), '%d-%m-Y')
                 employement_date = empdate.split('-') 
                 emp_day, emp_month = employement_date[0], employement_date[1]
-                password = "{}{}{}".format(vals.get('staff_number'),emp_day,emp_month)
+                password = ''.join(random.choice('EdcpasHwodfo!xyzus$rs1234567') for _ in range(10))
+                # password = "{}{}{}".format(vals.get('staff_number'),emp_day,emp_month)
                 _logger.info("DATE DATA IS {}  AND PASSWORD IS {}".format(employement_date, password))
-
+                
                 # ''.join(random.choice('eedcpasswodforxyzusers1234567') for _ in range(10))
                 # '{}-{}'.format(fullname[:2].upper(), str(uuid.uuid4())[:8]), # MA-2132ERER
                 user_vals = {
@@ -294,7 +295,7 @@ class ImportRecords(models.TransientModel):
                         # work_phone = row[25] or row[28] or 27,
                         # phone = row[27] or row[25],
                         work_phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False,
-                        phone = '0'+str(int(row[27])) if type(row[27]) in [float] else row[25] if row[25] else False,
+                        phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False,
                         hr_region_id = self.get_region_id(row[26]),
                         )
                     create_employee(vals)
@@ -355,7 +356,7 @@ class ImportRecords(models.TransientModel):
                     work_email = row[24].strip(),
                     private_email = row[24].strip(),
                     work_phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False,
-                    phone = '0'+str(int(row[27])) if type(row[27]) in [float] else row[25] if row[25] else False,
+                    phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False,
                     hr_region_id = self.get_region_id(26),
                     )
                 # ######################################

@@ -12,7 +12,7 @@
                             class="oe_highlight" 
                             type="object"
                             states="draft,review" 
-                            comfirm="Are you sure you want to Publish: This action will generate appraisal for employees in your department" 
+                            confirm="Are you sure you want to Publish: This action will generate appraisal for employees in your department" 
                             groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 
@@ -21,7 +21,7 @@
                             class="oe_highlight" 
                             type="object"
                             states="published" 
-                            comfirm="Are you sure you want to cancel: This will cancel sent appraisals" 
+                            confirm="Are you sure you want to cancel: This will cancel sent appraisals" 
                             groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 

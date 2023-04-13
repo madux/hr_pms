@@ -58,6 +58,7 @@
 						<group>
                             <separator string="Details" colspan="4"/>
                             <group>
+                                <field name="category" required="1"/>
                                 <field name="sequence" readonly="1"/>
                                 <field name="pms_year_id" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="date_from" readonly="1" force_save="1"/>
