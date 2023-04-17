@@ -46,19 +46,6 @@ class PmsSection(models.Model):
         store=True,
         compute="compute_section_weight"
         )
-    
-    @api.depends('section_line_ids')
-    def compute_section_weight(self):
-        """
-        If section_line_ids, the system should determine 
-        and divide 100% by the number of lines added
-        """
-        if self.section_line_ids:
-            numb_of_lines = len(self.section_line_ids) # eg 4
-            self.input_weightage = 100 / numb_of_lines if numb_of_lines > 0 else 100 # safe eva
-        else:
-            self.input_weightage = 100
-
         
     section_line_ids = fields.One2many(
         "pms.section.line",
@@ -72,15 +59,27 @@ class PmsSection(models.Model):
         required=False,
         )
     
-    @api.constrains('job_roles')
-    def _check_lines(self):
-        """Checks if no section line is added and max line is less than 1"""
-        if not self.mapped('section_line_ids') and self.max_line_number < 1:
-            raise ValidationError(
-                'You must provide the lines or set the maximum number to above 0'
-                )
-        if self.weighted_score < 1:
-            raise ValidationError(
-                """Section weight must be set above 0%""")
+    # @api.constrains('section_line_ids')
+    # def _check_lines(self):
+    #     """Checks if no section line is added and max line is less than 1"""
+    #     if not self.mapped('section_line_ids') and self.max_line_number < 1:
+    #         raise ValidationError(
+    #             'You must provide the lines or set the maximum number to above 0'
+    #             )
+    #     if self.weighted_score < 1:
+    #         raise ValidationError(
+    #             """Section weight must be set above 0%""")
+    
+    @api.depends('section_line_ids')
+    def compute_section_weight(self):
+        """
+        If section_line_ids, the system should determine 
+        and divide 100% by the number of lines added
+        """
+        if self.section_line_ids:
+            numb_of_lines = len(self.section_line_ids) # eg 4
+            self.input_weightage = 100 / numb_of_lines if numb_of_lines > 0 else 100 # safe eva
+        else:
+            self.input_weightage = 100
 
     

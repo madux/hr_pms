@@ -125,7 +125,7 @@ class KRA_SectionLine(models.Model):
         if self.weightage > 0 and self.weightage not in range (5, 21):
             message = {
                 'title': 'Invalid Weight',
-                'message': 'Weightage must not be within the range of 5 to 20'
+                'message': 'Weightage must be within the range of 5 to 20'
             }
             self.weightage = False
             return {'warning': message}

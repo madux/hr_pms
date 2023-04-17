@@ -21,6 +21,10 @@ class PMS_Appraisee(models.Model):
         string="Description Name", 
         required=True
         )
+    active = fields.Boolean(
+        string="Active", 
+        default=True
+        )
     pms_department_id = fields.Many2one(
         'pms.department', 
         string="PMS Department ID"
@@ -104,6 +108,8 @@ class PMS_Appraisee(models.Model):
         'attachment_id',
         string="Attachment"
     )
+    
+    
     supervisor_comment = fields.Text(
         string="Supervisor Comment", 
         )
@@ -906,7 +912,18 @@ class PMS_Appraisee(models.Model):
                 'state': 'done',
             })
         
+    def _check_lines_if_appraisers_have_rated(self):
+        kra_section_line_ids = self.mapped('kra_section_line_ids').filtered(lambda s: s.administrative_supervisor_rating > 0 or s.functional_supervisor_rating > 0)
+        if self.employee_id and self.env.user.id != self.employee_id.user_id.id:
+            raise ValidationError(
+                "Ops ! You are not entitled to withdraw the employee's appraisal"
+                )
+        if kra_section_line_ids:
+            raise ValidationError('You cannot withdraw this document because appraisers has started ratings on it')
+        
+    
     def button_withdraw(self):
+        self._check_lines_if_appraisers_have_rated()
         self.write({
                 'state':'withdraw',
             })
@@ -915,3 +932,17 @@ class PMS_Appraisee(models.Model):
         self.write({
                 'state':'draft',
             })
+    
+    @api.model
+    def create(self, vals):
+        templates = super(PMS_Appraisee,self).create(vals)
+        for template in templates:
+            if template.appraisee_attachement_ids:
+                template.appraisee_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+            if template.supervisor_attachement_ids:
+                template.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+            if template.manager_attachement_ids:
+                template.manager_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+            if template.reviewer_attachement_ids:
+                template.reviewer_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+        return templates

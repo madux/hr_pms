@@ -25,7 +25,7 @@
                             states="admin_rating" 
                             confirm="Are you sure you want to Submit rating"
                             help="Done by the Admin supervisor: This submits the admin rating to the functional manager"
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id"
+                            groups="hr_pms.group_pms_user_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id"
                         />
                         <button 
                             name="button_functional_manager_rating" 
@@ -35,7 +35,7 @@
                             states="functional_rating" 
                             help="Done by the Functional manager: This submits the admin rating to the employee's reviewer"
                             confirm="Are you sure you want to Submit rating"
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id"
+                            groups="hr_pms.group_pms_user_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id"
                         />
                         <button 
                             name="button_reviewer_manager_rating" 
@@ -45,16 +45,16 @@
                             states="reviewer_rating" 
                             confirm="Are you sure you want to Submit rating"
                             help="Done by the reviewer: This is the final process that determines the overall score"
-                            groups="hr_pms.group_pms_reviewer,hr_pms.group_pms_manager_id"
+                            groups="hr_pms.group_pms_user_id,hr_pms.group_pms_reviewer,hr_pms.group_pms_manager_id"
                         /> 
                         <button 
                             name="button_withdraw" 
                             string="Withdraw" 
-                            class="oe_highlight" 
+                            class="btn-primary" 
                             type="object"
-                            states="admin_rating" 
+                            states="admin_rating,functional_rating" 
                             confirm="Are you sure you want to Withdraw"
-                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr.group_hr_manager"
+                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr.group_hr_manager"
                         />
                         <button 
                             name="button_set_to_draft" 
@@ -63,7 +63,7 @@
                             type="object"
                             states="withdraw" 
                             confirm="Are you sure you want to continue?"
-                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id"
+                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_user_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id"
                         />
                         <field name="state" widget="statusbar" clickable="False" invisible="0" readonly="1"
 							statusbar_visible="draft,admin_rating,waiting_approval,done"
@@ -143,7 +143,7 @@
                                 </form>
                             </page>
                             <page name="section_line_ids" string="Sections" invisible="0">
-                                <separator string="KRA Sections" colspan="4"/>
+                                <separator string="SECTION (A) - KRA / Achievement(s)" colspan="4"/>
 							    <p style="color: red;">* Instructions: KRA / Achievement Ratings - Please use the following Rating Guidelines (1 to 4 scale, where 4 is the HIGHEST rating) </p>
                                 <field name="kra_section_line_ids" 
                                     required="1" options="{'no_quick_create':True,'no_open': True}" 
@@ -186,7 +186,7 @@
                                     </form>
                                 </field>
                                 <separator string="Functional Competency Sections" colspan="4"/>
-							    <p style="color: red;">* Instructions: Functional Competencies Ratings: Please TICK the most appropriate column using the following Rating Guidelines </p>
+							    <p style="color: red;">* Instructions: Functional Competencies Ratings: Please TICK the most appropriate column using the following Rating Guidelines (1 to 5 scale, where 5 is the HIGHEST rating)</p>
                                 <field name="fc_section_line_ids" 
                                     required="1" options="{'no_quick_create':True}" attrs="{'readonly': [('state', 'not in', ['draft', 'admin_rating','functional_rating','reviewer_rating'])]}">
                                     <tree string="Functional Sections" delete="false" create="false" editable="bottom">
@@ -300,15 +300,17 @@
                                                     the minimum standard is questionable<br/>
                                                 </th>
                                                 <th>
-                                                    Performance is well below standard.<br/>
-                                                    Whether the person can improve to meet<br/>
-                                                    the minimum standard is questionable
+                                                    Performance &amp; Competence is below the<br/>
+                                                    expected standards. However, potential to <br/>
+                                                    improve within a reasonable time frame is<br/>
+                                                    evident. Not someone, whose attrition bothers<br/>
+                                                    company
                                                 </th>
                                                 <th>Performance &amp; Competence is largely<br/>
                                                     meeting expected standards. This level is<br/>
                                                     what satisfies the bosses / company to retain<br/>
                                                     the talent even if it needs extra walking<br/>
-                                                    in normal ircumstances
+                                                    in normal circumstances
                                                 </th>
                                                 <th>The person is so successful at his/her job <br/>
                                                     &amp; competencies criteria that special note<br/>
@@ -516,19 +518,25 @@
                                     </group>
                                 </form>
                             </page>
-                            <page name="app_section" string="Appraisee Comment" invisible="0">
+                            <page name="app_section" string="Appraisee's Comment" invisible="0">
                                 <separator string="Appraisee Section" colspan="4"/>
                                 <form string="">
                                     <group>
                                         <group>
-                                            <field name="appraisee_comment"/> 
+                                            <field name="appraisee_comment" attrs="{'readonly': [('state', '!=', 'draft')]}"/> 
                                         </group>
                                         <group>
                                             <field name="appraisee_satisfaction"/> 
-                                            <field name="appraisee_attachement_ids" domain="[('id', '=', None)]"> 
+                                            <field name="appraisee_attachement_ids" domain="[('id', '=', None)]" attrs="{'readonly': [('state', '!=', 'draft')]}"> 
                                                 <form string="-" editable="bottom">
-                                                    <field name="name" string="Description"/> 
-                                                    <field name="datas" string="Upload file"/> 
+                                                    <group>
+                                                        <group>
+                                                            <field name="name" string="Description"/> 
+                                                        </group>
+                                                        <group>
+                                                            <field name="datas" string="Upload file"/> 
+                                                        </group>
+                                                    </group>
                                                 </form>
                                                 <tree string="-" editable="bottom">
                                                     <field name="name" string="Description"/> 
@@ -545,13 +553,20 @@
                                 <form string="">
                                     <group>
                                         <group>
-                                            <field name="manager_comment"/> 
+                                            <field name="manager_comment" attrs="{'readonly': [('state', '!=', 'functional_rating')]}"/> 
                                         </group>
                                         <group>
-                                            <field name="manager_attachement_ids" domain="[('id', '=', None)]">
+                                            <field name="manager_attachement_ids" domain="[('id', '=', None)]" attrs="{'readonly': [('state', '!=', 'functional_rating')]}">
                                                 <form string="-" editable="bottom">
-                                                    <field name="name" string="Description"/> 
-                                                    <field name="datas" string="Upload file"/> 
+                                                    <group>
+                                                        <group>
+                                                            <field name="name" string="Description"/> 
+                                                        </group>
+                                                        <group>
+                                                            <field name="datas" string="Upload file"/> 
+                                                        </group>
+                                                    </group>
+                                                    
                                                 </form>
                                                 <tree string="-" editable="bottom">
                                                     <field name="name" string="Description"/> 
@@ -569,13 +584,19 @@
                                 <form string="">
                                     <group>
                                         <group>
-                                            <field name="supervisor_comment"/> 
+                                            <field name="supervisor_comment" attrs="{'readonly': [('state', '!=', 'admin_rating')]}"/> 
                                         </group>
                                         <group>
-                                            <field name="supervisor_attachement_ids" domain="[('id', '=', None)]">
+                                            <field name="supervisor_attachement_ids" domain="[('id', '=', None)]" attrs="{'readonly': [('state', '!=', 'admin_rating')]}">
                                                 <form string="-" editable="bottom">
-                                                    <field name="name" string="Description"/> 
-                                                    <field name="datas" string="Upload file"/> 
+                                                    <group>
+                                                        <group>
+                                                            <field name="name" string="Description"/> 
+                                                        </group>
+                                                        <group>
+                                                            <field name="datas" string="Upload file"/> 
+                                                        </group>
+                                                    </group>
                                                 </form>
                                                 <tree string="-" editable="bottom">
                                                     <field name="name" string="Description"/> 
@@ -587,19 +608,25 @@
                                 </form>
                             </page>
                             <page name="reviewer_comment" string="Reviewer's Comment" invisible="0"
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer"
+                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer"
                             >
                                 <separator string="Reviewer's Section" colspan="4"/>
                                 <form string="">
                                     <group>
                                         <group>
-                                            <field name="reviewer_comment"/> 
+                                            <field name="reviewer_comment" attrs="{'readonly': [('state', '!=', 'reviewer_rating')]}"/> 
                                         </group>
                                         <group>
-                                            <field name="reviewer_attachement_ids" domain="[('id', '=', None)]">
+                                            <field name="reviewer_attachement_ids" domain="[('id', '=', None)]" attrs="{'readonly': [('state', '!=', 'reviewer_rating')]}">
                                                 <form string="-" editable="bottom">
-                                                    <field name="name" string="Description"/> 
-                                                    <field name="datas" string="Upload file"/> 
+                                                    <group>
+                                                        <group>
+                                                            <field name="name" string="Description"/> 
+                                                        </group>
+                                                        <group>
+                                                            <field name="datas" string="Upload file"/> 
+                                                        </group>
+                                                    </group>
                                                 </form>
                                                 <tree string="-" editable="bottom">
                                                     <field name="name" string="Description"/> 
