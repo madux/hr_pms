@@ -130,10 +130,10 @@ class HRgrade(models.Model):
 #     pms_number_commendation = fields.Integer(string="Commendation",)# compute="_compute_employees_component")
 #     pms_number_warning = fields.Integer(string="Queries", )#compute="_compute_employees_component")
 #     pms_number_absent = fields.Integer(string="Absent", )#compute="_compute_employees_component")
-    
+
 
 class HrEmployee(models.AbstractModel):
-    _inherit = "hr.employee.base"
+    _inherit = "hr.employee.base" 
 
     # pms_appraisal_ids = fields.Many2many('usl.employee.appraisal', string="Appraisals", readonly=True)
     administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
@@ -169,6 +169,7 @@ class HrEmployee(models.AbstractModel):
     #             model='hr.employee', res_id=self.id,
     #             email_layout_xmlid='mail.mail_notification_light',
     #         )
+    
 
     def send_credential_notification(self):
         MAIL_TEMPLATE = self.env.ref(
@@ -260,3 +261,48 @@ class HrEmployee(models.AbstractModel):
 
     def stat_button_total_appraisal(self):
         pass
+
+class HrEmployeePrivate(models.Model):
+    _inherit = "hr.employee"
+
+    # def update_pms_user_group(self, user, groups=[]):
+    #     emp_group = self.env.ref("hr_pms.group_pms_user_id")
+    #     # reviewer_group = self.env.ref("hr_pms.group_pms_reviewer")
+    #     groups.append(emp_group.id)
+    #     group_list = [(6, 0, groups)]
+    #     if user:
+    #         user.sudo().write({'groups_id':group_list})
+
+    # @api.onchange('administrative_supervisor_id')
+    # def update_administrative_supervisor_user(self): 
+    #     if self.administrative_supervisor_id:
+    #         if self.administrative_supervisor_id.user_id:
+    #             supervisor_group = self.env.ref("hr_pms.group_pms_supervisor")
+    #             groups = [supervisor_group.id]
+    #             self.update_pms_user_group(self.administrative_supervisor_id.user_id, groups)
+
+    # @api.onchange('parent_id')
+    # def update_parent_id_user(self):
+    #     user = self.parent_id
+    #     if user and user.user_id:
+    #         supervisor_group = self.env.ref("hr_pms.group_pms_supervisor")
+    #         groups = [supervisor_group.id]
+    #         self.update_pms_user_group(user.user_id, groups)
+    #     else:
+    #         pass 
+    
+    # @api.onchange('reviewer_id')
+    # def update_reviewer_id_user(self):
+    #     if self.reviewer_id:
+    #         reviewer_group = self.env.ref("hr_pms.group_pms_reviewer")
+    #         group = self.env['res.groups'].sudo().browse([reviewer_group.id])
+    #         group.update({
+    #             'users': [(4, self.reviewer_id.user_id.id)]
+    #         })
+            # .users = [(6, 0, [self.reviewer_id.user_id.id])]
+            # groups = [reviewer_group.id]
+            # group_list = [(6, 0, groups)]
+            # if user.user_id:
+            #     user.user_id.sudo().update({'groups_id':group_list})
+            # raise ValidationError(self.reviewer_id.name)
+            # self.update_pms_user_group(user.user_id, groups)

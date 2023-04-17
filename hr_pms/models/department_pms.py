@@ -223,6 +223,7 @@ class PMSDepartment(models.Model):
         PMS_Appraisee = self.env['pms.appraisee']
         job_position_ids = self.hr_category_id.mapped('job_role_ids').filtered(
             lambda se: se.department_id.id == self.department_id.id)
+        appraises = []
         for jb in job_position_ids:
             employees = Employee.search([
                 ('job_id', '=', jb.id),
@@ -240,6 +241,7 @@ class PMSDepartment(models.Model):
                         'date_end': self.pms_year_id.date_end,
                         'deadline': self.deadline,
                     }) 
+                    appraises.append(pms_appraisee)
                     kra_pms_department_section = self.mapped('section_line_ids').filtered(
                         lambda res: res.type_of_section == "KRA")
                     if kra_pms_department_section:
@@ -323,6 +325,7 @@ class PMSDepartment(models.Model):
                         emp.parent_id.work_email,
                     ]
                     self.action_notify(emp, pms_appraisee, emp.work_email, email_items)
+        # raise ValidationError(appraises)
         self.write({
             'state':'published'
         })
