@@ -1,2 +1,4 @@
 cmd.md
 .*pyc
+
+**/__pycache__/

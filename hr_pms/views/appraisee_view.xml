@@ -540,7 +540,7 @@
                                 </form>
                             </page>
                             <page name="manager_section" string="Manager's Comment" invisible="0"
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer">
+                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer,hr_pms.group_pms_user_id">
                                 <separator string="Manager's Comment" colspan="4"/>
                                 <form string="">
                                     <group>
@@ -563,7 +563,7 @@
                                 </form>
                             </page>
                             <page name="supervisor_section" string="Supervisor's Comment" invisible="0"
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer"
+                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer,hr_pms.group_pms_user_id"
                             >
                                 <separator string="Supervisor's Comment" colspan="4"/>
                                 <form string="">
@@ -587,7 +587,7 @@
                                 </form>
                             </page>
                             <page name="reviewer_comment" string="Reviewer's Comment" invisible="0"
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer"
+                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer,hr_pms.group_pms_user_id"
                             >
                                 <separator string="Reviewer's Section" colspan="4"/>
                                 <form string="">
