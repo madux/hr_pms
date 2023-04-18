@@ -1,2 +1,4 @@
 cmd.md
-.*pyc
+*.pyc
+/**/*.pyc
+/**/__pycache__/
