@@ -724,7 +724,7 @@
 			</field>
 		</record>
 
-        <!-- <record id="action_pms_appraisal_view_id" model="ir.actions.act_window">
+        <record id="action_pms_appraisal_view_id" model="ir.actions.act_window">
 			<field name="name">Appraisal</field>
 			<field name="res_model">pms.appraisee</field>
 			<field name="view_mode">tree,form</field>
@@ -736,7 +736,7 @@
 					Click To Create.
 				</p>
 			</field>
-		</record> -->
+		</record>
 
         <record id="action_pms_fa_view_id" model="ir.actions.act_window">
 			<field name="name">Functional Appraisal</field>
@@ -785,8 +785,8 @@
 
     <menuitem id="view_pms_appraisee_menu" name="Appraisee" sequence="1" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_appraisee_view_id"
     groups="hr_pms.group_pms_user_id,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
-    <!-- <menuitem id="view_pms_appraisal_menu" name="Appraisal" sequence="1" parent="view_pms_appraisee_menu" action="hr_pms.action_pms_appraisal_view_id"
-    groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/> -->
+    <menuitem id="view_pms_appraisal_menu" name="Appraisal" sequence="1" parent="view_pms_appraisee_menu" action="hr_pms.action_pms_appraisal_view_id"
+    groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
     <menuitem id="view_pms_fa_menu" name="Functional Appraisal" sequence="2" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_fa_view_id"
     groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
     <menuitem id="view_pms_aa_menu" name="Administrative Appraisal" sequence="3" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_aa_view_id"
