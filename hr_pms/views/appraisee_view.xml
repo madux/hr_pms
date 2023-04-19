@@ -621,7 +621,7 @@
                                                 <form string="-" editable="bottom">
                                                     <group>
                                                         <group>
-                                                            <field name="name" string="Description"/> 
+                 .                                           <field name="name" string="Description"/> 
                                                         </group>
                                                         <group>
                                                             <field name="datas" string="Upload file"/> 
@@ -785,7 +785,9 @@
 
     <menuitem id="view_pms_appraisee_menu" name="Appraisee" sequence="1" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_appraisee_view_id"
     groups="hr_pms.group_pms_user_id,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
-    <menuitem id="view_pms_appraisal_menu" name="Appraisal" sequence="1" parent="view_pms_appraisee_menu" action="hr_pms.action_pms_appraisal_view_id"
+    <menuitem id="view_pms_my_appraisal_menu" name="Appraisal" sequence="1" parent="hr_pms.view_pms_appraisee_menu" action="hr_pms.action_pms_appraisee_view_id"
+    groups="hr_pms.group_pms_user_id,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
+    <menuitem id="view_pms_appraisal_menu" name="General Appraisal(s)" sequence="1" parent="view_pms_appraisee_menu" action="hr_pms.action_pms_appraisal_view_id"
     groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
     <menuitem id="view_pms_fa_menu" name="Functional Appraisal" sequence="2" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_fa_view_id"
     groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>

@@ -108,6 +108,7 @@ class PMS_Appraisee(models.Model):
         'attachment_id',
         string="Attachment"
     )
+    appraisee_attachment_set = fields.Integer(default=0) # Added to field to check whether attachment have been updated
     
     
     supervisor_comment = fields.Text(
@@ -859,6 +860,8 @@ class PMS_Appraisee(models.Model):
                 'state': 'functional_rating',
                 'manager_id': self.employee_id.parent_id.id,
             })
+        if self.supervisor_attachement_ids:
+                self.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': self.id})
         
     def button_functional_manager_rating(self):
         if not self.employee_id.reviewer_id:
@@ -890,6 +893,8 @@ class PMS_Appraisee(models.Model):
                 'state': 'reviewer_rating',
                 'reviewer_id': self.employee_id.reviewer_id.id,
             })
+        if self.manager_attachement_ids:
+                self.manager_attachement_ids.write({'res_model': self._name, 'res_id': self.id})
     
     def button_reviewer_manager_rating(self):
         if self.employee_id.reviewer_id and self.env.user.id != self.employee_id.reviewer_id.user_id.id:
@@ -911,6 +916,8 @@ class PMS_Appraisee(models.Model):
         self.write({
                 'state': 'done',
             })
+        if self.reviewer_attachement_ids:
+                self.reviewer_attachement_ids.write({'res_model': self._name, 'res_id': self.id})
         
     def _check_lines_if_appraisers_have_rated(self):
         kra_section_line_ids = self.mapped('kra_section_line_ids').filtered(lambda s: s.administrative_supervisor_rating > 0 or s.functional_supervisor_rating > 0)
@@ -933,16 +940,26 @@ class PMS_Appraisee(models.Model):
                 'state':'draft',
             })
     
-    @api.model
-    def create(self, vals):
-        templates = super(PMS_Appraisee,self).create(vals)
-        for template in templates:
-            if template.appraisee_attachement_ids:
+    # @api.model
+    # def create(self, vals):
+    #     templates = super(PMS_Appraisee,self).create(vals)
+    #     for template in templates:
+    #         if template.appraisee_attachement_ids:
+    #             template.appraisee_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+    #         if template.supervisor_attachement_ids:
+    #             template.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+    #         if template.manager_attachement_ids:
+    #             template.manager_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+    #         if template.reviewer_attachement_ids:
+    #             template.reviewer_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+    #     return templates
+    # 
+    
+    def write(self, vals):
+        for template in self:
+            if template.appraisee_attachement_ids and template.appraisee_attachment_set == 0:
                 template.appraisee_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-            if template.supervisor_attachement_ids:
-                template.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-            if template.manager_attachement_ids:
-                template.manager_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-            if template.reviewer_attachement_ids:
-                template.reviewer_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-        return templates
+                template.appraisee_attachment_set = 1
+        
+        return super().write(vals)
+    
