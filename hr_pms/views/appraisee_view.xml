@@ -621,7 +621,7 @@
                                                 <form string="-" editable="bottom">
                                                     <group>
                                                         <group>
-                 .                                           <field name="name" string="Description"/> 
+                                                          <field name="name" string="Description"/> 
                                                         </group>
                                                         <group>
                                                             <field name="datas" string="Upload file"/> 
@@ -725,7 +725,7 @@
 		</record>
 
         <record id="action_pms_appraisal_view_id" model="ir.actions.act_window">
-			<field name="name">Appraisal</field>
+			<field name="name">Appraisals</field>
 			<field name="res_model">pms.appraisee</field>
 			<field name="view_mode">tree,form</field>
             <field name="domain">[]</field>
