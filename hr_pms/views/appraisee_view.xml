@@ -652,7 +652,7 @@
 			<field name="name">view.pms.appraisee.tree</field>
 			<field name="model">pms.appraisee</field>
 			<field name="arch" type="xml">
-				<tree string="appraisee" create="0">
+				<tree string="appraisee" create="0" decoration-success="state in ('functional_rating', 'admin_rating', 'reviewer_rating','wating_approval','done')" decoration-muted="state == 'withdraw'" decoration-bf="state == 'done'">
                     <field name="employee_id" readonly="1" string="Employee"/> 
                     <field name="department_id" readonly="0" string="Department"/>  
                     <field name="pms_year_id" readonly="1" string="Period"/>   
