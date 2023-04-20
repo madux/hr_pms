@@ -27,6 +27,7 @@
                                 
                                 <field name="employment_date" required="0"/>
                                 <field name="migrated_password" required="0" groups="base.group_system" string="Ps"/>
+                                <button name="reset_employee_user_password" type="object" string="Reset user login" required="0" groups="base.group_system"/>
                             </group> 
                             <group> 
                                 <field name="grade_id" required="0" options="{'no_create': True,'no_open': True}"/>

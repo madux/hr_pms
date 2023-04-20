@@ -25,6 +25,10 @@ class PMS_Appraisee(models.Model):
         string="Active", 
         default=True
         )
+    fold = fields.Boolean(
+        string="Fold", 
+        default=False
+        )
     pms_department_id = fields.Many2one(
         'pms.department', 
         string="PMS Department ID"
@@ -108,6 +112,7 @@ class PMS_Appraisee(models.Model):
         'attachment_id',
         string="Attachment"
     )
+    appraisee_attachement_set = fields.Integer(default=0, required=1) # Added to field to check whether attachment have been updated
     
     
     supervisor_comment = fields.Text(
@@ -120,6 +125,7 @@ class PMS_Appraisee(models.Model):
         'attachment_id',
         string="Attachment"
     )
+    supervisor_attachement_set = fields.Integer(default=0, required=1)
     manager_comment = fields.Text(
         string="Manager Comment", 
         )
@@ -130,6 +136,7 @@ class PMS_Appraisee(models.Model):
         'attachment_id',
         string="Attachment"
     )
+    manager_attachement_set = fields.Integer(default=0, required=1)
     reviewer_comment = fields.Text(
         string="Appraisee Comment", 
         )
@@ -140,6 +147,7 @@ class PMS_Appraisee(models.Model):
         'attachment_id',
         string="Attachment"
     )
+    reviewer_attachement_set = fields.Integer(default=0, required=1)
     appraisee_satisfaction = fields.Selection([
         ('none', ''),
         ('fully_agreed', 'Fully Agreed'),
@@ -201,10 +209,53 @@ class PMS_Appraisee(models.Model):
         ('functional_rating', 'Functional Appraiser'),
         ('reviewer_rating', 'Reviewer'),
         ('wating_approval', 'HR to Approve'),
-        ('done', 'Done'),
-        ('withdraw', 'Withdrawn'),
+        ('done', 'Completed'),
+        ('signed', 'Signed Off'),
+        ('withdraw', 'Withdrawn'), 
         ], string="Status", default = "draft", readonly=True)
+
+    dummy_state = fields.Selection([
+        ('a', 'Draft'),
+        ('b', 'Administrative Appraiser'),
+        ('c', 'Functional Appraiser'),
+        ('d', 'Reviewer'),
+        ('e', 'HR to Approve'),
+        ('f', 'Completed'),
+        ('g', 'Signed Off'),
+        ('h', 'Withdrawn'),
+        ], string="Dummy Status", readonly=True,compute="_compute_new_state", store=True)
     
+    @api.onchange('appraisee_satisfaction')
+    def onchange_appraisee_satisfaction(self):
+        '''
+        This is to trigger the state to notify that employee 
+        has completed his perception
+        '''
+        if self.appraisee_satisfaction != 'none':
+            self.update({'state': 'signed'})
+        else:
+            self.update({'state': 'done'})
+    
+    @api.depends('state')
+    def _compute_new_state(self):
+        for rec in self:
+            if rec.state == 'draft':
+                rec.dummy_state = 'a'
+            elif rec.state == 'admin_rating':
+                rec.dummy_state = 'b'
+            elif rec.state == 'functional_rating':
+                rec.dummy_state = 'c'
+            elif rec.state == 'reviewer_rating':
+                rec.dummy_state = 'd'
+            elif rec.state == 'wating_approval':
+                rec.dummy_state = 'e'
+            elif rec.state == 'done':
+                rec.dummy_state = 'f'
+            elif rec.state == 'signed':
+                rec.dummy_state = 'g'
+            else:
+                rec.dummy_state = 'h'
+
     pms_year_id = fields.Many2one(
         'pms.year', string="Period")
     date_from = fields.Date(
@@ -797,12 +848,31 @@ class PMS_Appraisee(models.Model):
         self.action_notify(subject, msg, email_to, email_cc)
 
     def validate_weightage(self):
+        kra_line = self.sudo().pms_department_id.mapped('section_line_ids').filtered(
+                    lambda res: res.type_of_section == "KRA")
+        if kra_line:
+            max_line_number = kra_line[0].max_line_number
+            limit = 1
+            if max_line_number > 0:
+                limit = max_line_number
+            else:
+                category_kra_line = self.sudo().pms_department_id.hr_category_id.sudo().mapped('section_ids').filtered(
+                    lambda res: res.type_of_section == "KRA")
+                max_category_line_number = category_kra_line[0].max_line_number if category_kra_line and category_kra_line[0].max_line_number > 0 else 1
+                limit = max_category_line_number
+            if len(self.kra_section_line_ids.ids) != limit:
+                raise ValidationError('Please ensure the number of KRA /Achievement section is up to {} line(s)'.format(int(limit)))
         sum_weightage = sum([weight.weightage for weight in self.mapped('kra_section_line_ids')])
         if sum_weightage != 100:
             raise ValidationError('Please ensure the sum of KRA weight by Appraisee is equal to 100 %')
         
+    def validate_deadline(self):
+        if self.deadline and fields.Date.today() > self.deadline:
+            raise ValidationError('You have exceeded deadline for the submission of your appraisal')
+        
     def button_submit(self):
         # send notification
+        self.validate_deadline()
         self.validate_weightage()
         admin_or_functional_user = self.administrative_supervisor_id.name or self.manager_id.name
         msg = """Dear {}, <br/> 
@@ -859,6 +929,8 @@ class PMS_Appraisee(models.Model):
                 'state': 'functional_rating',
                 'manager_id': self.employee_id.parent_id.id,
             })
+        # if self.supervisor_attachement_ids:
+        #         self.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': self.id})
         
     def button_functional_manager_rating(self):
         if not self.employee_id.reviewer_id:
@@ -890,6 +962,8 @@ class PMS_Appraisee(models.Model):
                 'state': 'reviewer_rating',
                 'reviewer_id': self.employee_id.reviewer_id.id,
             })
+        # if self.manager_attachement_ids:
+        #         self.manager_attachement_ids.write({'res_model': self._name, 'res_id': self.id})
     
     def button_reviewer_manager_rating(self):
         if self.employee_id.reviewer_id and self.env.user.id != self.employee_id.reviewer_id.user_id.id:
@@ -911,6 +985,8 @@ class PMS_Appraisee(models.Model):
         self.write({
                 'state': 'done',
             })
+        # if self.reviewer_attachement_ids:
+        #         self.reviewer_attachement_ids.write({'res_model': self._name, 'res_id': self.id})
         
     def _check_lines_if_appraisers_have_rated(self):
         kra_section_line_ids = self.mapped('kra_section_line_ids').filtered(lambda s: s.administrative_supervisor_rating > 0 or s.functional_supervisor_rating > 0)
@@ -933,16 +1009,39 @@ class PMS_Appraisee(models.Model):
                 'state':'draft',
             })
     
-    @api.model
-    def create(self, vals):
-        templates = super(PMS_Appraisee,self).create(vals)
-        for template in templates:
-            if template.appraisee_attachement_ids:
+    # @api.model
+    # def create(self, vals):
+    #     templates = super(PMS_Appraisee,self).create(vals)
+    #     for template in templates:
+    #         if template.appraisee_attachement_ids:
+    #             template.appraisee_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+    #         if template.supervisor_attachement_ids:
+    #             template.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+    #         if template.manager_attachement_ids:
+    #             template.manager_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+    #         if template.reviewer_attachement_ids:
+    #             template.reviewer_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+    #     return templates
+    
+    
+    def write(self, vals):
+        res = super().write(vals)
+        for template in self:
+            if template.appraisee_attachement_ids and template.appraisee_attachement_set == 0:
                 template.appraisee_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-            if template.supervisor_attachement_ids:
+                template.appraisee_attachement_set = 1
+
+            if template.supervisor_attachement_ids and template.supervisor_attachement_set == 0:
                 template.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-            if template.manager_attachement_ids:
+                template.supervisor_attachement_set = 1
+
+            if template.manager_attachement_ids and template.manager_attachement_set == 0:
                 template.manager_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-            if template.reviewer_attachement_ids:
+                template.manager_attachement_set = 1
+
+            if template.reviewer_attachement_ids and template.reviewer_attachement_set == 0:
                 template.reviewer_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-        return templates
+                template.reviewer_attachement_set = 1
+        
+        return res
+    
