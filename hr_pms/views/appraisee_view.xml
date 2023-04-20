@@ -509,7 +509,7 @@
                                             <field name="overall_score" readonly="1" force_save="1"/> 
                                             <field name="current_assessment_score" readonly="1"/>
                                             <field name="potential_assessment_score"/>
-                                            <field name="post_normalization_score"/>
+                                            <field name="post_normalization_score" readonly="1"/>
                                             <field name="approver_ids" invisible="1" required="0" widget="many2many_tags"/> 
                                             <field name="line_manager_id" readonly="1" invisible="1"/> 
                                             <field name="directed_user_id" readonly="1" invisible="1"/> 
@@ -709,11 +709,72 @@
 				</search>
 			</field>
 		</record>
- 
+        <record id="view_pms_appraisee_kanban" model="ir.ui.view">
+			<field name="name">Kanban appraisee</field>
+			<field name="model">pms.appraisee</field>
+			<field name="arch" type="xml">
+                <kanban default_group_by="dummy_state" class="o_hr_employee_kanban" js_class="hr_employee_kanban" sample="1">
+                    <field name="employee_id"/>
+                    <field name="state" options="{&quot;group_by_tooltip&quot;: {&quot;description&quot;: &quot;Description&quot;}}"/>
+                    <progressbar field="state" colors="{&quot;draft&quot;: &quot;admin_rating&quot;, &quot;functional_rating&quot;: &quot;reviewer_rating&quot;, &quot;done&quot;: &quot;signed&quot;}"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_hr_kanban_record">
+                                <div class="oe_kanban_details">
+                                    <div class="o_kanban_record_top">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title">
+                                                <div class="float-right" t-if="record.state.raw_value == 'done'" name="done_state">
+                                                    <!-- Employee is present/connected and it is normal according to his work schedule  -->
+                                                    <span class="fa fa-circle text-success" role="img" aria-label="Present" title="Present" name="done_state">
+                                                    </span>
+                                                </div>
+                                                <div class="float-right" t-if="record.state.raw_value == 'draft'" name="draft_state">
+                                                    <span class="fa fa-circle-o text-muted" role="img" aria-label="Draft" title="Draft" name="draft_state">
+                                                    </span>
+                                                </div>
+                                                <div class="float-right" t-if="record.state.raw_value == 'functional_rating'" name="functional_rating_state">
+                                                    <span class="fa fa-circle-o text-success" role="img" aria-label="Functional rating" title="Functional rating" name="functional_rating_state">
+                                                    </span>
+                                                </div>
+                                                <div class="float-right" t-if="record.state.raw_value == 'signed'" name="signed">
+                                                    <!-- Employee is not here but according to his work schedule, he should be connected -->
+                                                    <span class="fa fa-circle text-warning" role="img" aria-label="Signed" title="Signed" name="signed">
+                                                    </span>
+                                                </div>
+                                                Name : <field name="employee_id" placeholder="Employee's Name"/>
+                                            </strong>
+                                            <span t-if="record.job_title.raw_value" class="o_kanban_record_subtitle"><b>Designation: </b><field name="job_title"/></span>
+                                            <span t-if="record.employee_number" class="o_kanban_record_subtitle"><b>Staff No: </b><field name="employee_number"/></span>
+                                            <span t-if="record.department_id.raw_value" class="o_kanban_record_subtitle"><b>Department: </b><field name="department_id"/></span>
+                                        </div>
+                                    </div>
+                                    <ul>
+                                        <li t-if="record.administrative_supervisor_id.raw_value" class="o_text_overflow"><b>AA</b><field name="administrative_supervisor_id"/></li>
+                                        <li t-if="record.manager_id.raw_value" class="o_text_overflow"><b>FA: </b><field name="manager_id"/></li>
+                                        <li t-if="record.reviewer_id.raw_value" class="o_text_overflow"><b>FR: </b><field name="reviewer_id"/></li>
+                                        <li t-if="record.appraisee_satisfaction.raw_value" class="o_force_ltr"><b>Perception: </b><field name="appraisee_satisfaction"/></li>
+                                    </ul>
+                                    <div class="oe_kanban_content">
+                                        <div class="o_kanban_record_bottom">
+                                            <div class="oe_kanban_bottom_left"/>
+                                            <div class="oe_kanban_bottom_right">
+                                                <a title="Chat" icon="fa-comments" href="#" class="ml8 o_employee_chat_btn" role="button"><i class="fa fa-comments"/></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
 		<record id="action_pms_appraisee_view_id" model="ir.actions.act_window">
 			<field name="name">Appraisee</field>
 			<field name="res_model">pms.appraisee</field>
-			<field name="view_mode">tree,form</field>
+			<field name="view_mode">kanban,tree,form</field>
             <field name="domain">[]</field>
             <!-- <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field> -->
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />

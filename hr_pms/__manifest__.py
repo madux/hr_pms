@@ -26,7 +26,7 @@
             'views/pms_instruction_view.xml',
             'views/section_line_view.xml',
             'views/assessment_config.xml',
-            'views/employees_import_view.xml',
+            # 'views/employees_import_view.xml',
     ],
     'css': [],
     'js': [],
