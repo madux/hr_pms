@@ -232,7 +232,7 @@ class PMS_Appraisee(models.Model):
         has completed his perception
         '''
         if self.appraisee_satisfaction != 'none':
-            self.update({'state': 'ysigned'})
+            self.update({'state': 'signed'})
         else:
             self.update({'state': 'done'})
     
@@ -848,7 +848,7 @@ class PMS_Appraisee(models.Model):
         self.action_notify(subject, msg, email_to, email_cc)
 
     def validate_weightage(self):
-        kra_line = self.pms_department_id.sudo().mapped('section_line_ids').filtered(
+        kra_line = self.sudo().pms_department_id.mapped('section_line_ids').filtered(
                     lambda res: res.type_of_section == "KRA")
         if kra_line:
             max_line_number = kra_line[0].max_line_number
@@ -856,7 +856,7 @@ class PMS_Appraisee(models.Model):
             if max_line_number > 0:
                 limit = max_line_number
             else:
-                category_kra_line = self.pms_department_id.hr_category_id.sudo().mapped('section_ids').filtered(
+                category_kra_line = self.sudo().pms_department_id.hr_category_id.sudo().mapped('section_ids').filtered(
                     lambda res: res.type_of_section == "KRA")
                 max_category_line_number = category_kra_line[0].max_line_number if category_kra_line and category_kra_line[0].max_line_number > 0 else 1
                 limit = max_category_line_number

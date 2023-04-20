@@ -7,6 +7,7 @@ from odoo.exceptions import ValidationError
 from odoo import http
 import logging
 from lxml import etree
+import random
 
 _logger = logging.getLogger(__name__)
 
@@ -157,6 +158,24 @@ class HrEmployee(models.AbstractModel):
     pms_number_warning = fields.Integer(string="Queries", )#compute="_compute_employees_component")
     pms_number_absent = fields.Integer(string="Absent", )#compute="_compute_employees_component")
     
+    def reset_employee_user_password(self):
+        for rec in self:
+            if rec.user_id:
+                change_password_wiz = self.env['change.password.wizard'].sudo()
+                change_password_user = self.env['change.password.user'].sudo()
+                new_password = password = ''.join(random.choice('EdcpasHwodfo!xyzus$rs1234567') for _ in range(10))
+                change_password_wiz_id = change_password_wiz.create({
+                    'user_ids': [(0, 0, {
+                        'user_login': rec.user_id.login, 
+                        'new_passwd': new_password,
+                        'user_id': rec.user_id.id,
+                        })]
+                })
+                change_password_wiz_id.user_ids[0].change_password_button()
+                rec.migrated_password = new_password
+                # self.send_credential_notification()
+            else:
+                raise ValidationError('Employee is not related to any user. Kindly contact system admin to create a user for the employee')
     # def _message_post(self, template):
     #     """Wrapper method for message_post_with_template
 

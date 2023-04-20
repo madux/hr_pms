@@ -523,7 +523,7 @@
                                 <form string="">
                                     <group>
                                         <group>
-                                            <field name="appraisee_comment" attrs="{'readonly': [('state', '!=', 'draft')]}"/> 
+                                            <field name="appraisee_comment" attrs="{'readonly': [('state', 'not in', ['draft', 'done'])]}"/> 
                                         </group>
                                         <group>
                                             <field name="appraisee_satisfaction"/> 
@@ -713,7 +713,7 @@
 			<field name="name">Kanban appraisee</field>
 			<field name="model">pms.appraisee</field>
 			<field name="arch" type="xml">
-                <kanban default_group_by="dummy_state" class="o_hr_employee_kanban" js_class="hr_employee_kanban" sample="1">
+                <kanban default_group_by="dummy_state" class="o_hr_employee_kanban" js_class="hr_employee_kanban" sample="1" create="0" edit="0">
                     <field name="employee_id"/>
                     <field name="state" options="{&quot;group_by_tooltip&quot;: {&quot;description&quot;: &quot;Description&quot;}}"/>
                     <progressbar field="state" colors="{&quot;draft&quot;: &quot;admin_rating&quot;, &quot;functional_rating&quot;: &quot;reviewer_rating&quot;, &quot;done&quot;: &quot;signed&quot;}"/>
@@ -775,7 +775,7 @@
 			<field name="name">Appraisee</field>
 			<field name="res_model">pms.appraisee</field>
 			<field name="view_mode">tree,form</field>
-            <field name="domain">[('employee_id.user_id.id','=', context.get('uid'))]</field>
+            <field name="domain">[('employee_id.user_id.id','=', uid)]</field>
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">
@@ -803,9 +803,11 @@
 			<field name="name">Functional Appraisal</field>
 			<field name="res_model">pms.appraisee</field>
 			<field name="view_mode">tree,form</field>
-            <field name="domain">[('state','=','functional_rating'),('manager_id.user_id','=',context.get('uid'))]</field>
+            <field name="domain">[('state','=','functional_rating'),('manager_id.user_id','=',uid)]</field>
             <!-- <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field> -->
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
+             <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
+
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">
@@ -818,7 +820,7 @@
 			<field name="name">Administrative Appraisal</field>
 			<field name="res_model">pms.appraisee</field>
 			<field name="view_mode">tree,form</field>
-            <field name="domain">[('state','=','admin_rating'),('administrative_supervisor_id.user_id','=',context.get('uid'))]</field>
+            <field name="domain">[('state','=','admin_rating'),('administrative_supervisor_id.user_id.id','=',uid)]</field>
             <!-- <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field> -->
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
 			<field name="view_id" eval="False"/>
@@ -833,7 +835,7 @@
 			<field name="name">Reviewer</field>
 			<field name="res_model">pms.appraisee</field>
 			<field name="view_mode">tree,form</field>
-            <field name="domain">[('state','=','reviewer_rating'),('reviewer_id.user_id','=',context.get('uid'))]</field>
+            <field name="domain">[('state','=','reviewer_rating'),('reviewer_id.user_id','=', uid)]</field>
             <!-- <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field> -->
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
 			<field name="view_id" eval="False"/>
