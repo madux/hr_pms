@@ -211,7 +211,7 @@ class PMS_Appraisee(models.Model):
         ('wating_approval', 'HR to Approve'),
         ('done', 'Completed'),
         ('signed', 'Signed Off'),
-        ('withdraw', 'Withdrawn'),
+        ('withdraw', 'Withdrawn'), 
         ], string="Status", default = "draft", readonly=True)
 
     dummy_state = fields.Selection([
