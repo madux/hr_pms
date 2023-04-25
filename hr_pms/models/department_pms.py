@@ -50,7 +50,17 @@ class PMS_Department_Section(models.Model):
         'pms.section', 
         string="Section ID"
         )
-
+    
+    @api.onchange('min_line_number', 'max_line_number')
+    def onchange_min_max_limit(self):
+        if self.min_line_number >= self.max_line_number:
+            self.max_line_number = 7
+            self.min_line_number = 5
+            message = {
+                'title': 'Invalid',
+                'message': 'Minimum limit must not be greater than Maximum limit'
+            }
+            return {'warning': message}
 
 class PMSDepartment(models.Model):
     _name = "pms.department"

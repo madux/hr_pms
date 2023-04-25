@@ -81,7 +81,8 @@
         </record>
         <record model="pms.section" id="pms_kra_section_1">
             <field name="name">SECTION A: KRAs &amp; Achivements</field>
-            <field name="max_line_number">0</field>
+            <field name="min_line_number">5</field>
+            <field name="max_line_number">7</field>
             <field name="weighted_score">1</field>
             <field name="type_of_section">KRA</field>
             <field name="section_avg_scale">4</field>

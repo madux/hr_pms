@@ -24,6 +24,11 @@ class Training_SectionLine(models.Model):
         string='Comments', 
         
         )
+    requester_id = fields.Many2one(
+        'res.users',
+        string='Requested by', 
+        default=lambda self: self.env.uid,
+        )
     state = fields.Selection([
         ('draft', 'Draft'),
         ('admin_rating', 'Admin Supervisor'),

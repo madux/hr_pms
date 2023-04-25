@@ -229,6 +229,7 @@ class PMSJobCategory(models.Model):
                             'dep_input_weightage': sec.input_weightage,
                             'name': sec.name,
                             'max_line_number': sec.max_line_number,
+                            'min_line_number': sec.min_line_number,
                             'type_of_section': sec.type_of_section,
                             'pms_category_id': self.id,
                             # 'weighted_score': sec.weighted_score,

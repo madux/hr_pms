@@ -16,8 +16,13 @@ class PmsSection(models.Model):
         string="Section Name", 
         required=True)
 
-    max_line_number = fields.Float(
-        string="Maximum Number of Input"
+    min_line_number = fields.Integer(
+        string="Minimum Number of Input",
+        default=5
+        )
+    max_line_number = fields.Integer(
+        string="Maximum Number of Input",
+        default=7
         )
      
     type_of_section = fields.Selection([
@@ -69,6 +74,17 @@ class PmsSection(models.Model):
     #     if self.weighted_score < 1:
     #         raise ValidationError(
     #             """Section weight must be set above 0%""")
+    
+    @api.onchange('min_line_number', 'max_line_number')
+    def onchange_min_max_limit(self):
+        if self.min_line_number >= self.max_line_number:
+            self.max_line_number = 7
+            self.min_line_number = 5
+            message = {
+                'title': 'Invalid',
+                'message': 'Minimum limit must not be greater than Maximum limit'
+            }
+            return {'warning': message}
     
     @api.depends('section_line_ids')
     def compute_section_weight(self):

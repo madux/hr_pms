@@ -17,6 +17,17 @@ class PMS_Appraisee(models.Model):
     _description= "Employee appraisee"
     _inherit = "mail.thread"
 
+    @api.constrains('training_section_line_ids')
+    def constrain_for_training_section_line_ids(self):
+        user_id = self.env.user
+        # if the user is administative supervisor => find the lines he has requested
+        # and ensure it is not greater than 2
+        if self.env.uid not in [self.manager_id.user_id.id, self.administrative_supervisor_id.user_id.id]:
+            raise ValidationError('You are not allowed to add training needs')
+        if len(self.mapped('training_section_line_ids').\
+                   filtered(lambda self: self.env.user.id == self.requester_id.id)) > 2:
+            raise ValidationError('Maximum number of training needs added by you must not exceed 2. Please remove the line and save')
+
     name = fields.Char(
         string="Description Name", 
         required=True
@@ -138,7 +149,7 @@ class PMS_Appraisee(models.Model):
     )
     manager_attachement_set = fields.Integer(default=0, required=1)
     reviewer_comment = fields.Text(
-        string="Appraisee Comment", 
+        string="Reviewers Comment", 
         )
     reviewer_attachement_ids = fields.Many2many(
         'ir.attachment', 
@@ -212,7 +223,7 @@ class PMS_Appraisee(models.Model):
         ('done', 'Completed'),
         ('signed', 'Signed Off'),
         ('withdraw', 'Withdrawn'), 
-        ], string="Status", default = "draft", readonly=True)
+        ], string="Status", default = "draft", readonly=True, store=True)
 
     dummy_state = fields.Selection([
         ('a', 'Draft'),
@@ -852,19 +863,27 @@ class PMS_Appraisee(models.Model):
                     lambda res: res.type_of_section == "KRA")
         if kra_line:
             max_line_number = kra_line[0].max_line_number
-            limit = 1
+            min_line_number = kra_line[0].min_line_number
+            min_limit = 5
+            max_limit = 7
             if max_line_number > 0:
-                limit = max_line_number
+                max_limit = max_line_number
+                min_limit = min_line_number
             else:
                 category_kra_line = self.sudo().pms_department_id.hr_category_id.sudo().mapped('section_ids').filtered(
                     lambda res: res.type_of_section == "KRA")
-                max_category_line_number = category_kra_line[0].max_line_number if category_kra_line and category_kra_line[0].max_line_number > 0 else 1
-                limit = max_category_line_number
-            if len(self.kra_section_line_ids.ids) != limit:
-                raise ValidationError('Please ensure the number of KRA /Achievement section is up to {} line(s)'.format(int(limit)))
+                min_category_line_number = category_kra_line[0].min_line_number if category_kra_line and category_kra_line[0].max_line_number > 0 else min_limit
+                max_category_line_number = category_kra_line[0].max_line_number if category_kra_line and category_kra_line[0].max_line_number > 0 else max_limit
+                max_limit = max_category_line_number
+                min_limit = min_category_line_number
+            if len(self.kra_section_line_ids.ids) not in range(min_limit, max_limit + 1): # not in [5, 6, limit]:
+                raise ValidationError("""Please ensure the number of KRA / Achievement section is within the range of {} to {} line(s)""".format(int(min_limit), int(max_limit)))
         sum_weightage = sum([weight.weightage for weight in self.mapped('kra_section_line_ids')])
         if sum_weightage != 100:
-            raise ValidationError('Please ensure the sum of KRA weight by Appraisee is equal to 100 %')
+            needed_value = 100 - sum_weightage
+            raise ValidationError(
+                """Please ensure the sum of KRA weight by Appraisee is equal to 100 %.\n 
+                You need {}% weightage to complete it""".format(int(needed_value)))
         
     def validate_deadline(self):
         if self.deadline and fields.Date.today() > self.deadline:
@@ -1008,6 +1027,53 @@ class PMS_Appraisee(models.Model):
         self.write({
                 'state':'draft',
             })
+        
+    # @api.model
+    # def fields_view_get(self, view_id='hr_pms.view_hr_pms_appraisee_form', view_type='form', toolbar=False, submenu=False):
+    #     res = super(PMS_Appraisee, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar,
+    #                                                 submenu = submenu)
+    #     doc = etree.XML(res['arch'])
+    #     active_id = self.env.context.get('active_id', False)
+    #     if self.env.uid == self.administrative_supervisor_id.user_id.id:
+    #         raise ValidationError(f"""{self.env.uid} {self.administrative_supervisor_id.user_id.id} {active_id}""")
+    #     else:
+    #         raise ValidationError(f"""fff {self.env.uid} {self.env.context.get('administrative_supervisor_id')}  {active_id}""")
+
+    #         # if self.env.user.has_group('hr_pms.group_unmc_admin') == False or self.env.user.has_group('hr_pms.group_unmc_doctor') == False:
+    #         for node in doc.xpath("//button[@name='button_admin_supervisor_rating']"):
+    #             node.set('modifiers', '{"invisible": false}')
+    #     #     for node in doc.xpath("//field[@name='test_type_id']"):
+    #     #         node.set('modifiers', '{"readonly": true}')
+                
+    #     #     for node in doc.xpath("//field[@name='patient_id']"):
+    #     #         node.set('modifiers', '{"readonly": true}')
+                
+    #     #     for node in doc.xpath("//field[@name='date_requested']"):
+    #     #         node.set('modifiers', '{"readonly": true}')
+                
+    #     #     for node in doc.xpath("//field[@name='hospital']"):
+    #     #         node.set('modifiers', '{"readonly": true}')
+                
+    #     #     for node in doc.xpath("//field[@name='patient']"):
+    #     #         node.set('modifiers', '{"readonly": true}')
+    #     #     for node in doc.xpath("//field[@name='test_type']"):
+    #     #         node.set('modifiers', '{"readonly": true}')
+                
+    #     #     for node in doc.xpath("//field[@name='requested_by']"):
+    #     #         node.set('modifiers', '{"readonly": true}')
+    #     # elif not (self.env.user.has_group('hr_pms.group_unmc_lab_two') or self.env.user.has_group('hr_pms.group_unmc_admin')):
+    #     #     for node in doc.xpath("//field[@name='result']"):
+    #     #         node.set('modifiers', '{"readonly": true}')
+    #     #     for node in doc.xpath("//field[@name='recorded_by']"):
+    #     #         node.set('modifiers', '{"readonly": true}')
+                
+    #     #     for node in doc.xpath("//field[@name='notes']"):
+    #     #         node.set('modifiers', '{"readonly": true}')
+                
+    #     #     for node in doc.xpath("//field[@name='date_of_testing']"):
+    #     #         node.set('modifiers', '{"readonly": true}')
+    #     res['arch'] = etree.tostring(doc)
+    #     return res
     
     # @api.model
     # def create(self, vals):
