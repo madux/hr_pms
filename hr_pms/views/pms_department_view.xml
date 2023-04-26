@@ -80,7 +80,7 @@
 									<form string="Sections">
                                         <div class="oe_title">
                                             <h1>
-                                                <field name="name" default_focus="1" required="1" placeholder="KRAs &amp; Achivements"/>
+                                                <field name="name" default_focus="1" required="1" placeholder="Achievements"/>
                                             </h1>
                                         </div>
 										<group>
@@ -114,6 +114,15 @@
 
                                                     </group>
                                                 </group>
+                                                <notebook>
+                                                    <page string="KBA Description">
+                                                        <field name="kba_description_ids" editable="bottom">
+                                                            <tree string="">
+                                                                <field name="name" required="0" readonly="0"/> 
+                                                            </tree>
+                                                        </field>
+                                                    </page>
+                                                </notebook>
                                             </form>
                                             <tree string="" delete="true">
                                                 <field name="name"/> 

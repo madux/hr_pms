@@ -7,7 +7,10 @@
             <field name="inherit_id" ref="hr.view_employee_form" />
             <field name="arch" type="xml"> 
                 <xpath expr="//field[@name='parent_id']" position="replace">
-                    <field name="parent_id" string="Functional Manager" options="{'no_create': True,'no_open': True}"/>
+                    <field name="parent_id" string="Functional Manager" required="1" options="{'no_create': True,'no_open': True}"/>
+                </xpath>
+                <xpath expr="//field[@name='coach_id']" position="replace">
+                    <field name="coach_id" string="Coach" required="1" options="{'no_create': True,'no_open': True}"/>
                 </xpath>
                 <field name="work_email" position="before">
                     <field name="employee_number" required="1"/>
@@ -15,6 +18,7 @@
                 <field name="parent_id" position="after">
                     <field name="administrative_supervisor_id" string="Administrative supervisor" options="{'no_create': True,'no_open': True}"/>
                     <field name="reviewer_id" string="Reviewer" required="1" options="{'no_create': True,'no_open': True}"/>
+                    <!-- <button name="auto_update_employee_appraisers_role" type="object" string="Update Appraisers Role" required="0" groups="base.group_system,hr.group_hr_manager"/> -->
                 </field> 
                 <field name="job_id" position="replace">
                     <field name="job_id" string="Designation" required="0" options="{'no_create': True,'no_open': True}"/>
@@ -26,8 +30,9 @@
                             <group>
                                 
                                 <field name="employment_date" required="0"/>
-                                <field name="migrated_password" required="0" groups="base.group_system" string="Ps"/>
-                                <button name="reset_employee_user_password" type="object" string="Reset user login" required="0" groups="base.group_system"/>
+                                <field name="migrated_password" required="0" groups="base.group_system,hr.group_hr_manager" string="Ps"/>
+                                <field name="login_username" required="0" groups="base.group_system,hr.group_hr_manager" string="User Login"/>
+                                <button name="reset_employee_user_password" type="object" string="Reset user login" required="0" groups="base.group_system,hr.group_hr_manager"/>
                             </group> 
                             <group> 
                                 <field name="grade_id" required="0" options="{'no_create': True,'no_open': True}"/>
@@ -173,6 +178,44 @@
 			ref('base.group_system'),
 			])]"/>
             <field name="code">action=model.sudo().send_credential_notification()</field>
+        </record>
+
+        <record id="ir_action_server_update_employee_user_credentials" model="ir.actions.server">
+			<field name="name">Update Employee Password</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="hr.model_hr_employee" />
+            <field name="binding_model_id" ref="hr.model_hr_employee" />
+            <field name="state">code</field>
+            <field name="groups_id" eval="[(6, 0, [
+			ref('base.group_system'),
+            ref('hr.group_hr_manager'),
+			])]"/>
+            <field name="code">action=model.sudo().reset_multiple_employee_user_password()</field>
+        </record>
+
+        <record id="ir_action_server_auto_update_employee_appraisers_role" model="ir.actions.server">
+			<field name="name">Update Appraisers Role</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="hr.model_hr_employee" />
+            <field name="binding_model_id" ref="hr.model_hr_employee" />
+            <field name="state">code</field>
+            <field name="groups_id" eval="[(6, 0, [
+			ref('base.group_system'),
+            ref('hr.group_hr_manager'),
+			])]"/>
+            <field name="code">action=model.sudo().auto_update_employee_appraisers_role()</field>
+        </record>
+
+        <record id="ir_action_server_capitalize" model="ir.actions.server">
+			<field name="name">Capitalize Names </field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="hr.model_hr_employee" />
+            <field name="binding_model_id" ref="hr.model_hr_employee" />
+            <field name="state">code</field>
+            <field name="groups_id" eval="[(6, 0, [
+			ref('base.group_system'),
+			])]"/>
+            <field name="code">action=model.sudo().make_name_capitalize()</field>
         </record>
 
     <menuitem id="view_pms_district_menu" name="District" sequence="50" parent="hr_pms.view_hr_pms_config_menu" action="hr_pms.action_employee_district_view_id"

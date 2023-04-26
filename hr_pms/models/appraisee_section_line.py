@@ -86,34 +86,31 @@ class KRA_SectionLine(models.Model):
         if self.state == 'functional_rating':
             if self.kra_section_id.employee_id.parent_id and self.env.user.id != self.kra_section_id.employee_id.parent_id.user_id.id:
                 raise ValidationError(
-                """Ops ! You are not entitled to add a rating 
-                because you are not the employee's functional manager"""
+                """Ops ! You are not entitled to add a rating\n because you are not the employee's functional manager"""
                 )
         if self.state == 'admin_rating':
             if self.kra_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id:
                 raise ValidationError(
-                """Ops ! You are not entitled to add a rating 
-                because you are not the employee's administrative supervisor"""
+                """Ops ! You are not entitled to add a rating \n because you are not the employee's administrative supervisor"""
                 )
             
         if self.self_rating > self.section_avg_scale:
-            self.self_rating = False
+            self.self_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Self rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
         if self.functional_supervisor_rating > self.section_avg_scale:
-
+            self.functional_supervisor_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Functional supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
-            self.self_rating = False
             return {'warning': message}
         
         if self.administrative_supervisor_rating > self.section_avg_scale:
-            self.self_rating = 1
+            self.administrative_supervisor_rating = 1
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
@@ -225,7 +222,9 @@ class LC_SectionLine(models.Model):
         'pms.section.line', 
         string="Attributes"
         )
-    
+    kba_descriptions = fields.Text(
+        string='Description',
+        )
     state = fields.Selection([
         ('draft', 'Draft'),
         ('admin_rating', 'Admin Supervisor'),
@@ -248,7 +247,7 @@ class LC_SectionLine(models.Model):
                 return {
                     'title': 'Security Rule',
                     'message': """
-                    Ops ! You are not entitled to add a rating because you are not the employee's functional manager
+                    Ops ! You are not entitled to add a rating \n because you are not the employee's functional manager
                     """
                 }
 
@@ -258,7 +257,7 @@ class LC_SectionLine(models.Model):
                 return {
                     'title': 'Security Rule',
                     'message': """
-                    Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor
+                    Ops ! You are not entitled to add a rating \n because you are not the employee's administrative supervisor
                     """
                 }
                  
@@ -273,21 +272,21 @@ class LC_SectionLine(models.Model):
                 }
             
         if self.functional_supervisor_rating > self.section_avg_scale:
+            self.functional_supervisor_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Functional supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
-            self.functional_supervisor_rating = False
             return {'warning': message}
         if self.administrative_supervisor_rating > self.section_avg_scale:
-            self.administrative_supervisor_rating = False
+            self.administrative_supervisor_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
         if self.reviewer_rating > self.section_avg_scale:
-            self.reviewer_rating = False
+            self.reviewer_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
@@ -430,21 +429,21 @@ class FC_SectionLine(models.Model):
                     """
                 }
         if self.functional_supervisor_rating > self.section_avg_scale:
+            self.functional_supervisor_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Functional supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
-            self.functional_supervisor_rating = False
             return {'warning': message}
         if self.administrative_supervisor_rating > self.section_avg_scale:
-            self.administrative_supervisor_rating = False
+            self.administrative_supervisor_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
         if self.reviewer_rating > self.section_avg_scale:
-            self.reviewer_rating = False
+            self.reviewer_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)

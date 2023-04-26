@@ -241,6 +241,9 @@ class PMSJobCategory(models.Model):
                                 'section_id': sec.id,
                                 'is_required': sec_line.is_required,
                                 'description': sec_line.description,
+                                'kba_description_ids': [(0, 0, {
+                                    'name': kba.name,
+                                }) for kba in sec_line.kba_description_ids],
                             }) for sec_line in sec.section_line_ids]
                         }) for sec in self.section_ids],
                         

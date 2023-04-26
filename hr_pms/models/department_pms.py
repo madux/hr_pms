@@ -24,6 +24,10 @@ class PMS_Department_SectionLine(models.Model):
         'pms.section.line', 
         string="Attributes"
         )
+    kba_description_ids = fields.One2many(
+        'kba.descriptions',
+        'pms_section_line_id',
+        string="KBA Description",) 
 
 class PMS_Department_Section(models.Model):
     _name = "pms.department.section"
@@ -322,7 +326,7 @@ class PMSDepartment(models.Model):
                                                         'administrative_supervisor_rating': 0,
                                                         'functional_supervisor_rating': 0,
                                                         'section_line_id': secline.section_line_id.id,
-                                                        # 'self_rating': 0,
+                                                        'kba_descriptions': '\n'.join([kbline.name for kbline in secline.kba_description_ids]),
                                                         }) for secline in lc_section_lines] 
                         })
                     # current_assessment

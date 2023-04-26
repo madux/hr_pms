@@ -160,7 +160,7 @@ class PMS_Appraisee(models.Model):
     )
     reviewer_attachement_set = fields.Integer(default=0, required=1)
     appraisee_satisfaction = fields.Selection([
-        ('none', ''),
+        ('none', 'None'),
         ('fully_agreed', 'Fully Agreed'),
         ('largely_agreed', 'Largely Agreed'),
         ('partially_agreed', 'Partially Agreed'),
@@ -818,6 +818,22 @@ class PMS_Appraisee(models.Model):
         # base_url += '/web#id=%d&view_type=form&model=%s' % (id, name)
         return "<a href={}> </b>Click<a/>. ".format(base_url)
 
+    def action_send_reminder(self):
+        msg = """Dear {}, <br/> 
+            I wish to remind you of the appraisal currently on your desk. <br/> \
+            Please kindly review and do the needful.<br/> \
+            Yours Faithfully<br/>{}<br/>""".format(
+                self.create_uid.name,
+                self.env.user.name,
+                self.department_id.name,
+                )
+        subject = "Appraisal Reminder"
+        email_to = self.employee_id.work_email if self.state in ['draft', 'done'] else \
+            self.administrative_supervisor_id.work_email if self.state == "admin_rating" else \
+            self.manager_id.work_email if self.state == "functional_rating" else self.reviewer_id.work_email if self.state == "reviewer_rating" else self.employee_id.work_email
+        email_cc = [self.employee_id.work_email]
+        self.action_notify(subject, msg, email_to, email_cc)
+    
     def send_mail_notification(self, msg):
         subject = "Appraisal Notification"
         administrative_supervisor = self.employee_id.administrative_supervisor_id
@@ -880,10 +896,11 @@ class PMS_Appraisee(models.Model):
                 raise ValidationError("""Please ensure the number of KRA / Achievement section is within the range of {} to {} line(s)""".format(int(min_limit), int(max_limit)))
         sum_weightage = sum([weight.weightage for weight in self.mapped('kra_section_line_ids')])
         if sum_weightage != 100:
-            needed_value = 100 - sum_weightage
+            value_diff = 100 - sum_weightage 
+            needed_value_msg = f'''You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
             raise ValidationError(
-                """Please ensure the sum of KRA weight by Appraisee is equal to 100 %.\n 
-                You need {}% weightage to complete it""".format(int(needed_value)))
+                f"""Please ensure the sum of KRA weight by Appraisee is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+                )
         
     def validate_deadline(self):
         if self.deadline and fields.Date.today() > self.deadline:
