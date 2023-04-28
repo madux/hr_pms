@@ -26,7 +26,7 @@
             'views/pms_instruction_view.xml',
             'views/section_line_view.xml',
             'views/assessment_config.xml',
-            'views/pms_yr_view.xml'
+            'views/pms_yr_view.xml',
             'static/xml/dashboard_action.xml',
             # 'views/employees_import_view.xml',
 
