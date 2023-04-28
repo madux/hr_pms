@@ -7,8 +7,52 @@ from odoo.exceptions import ValidationError
 from odoo import http
 import logging
 from lxml import etree
+import random
 
 _logger = logging.getLogger(__name__)
+
+class HRLevelcategory(models.Model):
+    _name = "hr.level.category"
+    _rec_name = "category"
+    _description = "HR level category"
+
+    category = fields.Selection([
+        ('Junior Management', 'Junior Management'),
+        ('Middle Management', 'Middle Management'),
+        ('Senior Management', 'Senior Management'),
+        ], string="Category", default = "", required=True)
+    
+    job_role_ids = fields.Many2many(
+        'hr.job',
+        'hr_job_level_rel',
+        'hr_level_id',
+        'hr_job_id',
+        string="Job roles",
+        required=True
+    )
+
+    def action_set_job_role(self):
+        'this is just for the migration of existing records'
+        if self.category:
+            Employee = self.env['hr.employee']
+            domain = []
+            if self.category == "Junior Management":
+                domain = [('level_id.name', 'in', ['JM', 'Junior Management', 'Junior Mgt', 'Junior'])]
+            elif self.category == "Middle Management":
+                domain = [('level_id.name', 'in', ['MM', 'Middle Management', 'Middle Mgt', 'Middle'])]
+            elif self.category == "Senior Management":
+                domain = [('level_id.name', 'in', ['SM', 'Senior Management', 'Senior Mgt', 'Senior'])]
+            employees = Employee.search(domain)
+            self.job_role_ids = False 
+            if employees:
+                for rec in employees:
+                    self.job_role_ids = [(4, rec.job_id.id)]
+
+    @api.constrains('category')
+    def check_category(self):
+        exists = self.env['hr.level.category'].search([('category', '=', self.category)])
+        if len(exists) > 1:
+            raise ValidationError(f'You have already create level category using {self.category}')
 
 class HRUnit(models.Model):
     _name = "hr.region"
@@ -87,10 +131,57 @@ class HRgrade(models.Model):
 #     pms_number_commendation = fields.Integer(string="Commendation",)# compute="_compute_employees_component")
 #     pms_number_warning = fields.Integer(string="Queries", )#compute="_compute_employees_component")
 #     pms_number_absent = fields.Integer(string="Absent", )#compute="_compute_employees_component")
-    
 
-class HrEmployee(models.AbstractModel):
-    _inherit = "hr.employee.base"
+class HrEmployee(models.Model):
+    _inherit = "hr.employee" 
+
+    def make_name_capitalize(self):
+        rec_ids = self.env.context.get('active_ids', [])
+        for rec in rec_ids:
+            record = self.env['hr.employee'].browse([rec])
+            if record.name:
+                record.update({'name': record.name.upper()})
+
+    def update_pms_user_group(self, user, groups=[]):
+        emp_group = self.env.ref("hr_pms.group_pms_user_id")
+        # reviewer_group = self.env.ref("hr_pms.group_pms_reviewer")
+        groups.append(emp_group.id)
+        group_list = [(6, 0, groups)]
+        if user:
+            user.sudo().write({'groups_id':group_list})
+
+    def auto_update_employee_appraisers_role(self):
+        rec_ids = self.env.context.get('active_ids', [])
+        records = self.env['hr.employee'].browse(rec_ids)
+        for rec in records:
+            if rec.administrative_supervisor_id:
+                rec.update_administrative_supervisor_user(rec.administrative_supervisor_id.user_id)
+            if rec.parent_id:
+                rec.update_parent_id_user(rec.parent_id.user_id)
+            if rec.reviewer_id:
+                rec.update_reviewer_id_user(rec.reviewer_id.user_id)
+
+    # @api.onchange('administrative_supervisor_id')
+    def update_administrative_supervisor_user(self, userId):
+            supervisor_group = self.env.ref("hr_pms.group_pms_supervisor")
+            groups = [supervisor_group.id]
+            self.update_pms_user_group(userId, groups)
+
+    # @api.onchange('parent_id')
+    def update_parent_id_user(self, userId):
+        '''Updating manager / function appraiser user role'''
+        supervisor_group = self.env.ref("hr_pms.group_pms_supervisor")
+        groups = [supervisor_group.id]
+        self.update_pms_user_group(userId, groups)
+    
+    # @api.onchange('reviewer_id')
+    def update_reviewer_id_user(self, userId):
+        reviewer_group = self.env.ref("hr_pms.group_pms_reviewer")
+        groups = [reviewer_group.id]
+        self.update_pms_user_group(userId, groups)
+
+class HrEmployeeBase(models.AbstractModel):
+    _inherit = "hr.employee.base" 
 
     # pms_appraisal_ids = fields.Many2many('usl.employee.appraisal', string="Appraisals", readonly=True)
     administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
@@ -108,12 +199,53 @@ class HrEmployee(models.AbstractModel):
     migrated_password = fields.Char(
         string="migrated password", 
         )
+    login_username = fields.Char(
+        string="Login", 
+        related="user_id.login"
+        )
     pms_number_appraisal = fields.Integer(string="Appraisal",)# compute="_compute_employees_component")
     pms_number_queries = fields.Integer(string="Queries",)# compute="_compute_employees_component")
     pms_number_commendation = fields.Integer(string="Commendation",)# compute="_compute_employees_component")
     pms_number_warning = fields.Integer(string="Queries", )#compute="_compute_employees_component")
     pms_number_absent = fields.Integer(string="Absent", )#compute="_compute_employees_component")
+
+    def reset_employee_user_password(self):
+        for rec in self:
+            if rec.user_id:
+                change_password_wiz = self.env['change.password.wizard'].sudo()
+                change_password_user = self.env['change.password.user'].sudo()
+                new_password = password = ''.join(random.choice('EdcpasHwodfo!xyzus$rs1234567') for _ in range(10))
+                change_password_wiz_id = change_password_wiz.create({
+                    'user_ids': [(0, 0, {
+                        'user_login': rec.user_id.login, 
+                        'new_passwd': new_password,
+                        'user_id': rec.user_id.id,
+                        })]
+                })
+                change_password_wiz_id.user_ids[0].change_password_button()
+                rec.migrated_password = new_password
+                # self.send_credential_notification()
+            else:
+                raise ValidationError('Employee is not related to any user. Kindly contact system admin to create a user for the employee')
     
+    def reset_multiple_employee_user_password(self):
+        rec_ids = self.env.context.get('active_ids', [])
+        for record in rec_ids:
+            rec = self.env['hr.employee'].browse([record])
+            if rec.user_id:
+                change_password_wiz = self.env['change.password.wizard'].sudo()
+                change_password_user = self.env['change.password.user'].sudo()
+                new_password = password = ''.join(random.choice('EdcpasHwodfo!xyzus$rs1234567') for _ in range(10))
+                change_password_wiz_id = change_password_wiz.create({
+                    'user_ids': [(0, 0, {
+                        'user_login': rec.user_id.login, 
+                        'new_passwd': new_password,
+                        'user_id': rec.user_id.id,
+                        })]
+                })
+                change_password_wiz_id.user_ids[0].change_password_button()
+                rec.update({'migrated_password': new_password})
+
     # def _message_post(self, template):
     #     """Wrapper method for message_post_with_template
 
@@ -126,6 +258,7 @@ class HrEmployee(models.AbstractModel):
     #             model='hr.employee', res_id=self.id,
     #             email_layout_xmlid='mail.mail_notification_light',
     #         )
+    
 
     def send_credential_notification(self):
         MAIL_TEMPLATE = self.env.ref(
@@ -217,3 +350,48 @@ class HrEmployee(models.AbstractModel):
 
     def stat_button_total_appraisal(self):
         pass
+
+# class HrEmployeePrivate(models.Model):
+#     _inherit = "hr.employee"
+
+    # def update_pms_user_group(self, user, groups=[]):
+    #     emp_group = self.env.ref("hr_pms.group_pms_user_id")
+    #     # reviewer_group = self.env.ref("hr_pms.group_pms_reviewer")
+    #     groups.append(emp_group.id)
+    #     group_list = [(6, 0, groups)]
+    #     if user:
+    #         user.sudo().write({'groups_id':group_list})
+
+    # @api.onchange('administrative_supervisor_id')
+    # def update_administrative_supervisor_user(self): 
+    #     if self.administrative_supervisor_id:
+    #         if self.administrative_supervisor_id.user_id:
+    #             supervisor_group = self.env.ref("hr_pms.group_pms_supervisor")
+    #             groups = [supervisor_group.id]
+    #             self.update_pms_user_group(self.administrative_supervisor_id.user_id, groups)
+
+    # @api.onchange('parent_id')
+    # def update_parent_id_user(self):
+    #     user = self.parent_id
+    #     if user and user.user_id:
+    #         supervisor_group = self.env.ref("hr_pms.group_pms_supervisor")
+    #         groups = [supervisor_group.id]
+    #         self.update_pms_user_group(user.user_id, groups)
+    #     else:
+    #         pass 
+    
+    # @api.onchange('reviewer_id')
+    # def update_reviewer_id_user(self):
+    #     if self.reviewer_id:
+    #         reviewer_group = self.env.ref("hr_pms.group_pms_reviewer")
+    #         group = self.env['res.groups'].sudo().browse([reviewer_group.id])
+    #         group.update({
+    #             'users': [(4, self.reviewer_id.user_id.id)]
+    #         })
+            # .users = [(6, 0, [self.reviewer_id.user_id.id])]
+            # groups = [reviewer_group.id]
+            # group_list = [(6, 0, groups)]
+            # if user.user_id:
+            #     user.user_id.sudo().update({'groups_id':group_list})
+            # raise ValidationError(self.reviewer_id.name)
+            # self.update_pms_user_group(user.user_id, groups)

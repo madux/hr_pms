@@ -21,16 +21,21 @@
             'views/section_view.xml',
             'views/appraisee_view.xml',
             'views/employee_inherit_view.xml',
+            'views/hr_level_category.xml',
             # 'views/hr_employee_public_inherited.xml',
             'views/pms_instruction_view.xml',
             'views/section_line_view.xml',
             'views/assessment_config.xml',
-            'views/employees_import_view.xml',
             'views/pms_yr_view.xml'
+            'static/xml/dashboard_action.xml',
+            # 'views/employees_import_view.xml',
+
     ],
     'css': [],
     'js': [],
-    'qweb': [],
+    'qweb': [
+        'static/xml/dashboard.xml',
+    ],
     "active": False,
     'application': True,
     "sequence": 6,

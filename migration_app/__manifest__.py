@@ -1,5 +1,5 @@
 ##############################################################################
-#    Copyright (C) 2021 Bitlect. All Rights Reserved
+#    Copyright (C) 2021 MAACH SOFTWARE. All Rights Reserved
 #    BItlect Extensions to Sms module
 
 
@@ -13,7 +13,7 @@
     'depends': ['base'],
     "data": [
         'security/ir.model.access.csv',
-        'wizard/import_view.xml',
+        'wizard/import_employee_view.xml',
         
     ],
     "sequence": 3,
