@@ -6,7 +6,7 @@ from odoo.exceptions import ValidationError
 class PMS_Kba_description(models.Model):
     _name = "kba.descriptions"
 
-    name = fields.Char(
+    name = fields.Text(
         string="KBA descriptions", 
         required=True)
 

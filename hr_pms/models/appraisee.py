@@ -34,7 +34,8 @@ class PMS_Appraisee(models.Model):
         )
     active = fields.Boolean(
         string="Active", 
-        default=True
+        default=True,
+        tracking=True
         )
     fold = fields.Boolean(
         string="Fold", 
@@ -48,7 +49,7 @@ class PMS_Appraisee(models.Model):
         'pms.section', 
         string="Section ID",
         )
-    
+    submitted_date = fields.Datetime('Submitted Date', default=fields.Datetime.now())
     dummy_kra_section_scale = fields.Integer(
         string="Dummy KRA Section scale",
         help="Used to get the actual kra section scale because it wasnt setup",
@@ -114,7 +115,8 @@ class PMS_Appraisee(models.Model):
         readonly=True
         )
     appraisee_comment = fields.Text(
-        string="Appraisee Comment", 
+        string="Appraisee Comment",
+        tracking=True
         )
     appraisee_attachement_ids = fields.Many2many(
         'ir.attachment', 
@@ -128,6 +130,7 @@ class PMS_Appraisee(models.Model):
     
     supervisor_comment = fields.Text(
         string="Supervisor Comment", 
+        tracking=True
         )
     supervisor_attachement_ids = fields.Many2many(
         'ir.attachment', 
@@ -138,7 +141,8 @@ class PMS_Appraisee(models.Model):
     )
     supervisor_attachement_set = fields.Integer(default=0, required=1)
     manager_comment = fields.Text(
-        string="Manager Comment", 
+        string="Manager Comment",
+        tracking=True 
         )
     manager_attachement_ids = fields.Many2many(
         'ir.attachment', 
@@ -150,6 +154,7 @@ class PMS_Appraisee(models.Model):
     manager_attachement_set = fields.Integer(default=0, required=1)
     reviewer_comment = fields.Text(
         string="Reviewers Comment", 
+        tracking=True,
         )
     reviewer_attachement_ids = fields.Many2many(
         'ir.attachment', 
@@ -166,7 +171,8 @@ class PMS_Appraisee(models.Model):
         ('partially_agreed', 'Partially Agreed'),
         ('largely_disagreed', 'Largely Disagreed'),
         ('totally_disagreed', 'Totally Disagreed'),
-        ], string="Perception on PMS", default = "none")
+        ], string="Perception on PMS", default = "none", 
+        tracking=True)
     line_manager_id = fields.Many2one(
         'hr.employee', 
         string="Line Manager"
@@ -223,7 +229,7 @@ class PMS_Appraisee(models.Model):
         ('done', 'Completed'),
         ('signed', 'Signed Off'),
         ('withdraw', 'Withdrawn'), 
-        ], string="Status", default = "draft", readonly=True, store=True)
+        ], string="Status", default = "draft", readonly=True, store=True, tracking=True)
 
     dummy_state = fields.Selection([
         ('a', 'Draft'),
@@ -558,13 +564,20 @@ class PMS_Appraisee(models.Model):
             lambda s: s.state == 'reviewer_rating'
         )
         if ar:
-            ar_rating = ar[0].administrative_supervisor_rating or 1
+            ar_rating = ar[0].administrative_supervisor_rating or 0 # e.g 2
         if fa:
-            fa_rating = fa[0].functional_supervisor_rating or 1
+            fa_rating = fa[0].functional_supervisor_rating or 0 # e.g 2
         if fr:
-            fr_rating = fr[0].reviewer_rating or 1 
-        fr_rt = 30 if self.employee_id.administrative_supervisor_id else 60
-        weightage = (ar_rating * 30) + (fa_rating * fr_rt) + (fr_rating * 40)
+            fr_rating = fr[0].reviewer_rating or 0
+        # fr_rt = 30 if self.employee_id.administrative_supervisor_id else 60
+        if self.employee_id.administrative_supervisor_id:
+            ar_rating = ar_rating * 30
+            fa_rating = fa_rating * 30
+        else:
+            ar_rating = ar_rating * 0
+            fa_rating = fa_rating * 60
+        weightage = (ar_rating) + (fa_rating) + (fr_rating * 40)
+        # raise ValidationError(f"weightage =={weightage} fr_rt ==>{fr_rt} --- ar {ar_rating}--- fr_rating {fr_rating} fa_rating ==>{fa_rating}")
         self.current_assessment_score = weightage / 4
 
     @api.depends(
@@ -585,13 +598,18 @@ class PMS_Appraisee(models.Model):
             lambda s: s.state == 'reviewer_rating'
         )
         if ar:
-            ar_rating = ar[0].administrative_supervisor_rating or 1
+            ar_rating = ar[0].administrative_supervisor_rating or 0
         if fa:
-            fa_rating = fa[0].functional_supervisor_rating or 1
+            fa_rating = fa[0].functional_supervisor_rating or 0
         if fr:
-            fr_rating = fr[0].reviewer_rating or 1 
-        fr_rt = 30 if self.employee_id.administrative_supervisor_id else 60
-        weightage = (ar_rating * 30) + (fa_rating * fr_rt) + (fr_rating * 40)
+            fr_rating = fr[0].reviewer_rating or 0
+        if self.employee_id.administrative_supervisor_id:
+            ar_rating = ar_rating * 30
+            fa_rating = fa_rating * 30
+        else:
+            ar_rating = ar_rating * 0
+            fa_rating = fa_rating * 60
+        weightage = (ar_rating) + (fa_rating) + (fr_rating * 40)
         self.potential_assessment_score = weightage / 4
 
     def check_kra_section_lines(self):
@@ -927,11 +945,13 @@ class PMS_Appraisee(models.Model):
         if self.employee_id.administrative_supervisor_id:
             self.write({
                 'state': 'admin_rating',
+                'submitted_date': fields.Date.today(),
                 'administrative_supervisor_id': self.employee_id.administrative_supervisor_id.id,
             })
         else:
             self.write({
                 'state': 'functional_rating',
+                'submitted_date': fields.Date.today(),
                 'manager_id': self.employee_id.parent_id.id,
             })
             
@@ -1045,6 +1065,7 @@ class PMS_Appraisee(models.Model):
                 'state':'draft',
             })
         
+    
     # @api.model
     # def fields_view_get(self, view_id='hr_pms.view_hr_pms_appraisee_form', view_type='form', toolbar=False, submenu=False):
     #     res = super(PMS_Appraisee, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar,
@@ -1128,3 +1149,90 @@ class PMS_Appraisee(models.Model):
         
         return res
     
+    def _get_non_draft_pms(self):
+        pms = self.env['pms.appraisee'].search_count([('state', '!=', 'draft')])
+        return int(pms) if pms else 0
+    
+    def _get_overdue_pms(self):
+        submitted_pms = self.env['pms.appraisee'].search(
+            [('state', 'in', ['admin_rating', 'functional_rating'])])
+        total_overdue = 0
+        if submitted_pms:
+            # dd = (submitted_pms[0].submitted_date - submitted_pms[0].create_date).days
+            # raise ValidationError(dd)
+            total_overdue = len([rec for rec in submitted_pms if (rec.submitted_date - rec.create_date).days > 2])
+        return total_overdue
+    
+    def _get_completed_pms(self):
+        pms = self.env['pms.appraisee'].search_count([('state', '=', 'done')])
+        return int(pms) if pms else 0
+    
+    def _get_perception_pms(self, perception): 
+        pms = self.env['pms.appraisee'].search_count([('appraisee_satisfaction', 'in', perception)])
+        return int(pms) if pms else 0
+    
+    def _get_reviewer_pms(self):
+        pms = self.env['pms.appraisee'].search_count([('state', '=', 'reviewer_rating')])
+        return int(pms) if pms else 0
+    
+    @api.model
+    def get_dashboard_details(self):
+        return {
+            '_get_non_draft_pms': self._get_non_draft_pms(),
+            '_get_overdue_pms': self._get_overdue_pms(),
+            '_get_completed_pms': self._get_completed_pms(),
+            '_get_perception_agreed_pms': self._get_perception_pms(['fully_agreed','largely_agreed','partially_agreed']),
+            '_get_perception_disagreed_pms': self._get_perception_pms(['totally_disagreed', 'largely_disagreed']),
+            '_get_reviewer_pms': self._get_reviewer_pms(),
+        }
+    
+    # def action_get_overdue_pms(self):
+    #     form_view_ref = self.env.ref("hr_pms.view_hr_pms_appraisee_form", False)
+    #     tree_view_ref = self.env.ref("hr_pms.view_pms_appraisee_tree", False)
+    #     domain = self._get_overdue_pms()[1] # 
+    #     return {
+    #             'domain': [('id', 'in', domain)],
+    #             'name': "Overdue PMS",
+    #             'res_model': 'pms.appraisee',
+    #             'type': 'ir.actions.act_window',
+    #             'views': [(tree_view_ref.id, 'tree'),(form_view_ref.id, 'form')],
+    #         }
+
+    def overdue_pms(self):
+        submitted_pms = self.env['pms.appraisee'].search(
+            [('state', 'in', ['admin_rating', 'functional_rating'])])
+        total_overdue_ids = [0]
+        if submitted_pms:
+            total_overdue_ids = [rec.id for rec in submitted_pms if (rec.submitted_date - rec.create_date).days > 2]
+        return total_overdue_ids
+
+    @api.model
+    def create_action(self, domain, title, is_overdue=False):
+        domain = domain
+        action_ref = 'hr_pms.action_pms_appraisal_view_id'
+        search_view_ref = 'hr_pms.view_pms_appraisee_filter'
+        action = self.env["ir.actions.actions"]._for_xml_id(action_ref)
+        if title:
+            action['display_name'] = title
+        if search_view_ref:
+            action['search_view_id'] = self.env.ref(search_view_ref).read()[0]
+        action['views'] = [(False, view) for view in action['view_mode'].split(",")]
+        if is_overdue:
+            over_dues = self.overdue_pms()
+            domain = f"[('id', 'in', {over_dues})]"
+        action['domain'] = eval(domain)
+        return {'action': action}
+    
+    # @api.model
+    # def create_action(self, action_ref, title, search_view_ref):
+    #     action = self.env["ir.actions.actions"]._for_xml_id(action_ref)
+    #     if title:
+    #         action['display_name'] = title
+    #     if search_view_ref:
+    #         action['search_view_id'] = self.env.ref(search_view_ref).read()[0]
+    #     action['views'] = [(False, view) for view in action['view_mode'].split(",")]
+    #     action['domain'] = domain
+    #     return {'action': action}
+
+    
+        

@@ -344,12 +344,26 @@ class PMSDepartment(models.Model):
             'state':'published'
         })
     
-    # TODO Add cancel button as with security Departmental heads sees this button,
-    # Ensure all the appraisals sent to employees will be deactivated or cancelled
     def button_cancel(self):
         for rec in self:
+            related_appraisals = self.env['pms.appraisee'].search([
+                ('pms_department_id', '=', rec.id),('active', '=', True)
+                ])
+            for app in related_appraisals:
+                app.write({'active': False})
             rec.write({
                 'state':'cancel'
+            })
+    
+    def button_undo_cancel(self):
+        for rec in self:
+            related_appraisals = self.env['pms.appraisee'].search([
+                ('pms_department_id', '=', rec.id),('active', '=', False)
+                ])
+            for app in related_appraisals:
+                app.write({'active': True})
+            rec.write({
+                'state':'published'
             })
 
     def button_set_to_draft(self):

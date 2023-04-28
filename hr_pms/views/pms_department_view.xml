@@ -13,7 +13,6 @@
                             type="object"
                             states="draft,review" 
                             confirm="Are you sure you want to Publish: This action will generate appraisal for employees in your department" 
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 
                             name="button_cancel" 
@@ -22,7 +21,14 @@
                             type="object"
                             states="published" 
                             confirm="Are you sure you want to cancel: This will cancel sent appraisals" 
-                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
+                        />
+                        <button 
+                            name="button_undo_cancel" 
+                            string="Undo Cancel" 
+                            class="oe_highlight" 
+                            type="object"
+                            states="cancel" 
+                            confirm="Are you sure you want to undo cancel: This will reopen cancelled appraisals" 
                         />
                         <button 
                             name="button_set_to_draft" 
@@ -30,7 +36,6 @@
                             class="oe_highlight" 
                             type="object" 
                             states="cancel" 
-                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <field name="state" widget="statusbar" clickable="False" invisible="0" readonly="1"
 							statusbar_visible="draft,publish,cancel"

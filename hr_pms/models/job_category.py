@@ -6,7 +6,7 @@ from odoo import http
 
 class PMSJobCategory(models.Model):
     _name = "pms.category"
-    _description= "The job category of based on job roles"
+    _description= "PMS Template category based on job roles"
     _inherit = "mail.thread"
 
     name = fields.Char(
@@ -86,11 +86,12 @@ class PMSJobCategory(models.Model):
         'category_id',
         string="PMS Department ID")
 
-    # active = fields.Date(
-    #     string="Active",
-    #     readonly=True,
-    #     default=True,
-    #     store=True)
+    active = fields.Boolean(
+        string="Active", 
+        readonly=True, 
+        default=True, 
+        store=True)
+    
     @api.onchange('category')
     def onchange_category(self):
         if self.category:
@@ -192,11 +193,6 @@ class PMSJobCategory(models.Model):
             """)
 
     def button_publish(self):
-        # TODO Add publish button with security as PMS Officer,
-        # Create record (pms.department) for each job role department
-        # i.e if there are 4 job roles, it generates a record for each department
-        # forwards the mail notification to the department managers
-        ########## clears generated department
         cancelled_pms_department_ids = self.mapped('pms_department_ids').filtered(
             lambda s: s.state == 'cancel')
         if cancelled_pms_department_ids:
@@ -297,21 +293,18 @@ class PMSJobCategory(models.Model):
                 email_layout_xmlid='mail.mail_notification_light',
             )
      
-    # TODO Add cancel button as with security PMS Officer,
-    # Ensure all the appraisals sent to employees will be deactivated or cancelled
-
+     
     def button_cancel(self):
-        for rec in self.mapped('pms_department_ids').filtered(
-            lambda s: s.state in ['draft', 'review']):
-            rec.state = "cancel"
+        for rec in self.mapped('pms_department_ids'): #.filtered(
+            # lambda s: s.state in ['draft', 'review']):
+            rec.write({'active': False, 'state': 'cancel'})
         self.write({
                 'state':'cancel'
             })
     
     def button_republish(self):
-        for rec in self.mapped('pms_department_ids').filtered(
-            lambda s: s.state == 'cancel'):
-            rec.state = "review"
+        for rec in self.env['pms.department'].search([('active', '=', False), ('hr_category_id', '=', self.id)]):
+            rec.write({'active': True, 'state': 'review'})
         self.write({
                 'state':'published'
             })
