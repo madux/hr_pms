@@ -57,7 +57,7 @@ class PMS_Department_Section(models.Model):
     
     @api.onchange('min_line_number', 'max_line_number')
     def onchange_min_max_limit(self):
-        if self.min_line_number >= self.max_line_number:
+        if self.min_line_number > self.max_line_number:
             self.max_line_number = 7
             self.min_line_number = 5
             message = {

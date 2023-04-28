@@ -107,7 +107,7 @@
         </record>
         <!-- PMS YEAR -->
         <record model="pms.year" id="pms_year_2022_qrt2">
-            <field name="name">Oct - Dec 2022 [4th Quarter]</field>
+            <field name="name">Annual Appraisal Cycle - 2022</field>
             <field name="date_from">2022-10-01</field>
             <field name="date_end">2022-12-31</field>
         </record>
@@ -128,7 +128,7 @@
             <field name="date_end">2023-09-30</field>
         </record>
         <record model="pms.year" id="pms_year_2023_qrt4">
-            <field name="name">Oct - Dec 2023 [End of year appraisal]</field>
+            <field name="name">Annual Appraisal Cycle - 2023</field>
             <field name="date_from">2023-10-01</field>
             <field name="date_end">2023-12-31</field>
         </record>

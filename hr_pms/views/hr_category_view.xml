@@ -169,8 +169,8 @@
                                     <tree string="" delete="true">
                                         <field name="name"/> 
                                         <field name="type_of_section"/> 
-                                        <field name="max_line_number"/> 
 										<field name="min_line_number"/> 
+                                        <field name="max_line_number"/> 
                                         <field name="section_avg_scale"/> 
                                         <field name="input_weightage"/> 
                                     </tree>
