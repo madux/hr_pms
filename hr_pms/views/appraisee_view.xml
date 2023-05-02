@@ -158,7 +158,7 @@
                             <page name="section_line_ids" string="Sections" invisible="0">
                                 <separator string="SECTION (A) - KRA / Achievement(s)" colspan="4"/>
 							    <p style="color: red;" attrs="{'invisible': [('instruction_html', '!=', False)]}">* Minimum of 5 lines and Maximun of 7 Lines to be added on this section </p>
-							    <p style="color: red;">* Instructions: KRA / Achievement Ratings - Please use the following Rating Guidelines (1 to 4 scale, where 4 is the HIGHEST rating) </p>
+							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 4 scale, where 4 is the HIGHEST rating </p>
                                 
                                 <field name="kra_section_line_ids" 
                                     required="1" options="{'no_quick_create':True,'no_open': True}" 
@@ -201,7 +201,7 @@
                                     </form>
                                 </field>
                                 <separator string="Functional Competency Sections" colspan="4"/>
-							    <p style="color: red;">* Instructions: Functional Competencies Ratings: Please TICK the most appropriate column using the following Rating Guidelines (1 to 5 scale, where 5 is the HIGHEST rating)</p>
+							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 4(Highest) scale</p>
                                 <field name="fc_section_line_ids" 
                                     required="1" options="{'no_quick_create':True}" attrs="{'readonly': [('state', 'not in', ['draft', 'admin_rating','functional_rating','reviewer_rating'])]}">
                                     <tree string="Functional Sections" delete="false" create="false" editable="bottom">
@@ -237,7 +237,7 @@
                                     </form>
                                 </field>
                                 <separator string="Leadership Competency Sections" colspan="4"/>
-							    <p style="color: red;">* Instructions: Leadership Competency Ratings: Please use the following Rating Guidelines (1 to 5 scale). All LC have equal weightage </p>
+							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 4(Highest) scale</p>
                                 <field name="lc_section_line_ids" 
                                     required="1" options="{'no_quick_create':True}" attrs="{'readonly': [('state', 'not in', ['draft', 'admin_rating','functional_rating','reviewer_rating'])]}">
                                     <tree string="Leadership Competency" delete="false" create="false" editable="bottom">
@@ -303,7 +303,7 @@
                                     </form>
                                 </field>
                                 <separator string="Overall Current Assessment" colspan="4"/>
-							    <p style="color: red;">* Instruction: Appraisee to be rated by the Current Appraisee's and review officer</p>
+							    <p style="color: red;">* Instruction: Use the following scale for your rating</p>
                                 <div class="row">
                                     <table class="table table-bordered table-sm">
                                         <thead>
@@ -395,7 +395,7 @@
                                     </form>
                                 </field>
                                 <separator string="Potential Assessment" colspan="4"/>
-							    <p style="color: red;">* Instruction It's majorly about the 'future', not the past performance </p>
+							    <p style="color: red;">* Instruction It's majorly about the 'future', not the past performance: Use the following scale for your rating </p>
                                 <div class="row">
                                     <table class="table table-bordered table-sm">
                                         <thead>
