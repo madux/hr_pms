@@ -18,7 +18,7 @@ class Send_PMS_back(models.TransientModel):
         if self.reason:
             msg_body = "Dear Sir/Madam, </br>We wish to notify you that your appraisal with reference {} has been returned becasue of the reasons. </br> \
              </br>{}</br>Kindly check the reasons why it was returned</br> </br>Thanks".format(self.record_id.name, self.reason)
-            record_id.write({'reason_back': reasons,'state': 'draft'})
+            record_id.sudo().write({'reason_back': reasons,'state': 'draft'})
             self.mail_sending_reject(msg_body)
         else:
             raise ValidationError('Please Add the Reasons for refusal') 
@@ -39,6 +39,6 @@ class Send_PMS_back(models.TransientModel):
                 'body_html': msg_body
             }
         if mail_to:
-            mail_id = self.env['mail.mail'].create(mail_data)
-            self.env['mail.mail'].send(mail_id)
+            mail_id = self.env['mail.mail'].sudo().create(mail_data)
+            self.env['mail.mail'].sudo().send(mail_id)
         
