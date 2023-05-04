@@ -36,10 +36,10 @@ odoo.define('hr_pms.dashboard', function(require){
                 //     }
                 // });
             },
-            "click widget-3": function(){ 
+            "click .widget-3": function(){ 
                 var self = this;
                 self.onDashboardActionClickedTickets(
-                    "[('state', '=', 'done')]",
+                    "[('state', 'in', ['done', 'signed'])]",
                     'Completed Appraisals', 
                     );
             },

@@ -107,3 +107,4 @@ access_id_hr_grade,access_name_hr_grade,hr_pms.model_hr_grade,base.group_user,1,
 access_id_hr_region,access_name_hr_region,hr_pms.model_hr_region,base.group_user,1,1,1,1
 access_id_hr_level_category,access_name_hr_level_category,hr_pms.model_hr_level_category,base.group_user,1,1,1,1
 access_id_pms_hr_job,access_name_pms_hr_job,hr.model_hr_job,base.group_user,1,1,1,1
+access_id_pms_back,access_name_pms_back,hr_pms.model_pms_back,base.group_user,1,1,1,1

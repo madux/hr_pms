@@ -289,7 +289,7 @@ class LC_SectionLine(models.Model):
             self.reviewer_rating = 0
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
+                    'message': "Reviewer's rating Scale should be in the range of 1 - {}".format(self.section_avg_scale)
                 }
             return {'warning': message}
     
@@ -446,7 +446,7 @@ class FC_SectionLine(models.Model):
             self.reviewer_rating = 0
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
+                    'message': "Reviewer's supervisor rating Scale should be in the range of 1 - {}".format(self.section_avg_scale)
                 }
             return {'warning': message}
     

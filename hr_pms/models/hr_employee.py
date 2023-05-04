@@ -264,31 +264,36 @@ class HrEmployeeBase(models.AbstractModel):
         MAIL_TEMPLATE = self.env.ref(
         'hr_pms.mail_template_pms_notification', raise_if_not_found=False)
         # self.with_context(allow_write=True)._message_post(
-        #     MAIL_TEMPLATE) 
+        #     MAIL_TEMPLATE)  mail_template_non_email_subordinates_pms_notification
         rec_ids = self.env.context.get('active_ids', [])
+        template_to_use = "mail_template_pms_notification"
         for rec in rec_ids:
             record = self.env['hr.employee'].browse([rec])
             if record.work_email or record.private_email:
                 email_to = record.work_email or record.private_email 
-                ir_model_data = self.env['ir.model.data']
-                template_id = ir_model_data.get_object_reference('hr_pms', 'mail_template_pms_notification')[1]         
-                if template_id:
-                    ctx = dict()
-                    ctx.update({
-                        'default_model': 'hr.employee',
-                        'default_res_id': record.id,
-                        'default_use_template': bool(template_id),
-                        'default_template_id': template_id,
-                        'default_composition_mode': 'comment',
-                    })
-                    template_rec = self.env['mail.template'].browse(template_id)
-                    if email_to:
-                        template_rec.write({'email_to': email_to})
-                    template_rec.with_context(ctx).send_mail(record.id, True)
-                # record.action_send_mail(
-                #     'mail_template_pms_notification', 
-                #     [record.work_email, record.private_email],
-                #     )
+                template_to_use = "mail_template_pms_notification"
+            else: # either send it to the employee manager or supervisors email
+                email_to = record.parent_id.work_email or record.administrative_supervisor_id.work_email 
+                template_to_use = "mail_template_non_email_subordinates_pms_notification"
+            ir_model_data = self.env['ir.model.data']
+            template_id = ir_model_data.get_object_reference('hr_pms', template_to_use)[1]         
+            if template_id:
+                ctx = dict()
+                ctx.update({
+                    'default_model': 'hr.employee',
+                    'default_res_id': record.id,
+                    'default_use_template': bool(template_id),
+                    'default_template_id': template_id,
+                    'default_composition_mode': 'comment',
+                })
+                template_rec = self.env['mail.template'].browse(template_id)
+                if email_to:
+                    template_rec.write({'email_to': email_to})
+                template_rec.with_context(ctx).send_mail(record.id, True)
+            # record.action_send_mail(
+            #     'mail_template_pms_notification', 
+            #     [record.work_email, record.private_email],
+            #     )
     
     # def action_send_mail(self, with_template_id, email_items= None, email_from=None):
     #     '''Email_to = [lists of emails], Contexts = {Dictionary} '''

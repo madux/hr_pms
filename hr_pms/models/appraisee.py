@@ -41,6 +41,12 @@ class PMS_Appraisee(models.Model):
         string="Fold", 
         default=False
         )
+    is_current_user = fields.Boolean(
+        default=False, 
+        compute="compute_current_user", 
+        store=False,
+        help="Used to determine what the appraisee sees")
+
     pms_department_id = fields.Many2one(
         'pms.department', 
         string="PMS Department ID"
@@ -130,7 +136,7 @@ class PMS_Appraisee(models.Model):
     
     supervisor_comment = fields.Text(
         string="Supervisor Comment", 
-        tracking=True
+        # tracking=True
         )
     supervisor_attachement_ids = fields.Many2many(
         'ir.attachment', 
@@ -142,7 +148,7 @@ class PMS_Appraisee(models.Model):
     supervisor_attachement_set = fields.Integer(default=0, required=1)
     manager_comment = fields.Text(
         string="Manager Comment",
-        tracking=True 
+        # tracking=True 
         )
     manager_attachement_ids = fields.Many2many(
         'ir.attachment', 
@@ -154,7 +160,7 @@ class PMS_Appraisee(models.Model):
     manager_attachement_set = fields.Integer(default=0, required=1)
     reviewer_comment = fields.Text(
         string="Reviewers Comment", 
-        tracking=True,
+        # tracking=True,
         )
     reviewer_attachement_ids = fields.Many2many(
         'ir.attachment', 
@@ -1164,7 +1170,7 @@ class PMS_Appraisee(models.Model):
         return total_overdue
     
     def _get_completed_pms(self):
-        pms = self.env['pms.appraisee'].search_count([('state', '=', 'done')])
+        pms = self.env['pms.appraisee'].search_count([('state', 'in', ['done', 'signed'])])
         return int(pms) if pms else 0
     
     def _get_perception_pms(self, perception): 
@@ -1186,18 +1192,6 @@ class PMS_Appraisee(models.Model):
             '_get_reviewer_pms': self._get_reviewer_pms(),
         }
     
-    # def action_get_overdue_pms(self):
-    #     form_view_ref = self.env.ref("hr_pms.view_hr_pms_appraisee_form", False)
-    #     tree_view_ref = self.env.ref("hr_pms.view_pms_appraisee_tree", False)
-    #     domain = self._get_overdue_pms()[1] # 
-    #     return {
-    #             'domain': [('id', 'in', domain)],
-    #             'name': "Overdue PMS",
-    #             'res_model': 'pms.appraisee',
-    #             'type': 'ir.actions.act_window',
-    #             'views': [(tree_view_ref.id, 'tree'),(form_view_ref.id, 'form')],
-    #         }
-
     def overdue_pms(self):
         submitted_pms = self.env['pms.appraisee'].search(
             [('state', 'in', ['admin_rating', 'functional_rating'])])
@@ -1205,6 +1199,37 @@ class PMS_Appraisee(models.Model):
         if submitted_pms:
             total_overdue_ids = [rec.id for rec in submitted_pms if (rec.submitted_date - rec.create_date).days > 2]
         return total_overdue_ids
+    
+    def compute_current_user(self):
+        for rec in self:
+            if rec.employee_id.user_id.id == self.env.user.id and self.state not in ['draft','done', 'signed']:
+                rec.is_current_user = True
+            else:
+                rec.is_current_user = False
+    reason_back = fields.Text(string='Refusal Reasons')
+    is_functional_appraiser = fields.Boolean(string='Refusal Reasons', compute="compute_functional_appraiser")
+
+    def compute_functional_appraiser(self):
+        if self.manager_id and self.manager_id.user_id.id == self.env.user.id:
+            self.is_functional_appraiser = True 
+        else:
+            self.is_functional_appraiser = False
+
+    def return_appraisal(self):
+        return {
+              'name': 'Reason for Return',
+              'view_type': 'form',
+              "view_mode": 'form',
+              'res_model': 'pms.back',
+              'type': 'ir.actions.act_window',
+              'target': 'new',
+              'context': {
+                  'default_record_id': self.id,
+                  'default_date': fields.Datetime.now(),
+                  'default_direct_employee_id': self.employee_id.id,
+                  'default_resp':self.env.uid,
+              },
+        }
 
     @api.model
     def create_action(self, domain, title, is_overdue=False):

@@ -46,17 +46,22 @@
                             confirm="Are you sure you want to Submit rating"
                             help="Done by the reviewer: This is the final process that determines the overall score"
                         /> 
-                            <!-- groups="hr_pms.group_pms_user_id,hr_pms.group_pms_reviewer,hr_pms.group_pms_manager_id" -->
-
                         <button 
                             name="button_withdraw" 
                             string="Withdraw" 
-                            class="btn-primary" 
                             type="object"
-                            states="admin_rating,functional_rating" 
+                            attrs="{'invisible': ['|',('is_current_user', '!=', True), ('state', 'not in', ['admin_rating','functional_rating'])]}"
                             confirm="Are you sure you want to Withdraw"
                             groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr.group_hr_manager"
                         />
+                        <button 
+                            name="return_appraisal" 
+                            string="Return" 
+                            type="object"
+                            attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['admin_rating','functional_rating'])]}"
+                            confirm="Are you sure you want to Withdraw"
+                        />
+                            <!-- states="admin_rating,functional_rating" -->
                         <button 
                             name="button_set_to_draft" 
                             string="Set to draft" 
@@ -91,6 +96,9 @@
                                 <field name="date_from" readonly="1" force_save="1"/> 
                                 <field name="date_end" readonly="1" force_save="1"/>
                                 <field name="submitted_date" readonly="1" force_save="1"/>
+                                <field name="is_current_user" readonly="0"/>
+                                 <!-- groups="base.group_system"/> -->
+                                
                             </group>
                         </group>
                         <notebook>
@@ -155,7 +163,7 @@
                                     </group>
                                 </form>
                             </page>
-                            <page name="section_line_ids" string="Sections" invisible="0">
+                            <page name="section_line_ids" string="Sections" attrs="{'invisible': [('is_current_user', '=', True)]}">
                                 <separator string="SECTION (A) - KRA / Achievement(s)" colspan="4"/>
 							    <p style="color: red;" attrs="{'invisible': [('instruction_html', '!=', False)]}">* Minimum of 5 lines and Maximun of 7 Lines to be added on this section </p>
 							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 4 scale, where 4 is the HIGHEST rating </p>
@@ -517,6 +525,7 @@
                                     </form>
                                 </field>
                             </page>
+
                             <page name="scoreInfo" string="Score Details"
                             groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer">
                                 <form string="">
@@ -541,7 +550,7 @@
                                     </group>
                                 </form>
                             </page>
-                            <page name="all_comments" string="Comment" invisible="0">
+                            <page name="all_comments" string="Comment" invisible="0" attrs="{'invisible': [('is_current_user', '=', True)]}">
                                 <separator string="Appraisee Comments" colspan="4"/>
                                 <field name="appraisee_comment" readonly="1"/>
                                 <separator string="Supervisor Comments" colspan="4"/>
@@ -678,6 +687,19 @@
                                     </group>
                                 </form>
                             </page>
+                            <page name="reason_back" string="Refusal's Comment" attrs="{'invisible': [('state', 'in', ['draft'])]}"
+                            >
+                                <form string="">
+                                    <group>
+                                        <group>
+                                            <field name="reason_back" placeholder="Start typing..." readonly ="1"/> 
+                                        </group>
+                                        <group>
+                                            <field name="is_functional_appraiser" invisible ="1"/> 
+                                        </group>
+                                    </group>
+                                </form>
+                            </page>
                             
                         </notebook>
                     </sheet>
@@ -698,6 +720,7 @@
                     <field name="department_id" readonly="0" string="Department"/>  
                     <field name="pms_year_id" readonly="1" string="Period"/>   
                     <field name="deadline" readonly="1" string="Deadline"/> 
+                    <field name="is_current_user" readonly="1" string="Is current user" invisible="1"/> 
                     <!-- <field name="final_kra_score" readonly="1" string="KRA Score"/> 
                     <field name="final_fc_score" readonly="1" string="FC Score"/> 
                     <field name="final_lc_score" readonly="1" string="LC Score"/>  -->
