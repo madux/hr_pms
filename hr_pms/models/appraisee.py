@@ -1206,7 +1206,7 @@ class PMS_Appraisee(models.Model):
                 rec.is_current_user = True
             else:
                 rec.is_current_user = False
-    reason_back = fields.Text(string='Refusal Reasons')
+    reason_back = fields.Text(string='Refusal Reasons', tracking=True)
     is_functional_appraiser = fields.Boolean(string='Refusal Reasons', compute="compute_functional_appraiser")
 
     def compute_functional_appraiser(self):
