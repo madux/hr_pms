@@ -3,7 +3,7 @@ import time
 import base64
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo import models, fields, api, _, SUPERUSER_ID
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 from odoo import http
 import logging
 from lxml import etree
@@ -55,7 +55,7 @@ class PMS_Appraisee(models.Model):
         'pms.section', 
         string="Section ID",
         )
-    submitted_date = fields.Datetime('Submitted Date', default=fields.Datetime.now())
+    submitted_date = fields.Datetime('Submitted Date')
     dummy_kra_section_scale = fields.Integer(
         string="Dummy KRA Section scale",
         help="Used to get the actual kra section scale because it wasnt setup",
@@ -161,7 +161,8 @@ class PMS_Appraisee(models.Model):
     reviewer_comment = fields.Text(
         string="Reviewers Comment", 
         # tracking=True,
-        )
+        )     
+        
     reviewer_attachement_ids = fields.Many2many(
         'ir.attachment', 
         'ir_pms_reviewer_attachment_rel',
@@ -676,57 +677,68 @@ class PMS_Appraisee(models.Model):
                     "Ops! Please ensure all reviewer's rating at leadership competency is at least 1"
                 ) 
     
-    def check_current_assessment_section_lines(self):
+    def check_current_potential_assessment_section_lines(self):
         if self.state == "admin_rating":
             if self.mapped('current_assessment_section_line_ids').filtered(
-                lambda line: line.administrative_supervisor_rating < 1):
+                lambda line: line.name == "Administrative Appraiser" and line.assessment_type == False):
                 raise ValidationError(
-                    "Ops! Please ensure all administrative supervisor's rating at current assessment section is at least 1"
+                    "Ops! Please ensure all administrative supervisor's rating at current assessment section is at least Ordinary"
                 )
-            if self.mapped('current_assessment_section_line_ids').filtered(
-                lambda line: line.administrative_supervisor_rating < 1):
+            if self.mapped('potential_assessment_section_line_ids').filtered(
+                lambda line: line.name == "Administrative Appraiser" and line.assessment_type == False):
                 raise ValidationError(
-                    "Ops! Please ensure all administrative supervisor's rating at current assessment section is at least 1"
+                    "Ops! Please ensure all administrative supervisor's rating at potential assessment section is at least Low potential"
                 )
-        elif self.state == "functional_rating":
-            if self.mapped('current_assessment_section_line_ids').filtered(
-                lambda line: line.functional_supervisor_rating < 1):
-                raise ValidationError(
-                    "Ops! Please ensure all functional manager's rating at current assessment section is at least 1"
-                )
-
-        elif self.state == "reviewer_rating":
-            if self.mapped('current_assessment_section_line_ids').filtered(
-                lambda line: line.reviewer_rating < 1):
-                raise ValidationError(
-                    "Ops! Please ensure all reviewer's rating at current assessment section is at least 1"
-                ) 
             
-    def check_potential_assessment_section_lines(self):
-        if self.state == "admin_rating":
-            if self.mapped('potential_assessment_section_line_ids').filtered(
-                lambda line: line.administrative_supervisor_rating < 1):
-                raise ValidationError(
-                    "Ops! Please ensure all administrative supervisor's rating on potential assessment section is at least 1"
-                )
-            if self.mapped('potential_assessment_section_line_ids').filtered(
-                lambda line: line.administrative_supervisor_rating < 1):
-                raise ValidationError(
-                    "Ops! Please ensure all administrative supervisor's rating on potential assessment section is at least 1"
-                )
         elif self.state == "functional_rating":
-            if self.mapped('potential_assessment_section_line_ids').filtered(
-                lambda line: line.functional_supervisor_rating < 1):
+            if self.mapped('current_assessment_section_line_ids').filtered(
+                lambda line: line.name == "Functional Appraiser" and line.assessment_type == False):
                 raise ValidationError(
-                    "Ops! Please ensure all functional manager's rating on potential assessment section is at least 1"
+                    "Ops! Please ensure all functional manager's rating at current assessment section is at least Ordinary"
+                )
+            if self.mapped('potential_assessment_section_line_ids').filtered(
+                lambda line: line.name == "Functional Appraiser" and line.assessment_type == False):
+                raise ValidationError(
+                    "Ops! Please ensure all  functional manager's rating at potential assessment section is at least Low potential"
                 )
 
         elif self.state == "reviewer_rating":
-            if self.mapped('potential_assessment_section_line_ids').filtered(
-                lambda line: line.reviewer_rating < 1):
+            if self.mapped('current_assessment_section_line_ids').filtered(
+                lambda line: line.name == "Functional Reviewer" and line.assessment_type == False):
                 raise ValidationError(
-                    "Ops! Please ensure all reviewer's rating on potential assessment section is at least 1"
+                    "Ops! Please ensure all reviewer's rating at current assessment section is at least "
                 ) 
+            if self.mapped('potential_assessment_section_line_ids').filtered(
+                lambda line: line.name == "Functional Reviewer" and line.assessment_type == False):
+                raise ValidationError(
+                    "Ops! Please ensure all reviewer's rating at potential assessment section is at least Low potential"
+                )
+            
+    # def check_potential_assessment_section_lines(self):
+    #     if self.state == "admin_rating":
+    #         if self.mapped('potential_assessment_section_line_ids').filtered(
+    #             lambda line: line.administrative_supervisor_rating < 1):
+    #             raise ValidationError(
+    #                 "Ops! Please ensure all administrative supervisor's rating on potential assessment section is at least 1"
+    #             )
+    #         if self.mapped('potential_assessment_section_line_ids').filtered(
+    #             lambda line: line.administrative_supervisor_rating < 1):
+    #             raise ValidationError(
+    #                 "Ops! Please ensure all administrative supervisor's rating on potential assessment section is at least 1"
+    #             )
+    #     elif self.state == "functional_rating":
+    #         if self.mapped('potential_assessment_section_line_ids').filtered(
+    #             lambda line: line.functional_supervisor_rating < 1):
+    #             raise ValidationError(
+    #                 "Ops! Please ensure all functional manager's rating on potential assessment section is at least 1"
+    #             )
+
+    #     elif self.state == "reviewer_rating":
+    #         if self.mapped('potential_assessment_section_line_ids').filtered(
+    #             lambda line: line.reviewer_rating < 1):
+    #             raise ValidationError(
+    #                 "Ops! Please ensure all reviewer's rating on potential assessment section is at least 1"
+    #             ) 
         
     def _get_group_users(self):
         group_obj = self.env['res.groups']
@@ -818,8 +830,19 @@ class PMS_Appraisee(models.Model):
             email_to, 
             email_cc)
         
+    def get_email_from(self):
+        email_from = ""
+        if self.state == "admin_rating":
+            email_from = self.administrative_supervisor_id.work_email
+        if self.state == "functional_rating":
+            email_from = self.manager_id.work_email
+        if self.state == "reviewer_rating":
+            email_from = self.manager_id.work_email or self.administrative_supervisor_id.work_email
+        return email_from
+        
     def action_notify(self, subject, msg, email_to, email_cc):
-        email_from = self.env.user.email
+        sender_email_from = self.env.user.email
+        email_from = sender_email_from or self.get_email_from()
         if email_to and email_from:
             email_ccs = list(filter(bool, email_cc))
             reciepients = (','.join(items for items in email_ccs)) if email_ccs else False
@@ -834,7 +857,7 @@ class PMS_Appraisee(models.Model):
                 }
             mail_id = self.env['mail.mail'].sudo().create(mail_data)
             self.env['mail.mail'].sudo().send(mail_id)
-            self.message_post(body=msg)
+            # self.message_post(body=msg)
     
     def get_url(self, id, name):
         base_url = http.request.env['ir.config_parameter'].sudo().get_param('web.base.url')
@@ -852,7 +875,7 @@ class PMS_Appraisee(models.Model):
                 self.department_id.name,
                 )
         subject = "Appraisal Reminder"
-        email_to = self.employee_id.work_email if self.state in ['draft', 'done'] else \
+        email_to = self.employee_id.work_email or self.administrative_supervisor_id.work_email or self.manager_id.work_email if self.state in ['draft', 'done', 'reviewer_rating'] else \
             self.administrative_supervisor_id.work_email if self.state == "admin_rating" else \
             self.manager_id.work_email if self.state == "functional_rating" else self.reviewer_id.work_email if self.state == "reviewer_rating" else self.employee_id.work_email
         email_cc = [self.employee_id.work_email]
@@ -918,12 +941,12 @@ class PMS_Appraisee(models.Model):
                 min_limit = min_category_line_number
             if len(self.kra_section_line_ids.ids) not in range(min_limit, max_limit + 1): # not in [5, 6, limit]:
                 raise ValidationError("""Please ensure the number of KRA / Achievement section is within the range of {} to {} line(s)""".format(int(min_limit), int(max_limit)))
-        sum_weightage = sum([weight.weightage for weight in self.mapped('kra_section_line_ids')])
+        sum_weightage = sum([weight.appraisee_weightage for weight in self.mapped('kra_section_line_ids')])
         if sum_weightage != 100:
             value_diff = 100 - sum_weightage 
             needed_value_msg = f'''You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
             raise ValidationError(
-                f"""Please ensure the sum of KRA weight by Appraisee is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+                f"""Please ensure the sum of KRA weight by functional Appraiser is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
                 )
         
     def validate_deadline(self):
@@ -984,6 +1007,7 @@ class PMS_Appraisee(models.Model):
         self.check_kra_section_lines()
         self.check_fc_section_lines()
         self.check_lc_section_lines()
+        self.check_current_potential_assessment_section_lines()
         # self.check_current_assessment_section_lines()
         # self.check_potential_assessment_section_lines()
         self.send_mail_notification(msg)
@@ -999,6 +1023,14 @@ class PMS_Appraisee(models.Model):
             raise ValidationError(
                 "Ops ! please ensure that a reviewer is assigned to the employee"
                 )
+        sum_weightage = sum([weight.weightage for weight in self.mapped('kra_section_line_ids')])
+        if sum_weightage != 100:
+            value_diff = 100 - sum_weightage 
+            needed_value_msg = f'''You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
+            raise ValidationError(
+                f"""Please ensure the sum of KRA weight by Appraisee is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+                )
+        
         if self.employee_id.parent_id and self.env.user.id != self.employee_id.parent_id.user_id.id:
             raise ValidationError(
                 "Ops ! You are not entitled to submit this rating because you are not the employee's functional manager"
@@ -1006,6 +1038,7 @@ class PMS_Appraisee(models.Model):
         self.check_kra_section_lines()
         self.check_fc_section_lines()
         self.check_lc_section_lines()
+        self.check_current_potential_assessment_section_lines()
         # self.check_current_assessment_section_lines()
         # self.check_potential_assessment_section_lines()
         msg = """Dear {}, <br/> 
@@ -1034,8 +1067,7 @@ class PMS_Appraisee(models.Model):
                 )
         self.check_fc_section_lines()
         self.check_lc_section_lines()
-        # self.check_current_assessment_section_lines()
-        # self.check_potential_assessment_section_lines()
+        self.check_current_potential_assessment_section_lines()
         msg = """Dear {}, <br/> 
         I wish to notify you that your appraisal has been reviewed successfully.\
         Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
@@ -1134,7 +1166,15 @@ class PMS_Appraisee(models.Model):
     #     return templates
     
     
+    def validate_reviewer_commenter(self, vals):
+        old_comment = vals.get('reviewer_comment')
+        if old_comment and self.state == 'reviewer_rating':
+            if self.employee_id.reviewer_id and self.env.user.id != self.employee_id.reviewer_id.user_id.id:
+                raise UserError("Ops ! You are not entitled to add a review comment because you are not the employee's reviewer")
+        
     def write(self, vals):
+        
+        self.validate_reviewer_commenter(vals)
         res = super().write(vals)
         for template in self:
             if template.appraisee_attachement_ids and template.appraisee_attachement_set == 0:
@@ -1152,7 +1192,8 @@ class PMS_Appraisee(models.Model):
             if template.reviewer_attachement_ids and template.reviewer_attachement_set == 0:
                 template.reviewer_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
                 template.reviewer_attachement_set = 1
-        
+            # if is_not_reviewer:
+            #     template.write({'reviewer_comment': old_comment})
         return res
     
     def _get_non_draft_pms(self):
@@ -1202,12 +1243,12 @@ class PMS_Appraisee(models.Model):
     
     def compute_current_user(self):
         for rec in self:
-            if rec.employee_id.user_id.id == self.env.user.id and self.state not in ['draft','done', 'signed']:
+            if rec.employee_id.user_id.id == self.env.user.id and rec.state not in ['draft','done', 'signed']:
                 rec.is_current_user = True
             else:
                 rec.is_current_user = False
-    reason_back = fields.Text(string='Refusal Reasons', tracking=True)
-    is_functional_appraiser = fields.Boolean(string='Refusal Reasons', compute="compute_functional_appraiser")
+    reason_back = fields.Text(string='Return Reasons', tracking=True)
+    is_functional_appraiser = fields.Boolean(string='Is functional appraiser', compute="compute_functional_appraiser")
 
     def compute_functional_appraiser(self):
         if self.manager_id and self.manager_id.user_id.id == self.env.user.id:
