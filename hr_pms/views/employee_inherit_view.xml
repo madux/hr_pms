@@ -142,6 +142,16 @@
  
             </field>
         </record> -->
+        <record model="ir.ui.view" id="view_department_form_pms" >
+            <field name="name">hr.department</field>
+            <field name="model">hr.department</field>
+            <field name="inherit_id" ref="hr.view_department_form" />
+            <field name="arch" type="xml"> 
+                <xpath expr="//div[@class='oe_chatter']" position="before">
+                    <field name="jobs_ids" string="Job roles" required="0" invisible="0"/>
+                </xpath>
+            </field>
+        </record>
 
         <record id="action_employee_district_view_id" model="ir.actions.act_window">
 			<field name="name">District</field>

@@ -67,14 +67,19 @@ odoo.define('hr_pms.dashboard', function(require){
                     'Reviewers Appraisals ', 
                     );
             },
+            "click .widget-7": function(){ 
+                var self = this;
+                self.onDashboardActionget_not_generatedPms(
+                    'Employee Appraisals Not generated', 
+                    );
+            },
         },
-        onDashboardActionClickedTickets: function (domain=[], title="", overdue=false) {
+        onDashboardActionget_not_generatedPms: function (title) {
             var self = this; 
                 this._rpc({
                     model: 'pms.appraisee',
-                    method: 'create_action',
-                    args: [domain,title, overdue] 
-                    // "helpdesk_api.helpdeskticket_model_view_search"],
+                    method: 'get_not_generated_employees',
+                    args: [title] 
                 }).then(function (result) {
                     if (result.action) {
                         self.do_action(result.action);
@@ -91,6 +96,7 @@ odoo.define('hr_pms.dashboard', function(require){
             this._get_perception_agreed_pms = [];
             this._get_perception_disagreed_pms = [];
             this._get_reviewer_pms = [];
+            this._getpms_not_generated = [];
         },
         willStart: function(){
             var self = this;
@@ -118,6 +124,8 @@ odoo.define('hr_pms.dashboard', function(require){
                 self._get_perception_agreed_pms = result['_get_perception_agreed_pms'];
                 self._get_perception_disagreed_pms = result['_get_perception_disagreed_pms'];
                 self._get_reviewer_pms = result['_get_reviewer_pms'];
+                self._getpms_not_generated = result['_getpms_not_generated'];
+
             });
             return $.when(define_call);
         },

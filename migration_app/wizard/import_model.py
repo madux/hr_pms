@@ -76,11 +76,11 @@ class ImportRecords(models.TransientModel):
         gradeId = self.env['hr.grade'].search([('name', '=', name)], limit=1)
         return gradeId.id if gradeId else self.env['hr.grade'].create({'name': name}).id
     
-    def get_designation_id(self, name):
+    def get_designation_id(self, name, departmentid):
         if not name:
             return False
-        designationId = self.env['hr.job'].search([('name', '=', name)], limit=1)
-        return designationId.id if designationId else self.env['hr.job'].create({'name': name}).id
+        designationId = self.env['hr.job'].search([('name', '=', name), ('department_id', '=', departmentid)], limit=1)
+        return designationId.id if designationId else self.env['hr.job'].create({'name': name, 'department_id': departmentid}).id
 
     def get_unit_id(self, name):
         if not name:
@@ -186,11 +186,12 @@ class ImportRecords(models.TransientModel):
                     })
             vals.update({'employment_date': employee_id.employment_date})
             user, password = generate_user(vals)
-            employee_id.sudo().write({
+            employee_id.sudo().update({
                         'user_id': user.id if user else False,
-                        'work_email': vals.get('email'),
-                        'migrated_password': password,
+                        'work_email': employee_id.work_email,
+                        # 'migrated_password': password,
             })
+            employee_id.reset_employee_user_password()
 
         def generate_user(
                 vals,
@@ -212,17 +213,19 @@ class ImportRecords(models.TransientModel):
             for group in groups_to_remove:
                 tup = (3,group.id)
                 group_list.append(tup)
-            email = vals.get('email') or vals.get('private_emaill')
+            email = vals.get('email') or vals.get('private_email')
             fullname = vals.get('fullname')
             user, password = False, False
             login = email if email and email.endswith('@enugudisco.com') else vals.get('staff_number') 
+
             if login:
-                empdate = datetime.strftime(vals.get('employment_date'), '%d-%m-Y')
-                employement_date = empdate.split('-') 
-                emp_day, emp_month = employement_date[0], employement_date[1]
+                _logger.info('LOGGING FOUND')
+                # empdate = datetime.strftime(vals.get('employment_date'), '%d-%m-Y')
+                # employement_date = empdate.split('-') 
+                # emp_day, emp_month = employement_date[0], employement_date[1]
                 password = ''.join(random.choice('EdcpasHwodfo!xyzus$rs1234567') for _ in range(10))
                 # password = "{}{}{}".format(vals.get('staff_number'),emp_day,emp_month)
-                _logger.info("DATE DATA IS {}  AND PASSWORD IS {}".format(employement_date, password))
+                # _logger.info("DATE DATA IS {}  AND PASSWORD IS {}".format(employement_date, password))
                 
                 # ''.join(random.choice('eedcpasswodforxyzusers1234567') for _ in range(10))
                 # '{}-{}'.format(fullname[:2].upper(), str(uuid.uuid4())[:8]), # MA-2132ERER
@@ -231,17 +234,20 @@ class ImportRecords(models.TransientModel):
 				'login' : login,
 				'password': password,
                 }
-                _logger.info("Creating employee Rep User...")
+                _logger.info(f"Creating employee Rep User..with password {password} and {user_vals.get('password')}.")
                 User = self.env['res.users'].sudo()
                 user = User.search([('login', '=', login)],limit=1)
                 if user:
-                    pass # user.write(user_vals)
+                    _logger.info("User already exists...")
+                    password = False
                 else:
                     user = User.create(user_vals)
+                    _logger.info("Creating User record...")
                 _logger.info('Adding user to group ...')
                 user.sudo().write({'groups_id':group_list})
-                return user, password
+                return user, user_vals.get('password')
             return user, password
+        
         if self.import_type == "employee":
             for row in file_data:
                 # try:
@@ -272,6 +278,7 @@ class ImportRecords(models.TransientModel):
                                 appt_date = datetime(*xlrd.xldate_as_tuple(float(row[14]), 0)) #eg 4554545
 
                     dt = appt_date or emp_date
+                    departmentid = self.create_department(row[11])
                     vals = dict(
                         serial = row[0],
                         staff_number = str(int(row[1])),
@@ -279,13 +286,13 @@ class ImportRecords(models.TransientModel):
                         level_id = self.get_level_id(row[3].strip()),
                         district = self.get_district_id(row[9].strip()),
                         gender = 'male' if row[10] in ['m', 'M'] else 'female' if row[10] in ['f', 'F'] else 'other',
-                        department_id = self.create_department(row[11]),
+                        department_id = departmentid,
                         unit_id = self.get_unit_id(row[12].strip()),
                         sub_unit_id = self.get_sub_unit_id(row[13].strip()),
                         employment_date = dt,# datetime.strptime(appt_date, '%m-%b-%Y') if row[14].strip() else False,
                         # employment_date = datetime.strptime(row[14], '%m/%d/%Y') if row[14] else False,
                         grade_id = self.get_grade_id(row[15].strip()),
-                        job_id = self.get_designation_id(row[16]),
+                        job_id = self.get_designation_id(row[16], departmentid),
                         functional_appraiser_id = find_existing_employee(row[18]),
                         administrative_supervisor_name = row[19],
                         administrative_supervisor_id = find_existing_employee(str(row[20])),
@@ -339,6 +346,7 @@ class ImportRecords(models.TransientModel):
                         else:
                             appt_date = datetime(*xlrd.xldate_as_tuple(float(row[14]), 0)) #eg 4554545
                 dt = appt_date or emp_date
+                departmentid = self.create_department(row[11])
                 employee_vals = dict(
                     employee_number = str(int(row[1])),
                     # employee_identification_code = employee_code,
@@ -346,13 +354,13 @@ class ImportRecords(models.TransientModel):
                     level_id = self.get_level_id(row[3].strip()),
                     ps_district_id = self.get_district_id(row[9].strip()),
                     gender = 'male' if row[10] in ['m', 'M'] else 'female' if row[10] in ['f', 'F'] else 'other',
-                    department_id = self.create_department(row[11]),
+                    department_id = departmentid,
                     unit_id = self.get_unit_id(row[12].strip()),
                     work_unit_id = self.get_sub_unit_id(row[13].strip()),
                     employment_date = dt,
                     # employment_date = datetime.strptime(row[14], '%m/%d/%Y') if row[14] else False,
                     grade_id = self.get_grade_id(row[15].strip()),
-                    job_id = self.get_designation_id(row[16]), 
+                    job_id = self.get_designation_id(row[16], departmentid), 
                     work_email = row[24].strip(),
                     private_email = row[24].strip(),
                     work_phone = '0' + str(int(row[25])) if row[25] and type(row[25]) in [float] else row[25] if row[25] else False,
@@ -367,6 +375,9 @@ class ImportRecords(models.TransientModel):
                     functional_appraiser_id = fa,
                     administrative_supervisor_id = aa,
                     functional_reviewer_id = rr, 
+                    private_email = employee_vals.get('private_email'),
+                    email = employee_vals.get('work_email'),
+                    fullname = employee_vals.get('name'),
                     )
                     ## if fa, add, fr get the employee id, add the 
                     ## attributes to employee, also update the femployee user
@@ -375,10 +386,9 @@ class ImportRecords(models.TransientModel):
                 '|', ('employee_number', '=', employee_code), 
                 ('barcode', '=', employee_code)], limit = 1)
                 if employee_id:
-                    ## update employee job_id.department_id to the employee department
-                    employee_id.job_id.sudo().write({
-                        'department_id': employee_id.department_id.id
-                    })
+                    # employee_id.job_id.sudo().write({
+                    #     'department_id': employee_id.department_id.id
+                    # })
                     if aa:
                         administrative_supervisor_id = str(int(vals.get('administrative_supervisor_id'))) \
                         if type(aa) == float else aa
@@ -404,6 +414,17 @@ class ImportRecords(models.TransientModel):
                             'rr', 
                             )
                     employee_id.sudo().update(employee_vals)
+                    if not employee_id.user_id:
+                        # employee_vals['fullname'] = employee_vals.get('name')
+                        user, password = generate_user(vals)
+                        employee_id.sudo().write({
+                            'user_id': user.id if user else False,
+                        })
+                        if password:
+                            employee_id.sudo().write({
+                                'migrated_password': password
+                            })
+                            
                     _logger.info(f'Updating records for {employee_id.employee_number} at line {row[0]}')
                     count += 1
                 else:

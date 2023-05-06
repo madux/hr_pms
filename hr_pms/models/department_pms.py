@@ -138,22 +138,8 @@ class PMSDepartment(models.Model):
     def onchange_department_id(self):
         if self.department_id:
             self.department_manager_id = self.department_id.parent_id.id
-    
-    # TODO If is_department_head is set to true, display the buttons to them
-    # @api.depends('department_id')
-    # def check_department_head(self):
-    #     """Checks if the current user is the departmental Manager"""
-    #     for rec in self:
-    #         if rec.department_id.parent_id.user_id.id == self.env.user.id:
-    #             rec.is_department_head = True 
-    #         else:
-    #             rec.is_department_head = False 
-
-    def get_current_assessment_lines(self, appraisee):
-        # vals = self.env['assessment.description'].search([
-        #     ('type', '=', 'current')
-        # ])
-        # if vals:
+     
+    def get_current_assessment_lines(self, appraisee): 
         vals = [
             'Administrative Appraiser',
             'Functional Appraiser',
@@ -170,10 +156,6 @@ class PMSDepartment(models.Model):
         })
     
     def get_potential_assessment_lines(self, appraisee):
-        # vals = self.env['assessment.description'].search([
-        #     ('type', '=', 'potential')
-        # ])
-        # if vals:
         vals = [
             'Administrative Appraiser',
             'Functional Appraiser',
@@ -200,8 +182,8 @@ class PMSDepartment(models.Model):
         email_from = self.env.user.email
         subject = "Employee Appraisal Notification"
         msg = """Dear {}, <br/> 
-        I wish to notify you that your appraisal with description {} \
-        for the period {} has been generated.\
+        I wish to notify you that your appraisal with description {} <br/>\
+        for the period {} has been generated.<br/>\
         <br/>Kindly {} to review <br/>\
         Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
             employee.name,
@@ -238,10 +220,14 @@ class PMSDepartment(models.Model):
         job_position_ids = self.hr_category_id.mapped('job_role_ids').filtered(
             lambda se: se.department_id.id == self.department_id.id)
         appraises = []
+        categ_name = self.hr_category_id.category.category
+        # THIS IS TO PREVENT DUPLICATE APPRAISAL
+        level_type_name = 'JM' if categ_name == 'Junior Management' else 'MM' if categ_name == 'Middle Management' else 'SM' 
         for jb in job_position_ids:
             employees = Employee.search([
                 ('job_id', '=', jb.id),
-                ('department_id', '=', jb.department_id.id)
+                # ('department_id', '=', jb.department_id.id),
+                ('level_id.name', '=', level_type_name)
                 ])
             if employees:
                 for emp in employees:
@@ -370,3 +356,16 @@ class PMSDepartment(models.Model):
         self.write({
                 'state':'draft'
             })
+        
+    def action_mass_publish(self): 
+        rec_ids = self.env.context.get('active_ids', []) 
+        for rec in rec_ids:
+            record = self.env['pms.department'].browse([rec])
+            record.button_publish()
+
+    def button_mass_cancel(self):
+        rec_ids = self.env.context.get('active_ids', []) 
+        for rec in rec_ids:
+            record = self.env['pms.department'].browse([rec])
+            record.button_cancel()
+            record.button_set_to_draft()

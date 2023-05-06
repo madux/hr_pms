@@ -105,6 +105,23 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-4 col-sm-6 pos_order oh-payslip">
+                <div class="oh-card" style="width: 288px;">
+                    <div class="oh-card-body">
+                        <div class="stat-widget-one widget-7 pms_not_generatd">
+                            <div class="stat-icon" style="background:#5b8ed0">
+                                <i class="fa fa-check-square-o"/>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-head">Ungenerated Appraisals</div>
+                                <div class="stat_count">
+                                    <t t-esc="widget._get_reviewer_pms"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </t>
 </templates>

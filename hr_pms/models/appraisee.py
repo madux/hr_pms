@@ -1222,6 +1222,13 @@ class PMS_Appraisee(models.Model):
         pms = self.env['pms.appraisee'].search_count([('state', '=', 'reviewer_rating')])
         return int(pms) if pms else 0
     
+    def _getpms_not_generated(self):
+        pms = self.env['pms.appraisee'].search([])
+        employees = self.env['hr.employee'].search([]).ids
+        pms_employee_ids = [rec.employee_id.id for rec in pms]
+        number_of_intersections = set(pms_employee_ids).intersection(employees)
+        return len(number_of_intersections) if number_of_intersections else 0
+    
     @api.model
     def get_dashboard_details(self):
         return {
@@ -1231,6 +1238,7 @@ class PMS_Appraisee(models.Model):
             '_get_perception_agreed_pms': self._get_perception_pms(['fully_agreed','largely_agreed','partially_agreed']),
             '_get_perception_disagreed_pms': self._get_perception_pms(['totally_disagreed', 'largely_disagreed']),
             '_get_reviewer_pms': self._get_reviewer_pms(),
+            '_getpms_not_generated': self._getpms_not_generated(),
         }
     
     def overdue_pms(self):
@@ -1286,6 +1294,30 @@ class PMS_Appraisee(models.Model):
         if is_overdue:
             over_dues = self.overdue_pms()
             domain = f"[('id', 'in', {over_dues})]"
+        action['domain'] = eval(domain)
+        return {'action': action}
+
+    @api.model
+    def get_not_generated_employees(self, title):
+        def _getpms_not_generated():
+            pms = self.env['pms.appraisee'].search([])
+            employees = [rec.id for rec in self.env['hr.employee'].search([])]
+            pms_employee_ids = [rec.employee_id.id for rec in pms]
+            number_of_intersections = []
+            for rec in employees:
+                if rec not in pms_employee_ids:
+                    number_of_intersections.append(rec)
+            # number_of_intersections = [emp if emp not in employees else None for emp in pms_employee_ids] # set(employees).intersection(pms_employee_ids)
+            return number_of_intersections if number_of_intersections else [0]
+        action_ref = 'hr.open_view_employee_list_my'
+        search_view_ref = 'hr.view_employee_filter'
+        action = self.env["ir.actions.actions"]._for_xml_id(action_ref)
+        if title:
+            action['display_name'] = title
+        if search_view_ref:
+            action['search_view_id'] = self.env.ref(search_view_ref).read()[0]
+        action['views'] = [(False, view) for view in action['view_mode'].split(",")]
+        domain = f"[('id', 'in', {_getpms_not_generated()})]"
         action['domain'] = eval(domain)
         return {'action': action}
     

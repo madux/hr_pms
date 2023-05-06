@@ -176,10 +176,10 @@
                                         <field name="name" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/> 
                                         <field name="state" invisible="1"/> 
                                         <field name="appraisee_weightage" required="1" attrs="{'readonly': [('state', 'not in', ['draft'])],
-                                        'required': [('state', 'in', ['draft'])]}"/>
+                                        'required': [('state', 'in', ['draft'])]}" sum="total"/>
                                         <!-- self rating only for KRAs -->
                                          
-                                        <field name="weightage" required="1" attrs="{'readonly': [('state', 'not in', ['functional_rating'])],
+                                        <field name="weightage" required="1" sum="total" attrs="{'readonly': [('state', 'not in', ['functional_rating'])],
                                         'required': [('state', 'in', ['functional_rating'])], 'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating'])]}" />
                                         <field name="self_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'draft')],
                                         'required': [('state', '=', 'draft')]}"/>
@@ -850,7 +850,7 @@
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">
 				<p class="oe_view_noconten_create">
-					Click To Create.
+					No appraisal generated for you. Kindly check the General Appraisal Menu
 				</p>
 			</field>
 		</record>
@@ -864,7 +864,7 @@
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">
 				<p class="oe_view_noconten_create">
-					Click To Create.
+					No appraisal generated for you. Kindly check the General Appraisal Menu
 				</p>
 			</field>
 		</record>
@@ -881,7 +881,7 @@
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">
-					Click To Create.
+					No appraisal record found
 				</p>
 			</field>
 		</record>
@@ -896,7 +896,7 @@
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">
-					Click To Create.
+					No appraisal record found
 				</p>
 			</field>
 		</record>
@@ -911,7 +911,7 @@
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">
-					Click To Create.
+					No appraisal record found
 				</p>
 			</field>
 		</record>
