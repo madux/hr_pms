@@ -289,7 +289,7 @@ class HrEmployeeBase(models.AbstractModel):
                 template_rec = self.env['mail.template'].browse(template_id)
                 if email_to:
                     template_rec.write({'email_to': email_to})
-                # template_rec.with_context(ctx).send_mail(record.id, True)
+                template_rec.with_context(ctx).send_mail(record.id, False)
             # record.action_send_mail(
             #     'mail_template_pms_notification', 
             #     [record.work_email, record.private_email],
