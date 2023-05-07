@@ -69,14 +69,11 @@
 
                                     <tr><td valign="top" style="font-size: 13px;">
                                         <div>
-                                            Dear ${object.name or ''},<br/> <br/>
-                                            A User Account has been generated for your Subordinate because he/she has no organizational or private link to him to access your performance appraisal. <br/>
-                                            Kindly pass the following credentials to him/her accessing the system.
+                                            Dear,<br/> <br/>
+                                            A User Account has been generated for your Subordinate because he/she has no organizational or private email for him/ her to access their Performance Appraisal System. <br/>
+                                            Kindly pass the following credentials to him/her to access the system.
                                             <ul>
-                                                <li>URL: <a>http://hrpms.myeedc.com:8069</a> </li>
-                                                <li>URL: <a>http://hrpms.myeedc.com:8069/web</a> </li>
-                                                
-                                                <!-- <li>URL: <a>https://hrpms.myeedc.com/web/login</a> </li> -->
+                                                <li>URL: <a href='http://hrpms.myeedc.com:8069/web'>Click the link</a> or Copy the URL: <a>http://hrpms.myeedc.com:8069</a> </li>
                                                 <li>Username: ${object.user_id.login}</li>
                                                 <li>Password: ${object.migrated_password or ''}</li>
                                             </ul>
