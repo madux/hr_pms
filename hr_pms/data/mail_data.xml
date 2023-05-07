@@ -23,9 +23,7 @@
                                             A User Account has been generated for you to access your performance appraisal. <br/>
                                             Kindly use the following credentials for accessing the system.
                                             <ul>
-                                                <li>URL: <a>http://hrpms.myeedc.com:8069</a> </li>
-                                                <li>URL: <a>http://hrpms.myeedc.com:8069/web</a> </li>
-                                                
+                                                <li>URL: <a href='http://hrpms.myeedc.com:8069/web'>Click the link</a> or Copy the URL: <a>http://hrpms.myeedc.com:8069</a> </li>
                                                 <!-- <li>URL: <a>https://hrpms.myeedc.com/web/login</a> </li> -->
                                                 <li>Username: ${object.user_id.login}</li>
                                                 <li>Password: ${object.migrated_password or ''}</li>
