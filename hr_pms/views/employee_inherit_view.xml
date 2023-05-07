@@ -124,6 +124,22 @@
  
             </field>
         </record>
+        <record model="ir.ui.view" id="hr_view_employee_tree_pms_inherited" >
+            <field name="name">hr.employee</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="arch" type="xml"> 
+                <xpath expr="//field[@name='name']" position="before">
+                    <field name="employee_number" string="Staff Number"/>
+                </xpath>
+                <xpath expr="//field[@name='job_id']" position="replace">
+                    <field name="job_id" string="Designation"/>
+                </xpath> 
+                <xpath expr="//field[@name='job_id']" position="after">
+                    <field name="level_id" string="Level"/>
+                </xpath>
+            </field>
+        </record>
         <!-- <record model="ir.ui.view" id="hr_kanban_view_employees_pms_inherited" >
             <field name="name">hr.employee</field>
             <field name="model">hr.employee</field>

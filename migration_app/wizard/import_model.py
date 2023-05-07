@@ -23,6 +23,7 @@ class ImportRecords(models.TransientModel):
     import_type = fields.Selection([
             ('employee', 'Employee'),
             ('update', 'Update'),
+            ('email', 'Email Update'),
         ],
         string='Import Type', required=True, index=True,
         copy=True, default='',
@@ -434,7 +435,27 @@ class ImportRecords(models.TransientModel):
             if len(errors) > 1:
                 message = '\n'.join(errors)
                 return self.confirm_notification(message) 
-        
+        elif self.import_type == "email":
+            for row in file_data:
+                if row[0] and row[3]:
+                    staff_number = row[0].strip()
+                    email = row[3].strip()
+                    employee_id = self.env['hr.employee'].search([
+                    '|', ('employee_number', '=', staff_number), 
+                    ('barcode', '=', staff_number)], limit = 1)
+                    if employee_id:
+                        employee_id.sudo().write({
+                            'work_email': email
+                        })
+                        count += 1
+                else:
+                    unsuccess_records.append(row[0])
+            errors.append('Successful Update(s): ' +str(count))
+            errors.append('Unsuccessful Update(s): '+str(unsuccess_records)+' Record(s)')
+            if len(errors) > 1:
+                message = '\n'.join(errors)
+                return self.confirm_notification(message) 
+
     def confirm_notification(self,popup_message):
         view = self.env.ref('migration_app.hr_migration_confirm_dialog_view')
         view_id = view and view.id or False
