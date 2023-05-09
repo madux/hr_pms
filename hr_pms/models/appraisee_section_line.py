@@ -145,10 +145,10 @@ class KRA_SectionLine(models.Model):
 
     @api.onchange('weightage',)
     def onchange_weightage(self):
-        if self.weightage > 0 and self.weightage not in range (5, 25):
+        if self.weightage > 0 and self.weightage not in range (5, 26):
             message = {
                 'title': 'Invalid Weight',
-                'message': 'Weightage must be within the range of 5 to 20'
+                'message': 'Weightage must be within the range of 5 to 25'
             }
             self.weightage = False
             return {'warning': message}
