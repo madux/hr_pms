@@ -87,6 +87,10 @@
                                 <field name="name" default_focus="1" required="1" readonly="1" placeholder="KRAs &amp; Achivements"/>
                             </h1>
                         </div>
+                        <div class='alert alert-info' role="alert">
+                            FIND USER MANUAL HERE
+                            Download:  <a href='/hr_pms/static/TRAINING_FOR_HR_PMS.pdf' target="_blank"> <strong>USER MANUAL</strong> </a> <br/>
+                        </div>
                         <group>
                             <group>
                                 <field name="pms_year_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
@@ -101,6 +105,10 @@
                                 
                             </group>
                         </group>
+                        <div class='alert alert-info' role="alert">
+                            FIND USER MANUAL HERE
+                            Download:  <a href='/hr_pms/static/TRAINING_FOR_HR_PMS.pdf' target="_blank"> <strong>USER MANUAL</strong> </a> <br/>
+                        </div>
                         <notebook>
                             <page name="instruction_page" string="Instructions" invisible="0">
 							    <p style="color: red;" attrs="{'invisible': [('instruction_html', '!=', False)]}">* All Appraisees should rate the min - max of 5 - 20 on KRA / Achievement. </p>

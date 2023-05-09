@@ -199,7 +199,11 @@ class KRA_SectionLine(models.Model):
             else:
                 rec.weighted_score = 0
 
-
+    def unlink(self):
+        for delete in self.filtered(lambda delete: delete.state not in ['draft']):
+            raise ValidationError(_('You cannot delete a KRA section once submitted Click the Ok and then discard button to go back'))
+        return super(KRA_SectionLine, self).unlink()
+    
 class LC_SectionLine(models.Model):
     _name = "lc.section.line"
     _description= "Employee appraisee LC Section lines"
