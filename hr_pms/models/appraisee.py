@@ -972,7 +972,7 @@ class PMS_Appraisee(models.Model):
             value_diff = 100 - sum_weightage 
             needed_value_msg = f'''You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
             raise ValidationError(
-                f"""Please ensure the sum of KRA weight by functional Appraiser is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+                f"""Please ensure the sum of KRA weight by Appraisee is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
                 )
         
     def validate_deadline(self):
@@ -1057,7 +1057,7 @@ class PMS_Appraisee(models.Model):
             value_diff = 100 - sum_weightage 
             needed_value_msg = f'''You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
             raise ValidationError(
-                f"""Please ensure the sum of KRA weight by Appraisee is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+                f"""Please ensure the sum of KRA weight by Functional Appraiser is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
                 )
         
         if self.employee_id.parent_id and self.env.user.id != self.employee_id.parent_id.user_id.id:

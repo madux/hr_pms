@@ -25,7 +25,6 @@ class KRA_SectionLine(models.Model):
         )
     weightage = fields.Float(
         string='FA Weight (Total 100%)', 
-        
         )
     
     appraisee_weightage = fields.Float(
