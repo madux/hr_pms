@@ -30,7 +30,8 @@ class PMS_Appraisee(models.Model):
 
     name = fields.Char(
         string="Description Name", 
-        required=True
+        required=True,
+        size=70
         )
     active = fields.Boolean(
         string="Active", 
@@ -69,7 +70,8 @@ class PMS_Appraisee(models.Model):
     employee_number = fields.Char( 
         string="Staff ID",
         related="employee_id.employee_number",
-        store=True
+        store=True,
+        size=6
         )
     job_title = fields.Char( 
         string="Job title",

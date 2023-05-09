@@ -20,8 +20,8 @@ class KRA_SectionLine(models.Model):
     )
 
     name = fields.Char(
-        string='Description', 
-        
+        string='Description',
+        size=70
         )
     weightage = fields.Float(
         string='FA Weight (Total 100%)', 
@@ -211,6 +211,7 @@ class LC_SectionLine(models.Model):
 
     name = fields.Char(
         string='Description',
+        size=70
         )
     weightage = fields.Float(
         string='Weight (Total 100%)', 
