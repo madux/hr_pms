@@ -146,22 +146,26 @@ class KRA_SectionLine(models.Model):
     @api.onchange('weightage',)
     def onchange_weightage(self):
         if self.weightage > 0 and self.weightage not in range (5, 26):
-            message = {
-                'title': 'Invalid Weight',
-                'message': 'Weightage must be within the range of 5 to 25'
-            }
             self.weightage = 0
-            return {'warning': message}
+            raise UserError('Weightage must be within the range of 5 to 25')
+            # message = {
+            #     'title': 'Invalid Weight',
+            #     'message': 'Weightage must be within the range of 5 to 25'
+            # }
+            # self.weightage = 0
+            # return {'warning': message}
     
     @api.onchange('appraisee_weightage',)
     def onchange_appraisee_weightage(self):
         if self.appraisee_weightage > 0 and self.appraisee_weightage not in range (5, 26):
-            message = {
-                'title': 'Invalid Weight',
-                'message': 'Appraisee Weightage must be within the range of 5 to 25'
-            }
-            self.weightage = 0
-            return {'warning': message}
+            self.appraisee_weightage = 0
+            raise UserError('Appraisee Weightage must be within the range of 5 to 25')
+            # message = {
+            #     'title': 'Invalid Weight',
+            #     'message': 'Appraisee Weightage must be within the range of 5 to 25'
+            # }
+            # self.weightage = 0
+            # return {'warning': message}
 
     
     @api.depends('kra_section_id')
