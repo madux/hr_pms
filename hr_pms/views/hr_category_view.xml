@@ -67,6 +67,7 @@
                             <group>
                                 <field name="deadline"/>
                                 <field name="published_date" readonly="1" force_save="1"/>
+                                <field name="online_deadline_date" readonly="0" force_save="1"/>
                             </group>
                             <separator string="Category Section Weight" colspan="4"/>
                             <group>

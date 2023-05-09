@@ -60,7 +60,6 @@ class PmsSection(models.Model):
     # consider removing or make invisible N/B not to be used
     weighted_score = fields.Integer(
         string='Section Weighted', 
-        placeholder="eg. 35",
         required=False,
         )
     

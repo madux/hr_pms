@@ -95,6 +95,7 @@
                             <group>
                                 <field name="pms_year_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="deadline" readonly="1" force_save="1"/> 
+                                <!-- <field name="online_deadline_date" string="Appraisee Deadline Date" readonly="1" force_save="1"/>  -->
                             </group>
                             <group>
                                 <field name="date_from" readonly="1" force_save="1"/> 
@@ -175,6 +176,7 @@
                                 <separator string="SECTION (A) - KRA / Achievement(s)" colspan="4"/>
 							    <p style="color: red;" attrs="{'invisible': [('instruction_html', '!=', False)]}">* Minimum of 5 lines and Maximun of 7 Lines to be added on this section </p>
 							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 4 scale, where 4 is the HIGHEST rating </p>
+							    <p style="color: red;">* KRA Lines should be Minimum of 5 lines and Maximum of 7 Lines </p>
                                 
                                 <field name="kra_section_line_ids" 
                                     required="1" options="{'no_quick_create':True,'no_open': True}" 
@@ -562,13 +564,13 @@
                                     </group>
                                 </form>
                             </page>    
-                            <page name="app_section" string="Appraisee's Comment" invisible="0" attrs="{'invisible': [('state', 'not in', ['draft', 'done', 'signed'])]}">
+                            <page name="app_section" string="Appraisee's Comment" invisible="0">
                                 <separator string="Appraisee Section" colspan="4"/>
                                 <form string="">
                                     <group>
                                         
                                         <group>
-                                            <field name="appraisee_satisfaction" attrs="{'readonly': [('state', 'not in', ['done', 'signed'])]}"/> 
+                                            <field name="appraisee_satisfaction" attrs="{'readonly': [('state', 'not in', ['done', 'signed'])], 'invisible': [('state', 'not in', ['done', 'signed'])]}"/> 
                                         </group>
                                         <group>
                                             <field name="appraisee_comment" placeholder="Start typing..." attrs="{'readonly': [('state', 'not in', ['draft', 'done', 'signed'])]}"/> 
@@ -713,6 +715,35 @@
                                     </group>
                                 </form>
                             </page>
+                            <!-- <page name="attachment_page" string="Appraisee's Attachments" invisible="0">
+                                <separator string="Appraisee's Attachments" colspan="4"/>
+                                <form string="">
+                                    <group>
+                                        <group>
+                                            <field name="appraisee_attachement_ids" readonly="1"> 
+                                                <form string="-" editable="bottom">
+                                                    <group>
+                                                        <group>
+                                                            <field name="name" string="Description"/> 
+                                                        </group>
+                                                        <group>
+                                                            <field name="datas" string="Upload file"/> 
+                                                            <field name="datas" string="Download file" readonly="1" force_save="1"/> 
+                                                        </group>
+                                                    </group>
+                                                </form>
+                                                <tree string="-" editable="bottom">
+                                                    <field name="name" string="Description"/> 
+                                                    <field name="datas" string="Upload file"/>
+                                                    <field name="datas" string="Download file" readonly="1" force_save="1"/>  
+                                                </tree>
+                                            </field>
+                                        </group>
+                                        <group>
+                                        </group>
+                                    </group>
+                                </form>
+                            </page> -->
                             
                             
                         </notebook>
@@ -923,6 +954,19 @@
 				</p>
 			</field>
 		</record>
+
+        <record id="ir_action_server_pms_appraisee_reminder_mail" model="ir.actions.server">
+			<field name="name">Send Reminder Notification*</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="hr_pms.model_pms_appraisee"/>
+            <field name="binding_model_id" ref="hr_pms.model_pms_appraisee"/>
+            <field name="state">code</field>
+            <field name="groups_id" eval="[(6, 0, [
+			ref('base.group_system'),
+            ref('hr_pms.group_pms_officer_id'),
+			])]"/>
+            <field name="code">action=model.sudo().mass_send_reminder()</field>
+        </record>
 
     <menuitem id="view_pms_appraisee_menu" name="Appraisal" sequence="1" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_appraisee_view_id"/>
     <menuitem id="view_pms_my_appraisal_menu" name="My Appraisal(s)" sequence="1" parent="hr_pms.view_pms_appraisee_menu" action="hr_pms.action_pms_appraisee_view_id"

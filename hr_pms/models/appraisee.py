@@ -297,6 +297,10 @@ class PMS_Appraisee(models.Model):
         string="Deadline Date", 
         # compute="get_appraisal_deadline", 
         store=True)
+    online_deadline_date = fields.Date(
+        string="Appraisee Deadline Date", 
+        # compute="get_appraisal_deadline", 
+        store=True)
 
     overall_score = fields.Float(
         string="Overall score", 
@@ -858,7 +862,7 @@ class PMS_Appraisee(models.Model):
                     'state': 'sent'
                 }
             mail_id = self.env['mail.mail'].sudo().create(mail_data)
-            self.env['mail.mail'].sudo().send(mail_id)
+            # self.env['mail.mail'].sudo().send(mail_id)
             # self.message_post(body=msg)
     
     def get_url(self, id, name):
@@ -868,11 +872,10 @@ class PMS_Appraisee(models.Model):
         return "<a href={}> </b>Click<a/>. ".format(base_url)
 
     def action_send_reminder(self):
-        msg = """Dear {}, <br/> 
+        msg = """Dear, <br/> 
             I wish to remind you of the appraisal currently on your desk. <br/> \
             Please kindly review and do the needful.<br/> \
             Yours Faithfully<br/>{}<br/>""".format(
-                self.create_uid.name,
                 self.env.user.name,
                 self.department_id.name,
                 )
@@ -882,6 +885,26 @@ class PMS_Appraisee(models.Model):
             self.manager_id.work_email if self.state == "functional_rating" else self.reviewer_id.work_email if self.state == "reviewer_rating" else self.employee_id.work_email
         email_cc = [self.employee_id.work_email]
         self.action_notify(subject, msg, email_to, email_cc)
+
+    def mass_send_reminder(self):
+        rec_ids = self.env.context.get('active_ids', [])
+        for record in rec_ids:
+            rec = self.env['pms.appraisee'].browse([record])
+            msg = """Dear {}, <br/> 
+                I wish to remind you of the appraisal currently on your desk. <br/> \
+                Please kindly rate and submit before the submission deadline.<br/> \
+                Regards<br/>
+                HR: {}<br/>
+                """.format(
+                    rec.employee_id.name,
+                    rec.write_uid.company_id.name,
+                    )
+            subject = "Appraisal Reminder"
+            email_to = rec.employee_id.work_email or rec.administrative_supervisor_id.work_email or rec.manager_id.work_email if rec.state in ['draft', 'done', 'reviewer_rating'] else \
+                rec.administrative_supervisor_id.work_email if self.state == "admin_rating" else \
+                rec.manager_id.work_email if rec.state == "functional_rating" else rec.reviewer_id.work_email if rec.state == "reviewer_rating" else rec.employee_id.work_email
+            email_cc = [rec.employee_id.work_email]
+            rec.action_notify(subject, msg, email_to, email_cc)
     
     def send_mail_notification(self, msg):
         subject = "Appraisal Notification"
@@ -952,6 +975,9 @@ class PMS_Appraisee(models.Model):
                 )
         
     def validate_deadline(self):
+        appraisee_deadline = self.pms_department_id.hr_category_id.online_deadline_date
+        if appraisee_deadline and fields.Date.today() > appraisee_deadline:
+            raise ValidationError('Your deadline for submission has exceeded !!!')
         if self.deadline and fields.Date.today() > self.deadline:
             raise ValidationError('You have exceeded deadline for the submission of your appraisal')
         

@@ -11,7 +11,6 @@ class PMSJobCategory(models.Model):
 
     name = fields.Char(
         string="Name", 
-        placeholder="OFFICER - MGR", 
         required=True)
     
     category = fields.Many2one('hr.level.category', string="Category")
@@ -20,17 +19,14 @@ class PMSJobCategory(models.Model):
         
     kra_weighted_score = fields.Integer(
         string='KRA Section Weight', 
-        placeholder="eg. 35",
         required=True,
         )
     fc_weighted_score = fields.Integer(
         string='FC Section Weight', 
-        placeholder="eg. 20",
         required=True,
         )
     lc_weighted_score = fields.Integer(
         string='LC Section Weight', 
-        placeholder="eg. 40",
         required=True,
         )
 
@@ -54,7 +50,10 @@ class PMSJobCategory(models.Model):
         )
     deadline = fields.Date(
         string="Deadline Date", 
-        # compute="get_appraisal_deadline", 
+        store=True)
+    
+    online_deadline_date = fields.Date(
+        string="Online Deadline Date", 
         store=True)
 
     published_date = fields.Date(

@@ -9,7 +9,6 @@ class PMS_Year(models.Model):
 
     name = fields.Char(
         string="Name", 
-        placeholder="Jan 2023 - Mar 2023", 
         required=True)
     date_from = fields.Date(
         string="Date From", 
