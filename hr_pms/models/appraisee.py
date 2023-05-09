@@ -892,7 +892,8 @@ class PMS_Appraisee(models.Model):
             rec = self.env['pms.appraisee'].browse([record])
             msg = """Dear {}, <br/> 
                 I wish to remind you of the appraisal currently on your desk. <br/> \
-                Please kindly rate and submit before the submission deadline.<br/> \
+                Please kindly rate and submit before the submission deadline.
+                You can choose to ignore if necessary process has been done. <br/> \
                 Regards<br/>
                 HR: {}<br/>
                 """.format(

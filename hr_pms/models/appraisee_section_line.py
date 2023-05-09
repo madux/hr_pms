@@ -150,7 +150,7 @@ class KRA_SectionLine(models.Model):
                 'title': 'Invalid Weight',
                 'message': 'Weightage must be within the range of 5 to 25'
             }
-            self.weightage = False
+            self.weightage = 0
             return {'warning': message}
     
     @api.onchange('appraisee_weightage',)
@@ -160,7 +160,7 @@ class KRA_SectionLine(models.Model):
                 'title': 'Invalid Weight',
                 'message': 'Appraisee Weightage must be within the range of 5 to 25'
             }
-            self.weightage = False
+            self.weightage = 0
             return {'warning': message}
 
     
