@@ -84,11 +84,11 @@
                     <sheet>
                         <div class="oe_title">
                             <h1>
-                                <field name="name" default_focus="1" required="1" readonly="1" placeholder="KRAs &amp; Achivements"/>
+                                <field name="name" default_focus="1" required="1" attrs="{'readonly': [('lock_fields', '=', True)]}" placeholder="KRAs &amp; Achivements"/>
                             </h1>
                         </div>
                         <div class='alert alert-info' role="alert">
-                            FIND USER MANUAL HERE
+                            FIND USER MANUAL HERE ==>
                             Download:  <a href='/hr_pms/static/TRAINING_FOR_HR_PMS.pdf' target="_blank"> <strong>USER MANUAL</strong> </a> <br/>
                         </div>
                         <group>
@@ -102,12 +102,13 @@
                                 <field name="date_end" readonly="1" force_save="1"/>
                                 <field name="submitted_date" readonly="1" force_save="1"/>
                                 <field name="is_current_user" readonly="0" invisible="1"/>
+                                <field name="lock_fields" readonly="0" invisible="0" groups="base.group_system"/>
                                  <!-- groups="base.group_system"/> -->
                                 
                             </group>
                         </group>
                         <div class='alert alert-info' role="alert">
-                            FIND USER MANUAL HERE
+                            FIND USER MANUAL HERE ==>
                             Download:  <a href='/hr_pms/static/TRAINING_FOR_HR_PMS.pdf' target="_blank"> <strong>USER MANUAL</strong> </a> <br/>
                         </div>
                         <notebook>
@@ -121,7 +122,7 @@
                                     <group>
                                     <separator class="alert alert-info" role="alert" string="Appraisee’s Personal Information (employee must have worked for minimum 6 months in the appraisal period)" colspan="4"/>
                                     <group>
-                                        <field name="employee_id" readonly="1" options="{'no_create': True,'no_open': True}"/> 
+                                        <field name="employee_id" attrs="{'readonly': [('lock_fields', '=', True)]}" readonly="0" options="{'no_create': True,'no_open': True}"/> 
                                         <field name="job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
                                         <field name="department_id" readonly="1" string="Department" force_save="1" options="{'no_create': True,'no_open': True}"/>
                                         <field name="ps_district_id" readonly="1" string="District" force_save="1" options="{'no_create': True,'no_open': True}"/> 
@@ -966,6 +967,19 @@
             ref('hr_pms.group_pms_officer_id'),
 			])]"/>
             <field name="code">action=model.sudo().mass_send_reminder()</field>
+        </record>
+
+        <record id="ir_action_server_pms_appraisee_duplicate" model="ir.actions.server">
+			<field name="name">Duplicate</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="hr_pms.model_pms_appraisee"/>
+            <field name="binding_model_id" ref="hr_pms.model_pms_appraisee"/>
+            <field name="state">code</field>
+            <field name="groups_id" eval="[(6, 0, [
+			ref('base.group_system'),
+            ref('hr_pms.group_pms_officer_id'),
+			])]"/>
+            <field name="code">action=model.sudo().bulk_copy_appraisal()</field>
         </record>
 
     <menuitem id="view_pms_appraisee_menu" name="Appraisal" sequence="1" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_appraisee_view_id"/>

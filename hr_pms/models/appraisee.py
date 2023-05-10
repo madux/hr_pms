@@ -36,25 +36,33 @@ class PMS_Appraisee(models.Model):
     active = fields.Boolean(
         string="Active", 
         default=True,
-        tracking=True
+        tracking=True,
         )
     fold = fields.Boolean(
         string="Fold", 
+        default=False
+        )
+    
+    lock_fields = fields.Boolean(
+        string="Lock Fields", 
         default=False
         )
     is_current_user = fields.Boolean(
         default=False, 
         compute="compute_current_user", 
         store=False,
-        help="Used to determine what the appraisee sees")
+        help="Used to determine what the appraisee sees"
+        )
 
     pms_department_id = fields.Many2one(
         'pms.department', 
-        string="PMS Department ID"
+        string="PMS Department ID",
+        copy=True
         )
     section_id = fields.Many2one(
         'pms.section', 
         string="Section ID",
+        copy=True
         )
     submitted_date = fields.Datetime('Submitted Date')
     dummy_kra_section_scale = fields.Integer(
@@ -65,13 +73,15 @@ class PMS_Appraisee(models.Model):
             
     employee_id = fields.Many2one(
         'hr.employee', 
-        string="Employee"
+        string="Employee",
+        copy=False
         )
     employee_number = fields.Char( 
         string="Staff ID",
         related="employee_id.employee_number",
         store=True,
-        size=6
+        size=6,
+        copy=False
         )
     job_title = fields.Char( 
         string="Job title",
@@ -97,7 +107,8 @@ class PMS_Appraisee(models.Model):
         )
     department_id = fields.Many2one(
         'hr.department', 
-        string="Department ID"
+        string="Department ID",
+        copy=True
         )
     reviewer_id = fields.Many2one(
         'hr.employee', 
@@ -124,14 +135,16 @@ class PMS_Appraisee(models.Model):
         )
     appraisee_comment = fields.Text(
         string="Appraisee Comment",
-        tracking=True
+        tracking=True,
+        copy=False
         )
     appraisee_attachement_ids = fields.Many2many(
         'ir.attachment', 
         'ir_pms_appraisee_attachment_rel',
         'pms_appraisee_attachment_id',
         'attachment_id',
-        string="Attachment"
+        string="Attachment",
+        copy=False
     )
     appraisee_attachement_set = fields.Integer(default=0, required=1) # Added to field to check whether attachment have been updated
     
@@ -139,6 +152,7 @@ class PMS_Appraisee(models.Model):
     supervisor_comment = fields.Text(
         string="Supervisor Comment", 
         # tracking=True
+        copy=False
         )
     supervisor_attachement_ids = fields.Many2many(
         'ir.attachment', 
@@ -181,7 +195,7 @@ class PMS_Appraisee(models.Model):
         ('largely_disagreed', 'Largely Disagreed'),
         ('totally_disagreed', 'Totally Disagreed'),
         ], string="Perception on PMS", default = "none", 
-        tracking=True)
+        tracking=True, copy=False)
     line_manager_id = fields.Many2one(
         'hr.employee', 
         string="Line Manager"
@@ -195,22 +209,26 @@ class PMS_Appraisee(models.Model):
     kra_section_line_ids = fields.One2many(
         "kra.section.line",
         "kra_section_id",
-        string="KRAs"
+        string="KRAs",
+        copy=True
     )
     lc_section_line_ids = fields.One2many(
         "lc.section.line",
         "lc_section_id",
-        string="Leadership Competence"
+        string="Leadership Competence",
+        copy=True
     )
     fc_section_line_ids = fields.One2many(
         "fc.section.line",
         "fc_section_id",
-        string="Functional Competence"
+        string="Functional Competence",
+        copy=True
     )
     training_section_line_ids = fields.One2many(
         "training.section.line",
         "training_section_id",
-        string="Training section"
+        string="Training section",
+        copy=False
     )
     current_assessment_section_line_ids = fields.One2many(
         "current.assessment.section.line",
@@ -238,7 +256,7 @@ class PMS_Appraisee(models.Model):
         ('done', 'Completed'),
         ('signed', 'Signed Off'),
         ('withdraw', 'Withdrawn'), 
-        ], string="Status", default = "draft", readonly=True, store=True, tracking=True)
+        ], string="Status", default = "draft", readonly=True, store=True, tracking=True, copy=False)
 
     dummy_state = fields.Selection([
         ('a', 'Draft'),
@@ -249,7 +267,7 @@ class PMS_Appraisee(models.Model):
         ('f', 'Completed'),
         ('g', 'Signed Off'),
         ('h', 'Withdrawn'),
-        ], string="Dummy Status", readonly=True,compute="_compute_new_state", store=True)
+        ], string="Dummy Status", readonly=True,compute="_compute_new_state", store=True,copy=False)
     
     @api.onchange('appraisee_satisfaction')
     def onchange_appraisee_satisfaction(self):
@@ -283,20 +301,21 @@ class PMS_Appraisee(models.Model):
                 rec.dummy_state = 'h'
 
     pms_year_id = fields.Many2one(
-        'pms.year', string="Period")
+        'pms.year', string="Period", copy=True)
     date_from = fields.Date(
         string="Date From", 
         readonly=False, 
-        store=True)
+        store=True, copy=True)
     date_end = fields.Date(
         string="Date End", 
         readonly=False,
-        store=True
+        store=True, 
+        copy=True
         )
     deadline = fields.Date(
         string="Deadline Date", 
         # compute="get_appraisal_deadline", 
-        store=True)
+        store=True, copy=True)
     online_deadline_date = fields.Date(
         string="Appraisee Deadline Date", 
         # compute="get_appraisal_deadline", 
@@ -344,6 +363,7 @@ class PMS_Appraisee(models.Model):
         string='Instructions', 
         store=True,
         default=lambda self: self._get_default_instructions(),
+        copy=True
         )
     
     # consider removing
@@ -681,8 +701,7 @@ class PMS_Appraisee(models.Model):
                 lambda line: line.reviewer_rating < 1):
                 raise ValidationError(
                     "Ops! Please ensure all reviewer's rating at leadership competency is at least 1"
-                ) 
-    
+                )
     def check_current_potential_assessment_section_lines(self):
         if self.state == "admin_rating":
             if self.mapped('current_assessment_section_line_ids').filtered(
@@ -906,6 +925,16 @@ class PMS_Appraisee(models.Model):
                 rec.manager_id.work_email if rec.state == "functional_rating" else rec.reviewer_id.work_email if rec.state == "reviewer_rating" else rec.employee_id.work_email
             email_cc = [rec.employee_id.work_email]
             rec.action_notify(subject, msg, email_to, email_cc)
+
+    def bulk_copy_appraisal(self):
+        rec_ids = self.env.context.get('active_ids', [])
+        for record in rec_ids:
+            rec = self.env['pms.appraisee'].browse([record])
+            if rec.state != 'draft':
+                raise UserError('You cannot duplicate this record !!!')
+            else:
+                rec.copy()
+                rec.lock_fields = False
     
     def send_mail_notification(self, msg):
         subject = "Appraisal Notification"
@@ -984,6 +1013,7 @@ class PMS_Appraisee(models.Model):
         
     def button_submit(self):
         # send notification
+        self.lock_fields = True
         self.validate_deadline()
         self.validate_weightage()
         admin_or_functional_user = self.administrative_supervisor_id.name or self.manager_id.name
@@ -1201,8 +1231,7 @@ class PMS_Appraisee(models.Model):
             if self.employee_id.reviewer_id and self.env.user.id != self.employee_id.reviewer_id.user_id.id:
                 raise UserError("Ops ! You are not entitled to add a review comment because you are not the employee's reviewer")
         
-    def write(self, vals):
-        
+    def write(self, vals): 
         self.validate_reviewer_commenter(vals)
         res = super().write(vals)
         for template in self:

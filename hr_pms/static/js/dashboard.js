@@ -136,19 +136,19 @@ odoo.define('hr_pms.dashboard', function(require){
                 self.$('.o_opos_dashboard').append(QWeb.render(template, {widget: self}));
             });
         },
-        // onDashboardActionClickedTickets: function (title,action_ref,search_view_ref) {
-        //     var self = this;
-        //         this._rpc({
-        //             model: 'pms.appraisee',
-        //             method: 'create_action',
-        //             args: [action_ref,title, search_view_ref] 
-        //             // "helpdesk_api.helpdeskticket_model_view_search"],
-        //         }).then(function (result) {
-        //             if (result.action) {
-        //                 self.do_action(result.action);
-        //             }
-        //         });
-        // },
+        onDashboardActionClickedTickets: function (domain,title,overdue_pms=false) {
+            var self = this;
+                this._rpc({
+                    model: 'pms.appraisee',
+                    method: 'create_action',
+                    args: [domain,title, overdue_pms] 
+                    // "helpdesk_api.helpdeskticket_model_view_search"],
+                }).then(function (result) {
+                    if (result.action) {
+                        self.do_action(result.action);
+                    }
+                });
+        },
 
     })
     core.action_registry.add('custom_pms_dashboard_tag', PosDashboard);
