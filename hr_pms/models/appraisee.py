@@ -934,7 +934,7 @@ class PMS_Appraisee(models.Model):
                 raise UserError('You cannot duplicate this record !!!')
             else:
                 rec.copy()
-                rec.lock_fields = False
+                rec.lock_fields = True
     
     def send_mail_notification(self, msg):
         subject = "Appraisal Notification"
@@ -1013,7 +1013,7 @@ class PMS_Appraisee(models.Model):
         
     def button_submit(self):
         # send notification
-        self.lock_fields = True
+        self.lock_fields = False
         self.validate_deadline()
         self.validate_weightage()
         admin_or_functional_user = self.administrative_supervisor_id.name or self.manager_id.name

@@ -84,7 +84,7 @@
                     <sheet>
                         <div class="oe_title">
                             <h1>
-                                <field name="name" default_focus="1" required="1" attrs="{'readonly': [('lock_fields', '=', True)]}" placeholder="KRAs &amp; Achivements"/>
+                                <field name="name" default_focus="1" required="1" attrs="{'readonly': [('lock_fields', '=', False)]}" placeholder="KRAs &amp; Achivements"/>
                             </h1>
                         </div>
                         <div class='alert alert-info' role="alert">
@@ -122,7 +122,7 @@
                                     <group>
                                     <separator class="alert alert-info" role="alert" string="Appraisee’s Personal Information (employee must have worked for minimum 6 months in the appraisal period)" colspan="4"/>
                                     <group>
-                                        <field name="employee_id" attrs="{'readonly': [('lock_fields', '=', True)]}" readonly="0" options="{'no_create': True,'no_open': True}"/> 
+                                        <field name="employee_id" attrs="{'readonly': [('lock_fields', '=', False)]}" readonly="0" options="{'no_create': True,'no_open': True}"/> 
                                         <field name="job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
                                         <field name="department_id" readonly="1" string="Department" force_save="1" options="{'no_create': True,'no_open': True}"/>
                                         <field name="ps_district_id" readonly="1" string="District" force_save="1" options="{'no_create': True,'no_open': True}"/> 
@@ -547,7 +547,6 @@
                                     <group>
                                         <separator string="Score Informations" colspan="4"/>
                                         <group>
-                                        
                                             <field name="final_kra_score" readonly="1" force_save="1"/> 
                                             <field name="final_fc_score" readonly="1" force_save="1"/> 
                                             <field name="final_lc_score" readonly="1" force_save="1"/>  
@@ -565,7 +564,7 @@
                                     </group>
                                 </form>
                             </page>    
-                            <page name="app_section" string="Appraisee's Comment" invisible="0">
+                            <page name="app_section" string="Appraisee's Comment &amp; Attachments" invisible="0">
                                 <separator string="Appraisee Section" colspan="4"/>
                                 <form string="">
                                     <group>
