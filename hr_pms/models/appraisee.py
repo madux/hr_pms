@@ -31,7 +31,7 @@ class PMS_Appraisee(models.Model):
     name = fields.Char(
         string="Description Name", 
         required=True,
-        size=70
+        size=150
         )
     active = fields.Boolean(
         string="Active", 
