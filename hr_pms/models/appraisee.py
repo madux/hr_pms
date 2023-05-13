@@ -796,7 +796,11 @@ class PMS_Appraisee(models.Model):
                 msg = """Dear {}, <br/>
                 I wish to notify you that my appraisal has been submitted to you for rating(s) \
                 <br/>Kindly {} to proceed with the ratings <br/>\
-                Yours Faithfully<br/>{}<br/>Department: ({})""".format(
+                Yours Faithfully<br/>{}<br/>Department: ({}). <br/><br/>
+                <p style="color:red;">This is a system generated email, do not reply.<br/>
+                For any technical issue, log it in ICT Support Application. 
+                https://ictsupport.eedc.online/</p>
+                """.format(
                     department_manager.name,
                     self.get_url(self.id, self._name),
                     self.env.user.name,
@@ -816,7 +820,11 @@ class PMS_Appraisee(models.Model):
                 I wish to notify you that an appraisal for {} \
                 has been submitted for HR processing\
                 <br/>Kindly {} to review the appraisal<br/>\
-                Yours Faithfully<br/>{}<br/>""".format(
+                Yours Faithfully<br/>{}.<br/><br/>
+                <p style="color:red;">This is a system generated email, do not reply.<br/>
+                For any technical issue, log it in ICT Support Application. 
+                https://ictsupport.eedc.online/</p>
+                """.format(
                     self.employee_id.name,
                     self.get_url(self.id, self._name),
                     self.env.user.name,
@@ -831,7 +839,11 @@ class PMS_Appraisee(models.Model):
                 I wish to notify you that an appraisal for {} has been completed.\
                 <br/>Kindly {} to review the appraisal. <br/> \
                 For further Inquiry, contact HR Department<br/>\
-                Yours Faithfully<br/>{}<br/>""".format(
+                Yours Faithfully<br/>{}.<br/><br/>
+                <p style="color:red;">This is a system generated email, do not reply.<br/>
+                For any technical issue, log it in ICT Support Application. 
+                https://ictsupport.eedc.online/</p>
+                """.format(
                     self.employee_id.name,
                     self.get_url(self.id, self._name),
                     self.env.user.name,
@@ -894,7 +906,11 @@ class PMS_Appraisee(models.Model):
         msg = """Dear, <br/> 
             I wish to remind you of the appraisal currently on your desk. <br/> \
             Please kindly review and do the needful.<br/> \
-            Yours Faithfully<br/>{}<br/>""".format(
+            Yours Faithfully<br/>{}<br/><br/>
+            <p style="color:red;">This is a system generated email, do not reply.<br/>
+            For any technical issue, log it in ICT Support Application. 
+            https://ictsupport.eedc.online/<p/>
+            """.format(
                 self.env.user.name,
                 self.department_id.name,
                 )
@@ -914,7 +930,10 @@ class PMS_Appraisee(models.Model):
                 Please kindly rate and submit before the submission deadline.
                 You can choose to ignore if necessary process has been done. <br/> \
                 Regards<br/>
-                HR: {}<br/>
+                HR: {}<br/><br/>
+                <p style="color:red;">This is a system generated email, do not reply.<br/>
+                For any technical issue, log it in ICT Support Application. 
+                https://ictsupport.eedc.online/</p>
                 """.format(
                     rec.employee_id.name,
                     rec.write_uid.company_id.name,
@@ -1021,7 +1040,11 @@ class PMS_Appraisee(models.Model):
         I wish to notify you that an appraisal for {} \
         has been submitted for ratings.\
         <br/>Kindly {} to review <br/>\
-        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+        Yours Faithfully<br/>{}<br/>HR Department ({}).<br/><br/>
+        <p style="color:red;">This is a system generated email, do not reply.<br/>
+        For any technical issue, log it in ICT Support Application. 
+        https://ictsupport.eedc.online/</p>
+        """.format(
             admin_or_functional_user,
             self.employee_id.name,
             self.get_url(self.department_id.id, self._name),
@@ -1048,7 +1071,11 @@ class PMS_Appraisee(models.Model):
         I wish to notify you that an appraisal for {} \
         has been submitted for functional manager's ratings.\
         <br/>Kindly {} to review <br/>\
-        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+        Yours Faithfully<br/>{}<br/>HR Department ({}).<br/><br/>
+        <p style="color:red;">This is a system generated email, do not reply.<br/>
+        For any technical issue, log it in ICT Support Application. 
+        https://ictsupport.eedc.online/</p>
+        """.format(
             self.employee_id.parent_id.name,
             self.employee_id.name,
             self.get_url(self.department_id.id, self._name),
@@ -1104,7 +1131,11 @@ class PMS_Appraisee(models.Model):
         I wish to notify you that an appraisal for {} \
         has been submitted for reviewer's ratings.\
         <br/>Kindly {} to review <br/>\
-        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+        Yours Faithfully<br/>{}<br/>HR Department ({}).<br/><br/>
+        <p style="color:red;">This is a system generated email, do not reply.<br/>
+        For any technical issue, log it in ICT Support Application. 
+        https://ictsupport.eedc.online/</p>
+        """.format(
             self.employee_id.parent_id.name,
             self.employee_id.name,
             self.get_url(self.department_id.id, self._name),
@@ -1129,7 +1160,11 @@ class PMS_Appraisee(models.Model):
         self.check_current_potential_assessment_section_lines()
         msg = """Dear {}, <br/> 
         I wish to notify you that your appraisal has been reviewed successfully.\
-        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+        Yours Faithfully<br/>{}<br/>HR Department ({}).<br/><br/>
+        <p style="color:red;">This is a system generated email, do not reply.<br/>
+        For any technical issue, log it in ICT Support Application. 
+        https://ictsupport.eedc.online/</p>
+        """.format(
             self.employee_id.name,
             self.env.user.name,
             self.reviewer_id.department_id.name,
