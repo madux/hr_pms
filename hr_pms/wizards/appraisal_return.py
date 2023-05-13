@@ -14,10 +14,12 @@ class Send_PMS_back(models.TransientModel):
      
     def post(self):
         record_id = self.env['pms.appraisee'].search([('id','=', self.record_id.id)])
-        reasons = "<b><h4>Message From: %s </b></br> Please refer to the reasons below:</h4></br>* %s." %(self.env.user.name,self.reason)
+        reasons = "<b><h4>Message From: %s </b><br/> Please refer to the reason on the refusal comment section:</h4><br/>* %s." %(self.env.user.name,self.reason)
         if self.reason:
-            msg_body = "Dear Sir/Madam, </br>We wish to notify you that your appraisal with reference {} has been returned becasue of the reasons. </br> \
-             </br>{}</br>Kindly check the reasons why it was returned</br> </br>Thanks".format(self.record_id.name, self.reason)
+            msg_body = "Dear Sir/Madam, </br> We wish to notify you that {} appraisal with reference <br/>{} has been returned with reason(s) below; \
+             <br/>{} <br/><br/>HR Administrator<br/>\
+             Should you require any additional information, please contact ICT support for help.<br/>\
+             <a href='https://ictsupport.eedc.online'>Click ICT Support link</a>".format(self.direct_employee_id.name, self.record_id.name, self.reason)
             record_id.sudo().write({'reason_back': "By {}: {}".format(self.env.user.name, self.reason),'state': 'draft'})
             self.mail_sending_reject(msg_body)
         else:

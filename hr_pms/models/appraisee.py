@@ -602,16 +602,36 @@ class PMS_Appraisee(models.Model):
             fa_rating = fa[0].functional_supervisor_rating or 0 # e.g 2
         if fr:
             fr_rating = fr[0].reviewer_rating or 0
-        # fr_rt = 30 if self.employee_id.administrative_supervisor_id else 60
-        if self.employee_id.administrative_supervisor_id:
-            ar_rating = ar_rating * 30
-            fa_rating = fa_rating * 30
-        else:
-            ar_rating = ar_rating * 0
-            fa_rating = fa_rating * 60
-        weightage = (ar_rating) + (fa_rating) + (fr_rating * 40)
+        # # fr_rt = 30 if self.employee_id.administrative_supervisor_id else 60
+        # if self.employee_id.administrative_supervisor_id:
+        #     ar_rating = ar_rating * 30
+        #     fa_rating = fa_rating * 30
+        # else:
+        #     ar_rating = ar_rating * 0
+        #     fa_rating = fa_rating * 60
+        # weightage = (ar_rating) + (fa_rating) + (fr_rating * 40)
         # raise ValidationError(f"weightage =={weightage} fr_rt ==>{fr_rt} --- ar {ar_rating}--- fr_rating {fr_rating} fa_rating ==>{fa_rating}")
+
+        aar = ar_rating * 30 if self.employee_id.administrative_supervisor_id else 0
+        f_rating = self.get_fa_rating(
+                    self.employee_id.parent_id, 
+                    self.employee_id.administrative_supervisor_id, 
+                    self.employee_id.reviewer_id)
+        faa = fa_rating * f_rating
+        ffr = fr_rating * 40 if self.employee_id.reviewer_id else 0
+        weightage = (aar) + (faa) + (ffr)
         self.current_assessment_score = weightage / 4
+
+    def get_fa_rating(self, manager_id, administrative_supervisor_id,reviewer_id):
+        f_rating = 30
+        # if functional_supervisor_rating:
+        if not administrative_supervisor_id and not reviewer_id:
+            f_rating = 100
+        elif reviewer_id and not administrative_supervisor_id:
+            f_rating = 60
+        elif administrative_supervisor_id and not reviewer_id:
+            f_rating = 70
+        return f_rating
 
     @api.depends(
         'potential_assessment_section_line_ids',
@@ -636,13 +656,15 @@ class PMS_Appraisee(models.Model):
             fa_rating = fa[0].functional_supervisor_rating or 0
         if fr:
             fr_rating = fr[0].reviewer_rating or 0
-        if self.employee_id.administrative_supervisor_id:
-            ar_rating = ar_rating * 30
-            fa_rating = fa_rating * 30
-        else:
-            ar_rating = ar_rating * 0
-            fa_rating = fa_rating * 60
-        weightage = (ar_rating) + (fa_rating) + (fr_rating * 40)
+        
+        aar = ar_rating * 30 if self.employee_id.administrative_supervisor_id else 0
+        f_rating = self.get_fa_rating(
+                    self.employee_id.parent_id, 
+                    self.employee_id.administrative_supervisor_id, 
+                    self.employee_id.reviewer_id)
+        faa = fa_rating * f_rating
+        ffr = fr_rating * 40 if self.employee_id.reviewer_id else 0
+        weightage = (aar) + (faa) + (ffr)
         self.potential_assessment_score = weightage / 4
 
     def check_kra_section_lines(self):
@@ -891,40 +913,55 @@ class PMS_Appraisee(models.Model):
         return "<a href={}> </b>Click<a/>. ".format(base_url)
 
     def action_send_reminder(self):
-        msg = """Dear, <br/> 
-            I wish to remind you of the appraisal currently on your desk. <br/> \
-            Please kindly review and do the needful.<br/> \
-            Yours Faithfully<br/>{}<br/>""".format(
-                self.env.user.name,
-                self.department_id.name,
-                )
+        msg = """Dear Sir/Madam, <br/> 
+            I wish to remind you of the appraisal(s) currently on your desk. <br/>
+            Please kindly review and do the needful.<br/>
+            Regards<br/>
+            HR Administrator <br/><br/>
+            Should you require any additional information, please contact ICT support for help.<br/>
+            <a href='https://ictsupport.eedc.online' target="_blank">Click ICT Support link</a><br/>"""
         subject = "Appraisal Reminder"
         email_to = self.employee_id.work_email or self.administrative_supervisor_id.work_email or self.manager_id.work_email if self.state in ['draft', 'done', 'reviewer_rating'] else \
             self.administrative_supervisor_id.work_email if self.state == "admin_rating" else \
             self.manager_id.work_email if self.state == "functional_rating" else self.reviewer_id.work_email if self.state == "reviewer_rating" else self.employee_id.work_email
-        email_cc = [self.employee_id.work_email]
-        self.action_notify(subject, msg, email_to, email_cc)
+        email_cc = self.employee_id.work_email
+        # self.action_notify(subject, msg, email_to, email_cc)
+        self.mail_sending(subject, msg, email_to, email_cc)
+
+    def mail_sending(self, subject, msg_body, email_to, email_cc):
+        email_from = self.write_uid.company_id.email or self.env.user.email
+        mail_data = {
+                'email_from': email_from,
+                'subject': subject,
+                'email_to': email_to,
+                'reply_to': False,
+                'email_cc': email_cc, # emails if self.users_followers else [],
+                'body_html': msg_body
+            }
+        if email_from and email_to:
+            mail_id = self.env['mail.mail'].sudo().create(mail_data)
+            self.env['mail.mail'].sudo().send(mail_id)
 
     def mass_send_reminder(self):
         rec_ids = self.env.context.get('active_ids', [])
         for record in rec_ids:
             rec = self.env['pms.appraisee'].browse([record])
-            msg = """Dear {}, <br/> 
-                I wish to remind you of the appraisal currently on your desk. <br/> \
+            msg = """Dear Sir/Madam, <br/> 
+                I wish to remind you of the appraisal(s) currently on your desk. <br/>
                 Please kindly rate and submit before the submission deadline.
-                You can choose to ignore if necessary process has been done. <br/> \
-                Regards<br/>
-                HR: {}<br/>
-                """.format(
-                    rec.employee_id.name,
-                    rec.write_uid.company_id.name,
-                    )
+                You can choose to ignore if necessary process has been done. <br/>
+                Regards<br/> 
+                HR Administrator<br/>
+                Should you require any additional information, please contact ICT support for help.<br/>
+                <a href='https://ictsupport.eedc.online' target="_blank">Click ICT Support link</a>"""
+                
             subject = "Appraisal Reminder"
             email_to = rec.employee_id.work_email or rec.administrative_supervisor_id.work_email or rec.manager_id.work_email if rec.state in ['draft', 'done', 'reviewer_rating'] else \
                 rec.administrative_supervisor_id.work_email if self.state == "admin_rating" else \
                 rec.manager_id.work_email if rec.state == "functional_rating" else rec.reviewer_id.work_email if rec.state == "reviewer_rating" else rec.employee_id.work_email
-            email_cc = [rec.employee_id.work_email]
-            rec.action_notify(subject, msg, email_to, email_cc)
+            email_cc = rec.employee_id.work_email
+            # rec.action_notify(subject, msg, email_to, email_cc)
+            self.mail_sending(subject, msg, email_to, email_cc)
 
     def bulk_copy_appraisal(self):
         rec_ids = self.env.context.get('active_ids', [])
@@ -1114,7 +1151,7 @@ class PMS_Appraisee(models.Model):
         I wish to notify you that an appraisal for {} \
         has been submitted for reviewer's ratings.\
         <br/>Kindly {} to review <br/>\
-        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+        Yours Faithfully<br/>{}<br/> ({})""".format(
             self.employee_id.parent_id.name,
             self.employee_id.name,
             self.get_url(self.department_id.id, self._name),
@@ -1164,7 +1201,7 @@ class PMS_Appraisee(models.Model):
     def button_withdraw(self):
         self._check_lines_if_appraisers_have_rated()
         self.write({
-                'state':'withdraw',
+                'state':'draft',
             })
         
     def button_set_to_draft(self):

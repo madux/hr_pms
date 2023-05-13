@@ -113,7 +113,7 @@
                                 <i class="fa fa-check-square-o"/>
                             </div>
                             <div class="stat-content">
-                                <div class="stat-head">Ungenerated Appraisals</div>
+                                <div class="stat-head">Ungenerated PMS</div>
                                 <div class="stat_count">
                                     <t t-esc="widget._getpms_not_generated"/>
                                 </div>

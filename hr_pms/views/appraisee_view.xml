@@ -13,7 +13,6 @@
                             type="object"
                             states="draft" 
                             confirm="Are you sure you want to Submit"
-                            help="This submits the form to admin supervisor or functional manager"
                             groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id"
                         />
 
@@ -24,7 +23,6 @@
                             type="object"
                             states="admin_rating" 
                             confirm="Are you sure you want to Submit rating"
-                            help="Done by the Admin supervisor: This submits the admin rating to the functional manager"
                         />
                             <!-- groups="hr_pms.group_pms_user_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id" -->
                         <button 
@@ -33,7 +31,6 @@
                             class="oe_highlight" 
                             type="object"
                             states="functional_rating" 
-                            help="Done by the Functional manager: This submits the admin rating to the employee's reviewer"
                             confirm="Are you sure you want to Submit rating"
                         />
                         <!-- groups="hr_pms.group_pms_user_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id" -->
@@ -44,7 +41,6 @@
                             type="object"
                             states="reviewer_rating" 
                             confirm="Are you sure you want to Submit rating"
-                            help="Done by the reviewer: This is the final process that determines the overall score"
                         /> 
                         <button 
                             name="button_withdraw" 
@@ -185,11 +181,10 @@
                                     context="{'default_section_avg_scale': dummy_kra_section_scale}">
                                     <tree string="KRA Sections" delete="true" editable="bottom" options="{'no_create':True, 'no_open': False}">
                                         <field name="name" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/> 
-                                        <field name="state" invisible="0" force_save="1"/> 
+                                        <field name="state" invisible="1" force_save="1"/> 
                                         <field name="appraisee_weightage" required="1" attrs="{'readonly': [('state', 'not in', ['draft'])],
                                         'required': [('state', 'in', ['draft'])]}" sum="total"/>
                                         <!-- self rating only for KRAs -->
-                                         
                                         <field name="weightage" required="1" sum="total" attrs="{'readonly': [('state', 'not in', ['functional_rating'])],
                                         'required': [('state', 'in', ['functional_rating'])], 'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating'])]}" />
                                         <field name="self_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'draft')],

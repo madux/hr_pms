@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import time
 import base64
 from odoo import models, fields, api, _, SUPERUSER_ID
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 import logging
 from lxml import etree
 _logger = logging.getLogger(__name__)
@@ -140,26 +140,29 @@ class currentAssessmentSectionLine(models.Model):
             if self.current_assessment_section_id.employee_id.parent_id and self.env.user.id != self.current_assessment_section_id.employee_id.parent_id.user_id.id:
                 self.assessment_type = ""
                 self.functional_supervisor_rating = False
-                return {
-                    'title': 'User Validation Issue',
-                    'message': "Ops ! You are not entitled to add a rating because you are not the employee's functional manager"
-                }
+                # return {
+                #     'title': 'User Validation Issue',
+                #     'message': "Ops ! You are not entitled to add a rating because you are not the employee's functional manager"
+                # }
+                raise UserError("Wrong Access !! You are not entitled to add a rating because you are not the employee's functional manager")
         if self.state == 'admin_rating':
             if self.current_assessment_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.current_assessment_section_id.employee_id.administrative_supervisor_id.user_id.id:
                 self.assessment_type = ""
                 self.administrative_supervisor_rating = False
-                return {
-                    'title': 'User Validation Issue',
-                    'message': "Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor"
-                }
+                # return {
+                #     'title': 'User Validation Issue',
+                #     'message': "Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor"
+                # }
+                raise UserError("Access Error !!! You are not entitled to add a rating because you are not the employee's administrative supervisor")
         if self.state == 'reviewer_rating':
             if self.current_assessment_section_id.employee_id.reviewer_id and self.env.user.id != self.current_assessment_section_id.employee_id.reviewer_id.user_id.id:
                 self.assessment_type = ""
                 self.reviewer_rating = False
-                return {
-                    'title': 'Security Rule',
-                    'message': """Ops ! You are not entitled to add a rating because you are not the employee's reviewer"""
-                }
+                # return {
+                #     'title': 'Security Rule',
+                #     'message': """Ops ! You are not entitled to add a rating because you are not the employee's reviewer"""
+                # }
+                raise UserError("Access Error !!!You are not entitled to add a rating because you are not the employee's reviewer")
             
         # if self.functional_supervisor_rating > 5:
         #     message = {
@@ -278,31 +281,34 @@ class PotentialSectionLine(models.Model):
     #     'administrative_supervisor_rating',
     #     'reviewer_rating'
     #     )
-    def validate_rating(self):
+    def validate_rating(self): # potential
         if self.state == 'functional_rating':
             if self.potential_section_id.employee_id.parent_id and self.env.user.id != self.potential_section_id.employee_id.parent_id.user_id.id:
                 self.assessment_type = ""
                 self.functional_supervisor_rating = False
-                return {
-                    'title': 'User Validation Issue',
-                    'message': "Ops ! You are not entitled to add a rating because you are not the employee's functional manager"
-                }
+                # return {
+                #     'title': 'User Validation Issue',
+                #     'message': "Ops ! You are not entitled to add a rating because you are not the employee's functional manager"
+                # }
+                raise UserError("Ops ! You are not entitled to add a rating because you are not the employee's functional manager")
         if self.state == 'admin_rating':
             if self.potential_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.potential_section_id.employee_id.administrative_supervisor_id.user_id.id:
                 self.assessment_type = ""
                 self.administrative_supervisor_rating = False
-                return {
-                    'title': 'User Validation Issue',
-                    'message': "Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor"
-                }
+                # return {
+                #     'title': 'User Validation Issue',
+                #     'message': "Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor"
+                # }
+                raise UserError("Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor")
         if self.state == 'reviewer_rating':
             if self.potential_section_id.employee_id.reviewer_id and self.env.user.id != self.potential_section_id.employee_id.reviewer_id.user_id.id:
-                self.assessment_type = ""
+                self.assessment_type = False
                 self.reviewer_rating = False
-                return {
-                    'title': 'Security Rule',
-                    'message': """Ops ! You are not entitled to add a rating because you are not the employee's reviewer"""
-                }
+                # return {
+                #     'title': 'Security Rule',
+                #     'message': """Ops ! You are not entitled to add a rating because you are not the employee's reviewer"""
+                # }
+                raise UserError("""Access Error !!! You are not entitled to add a rating because you are not the employee's reviewer""")
             
         # if self.functional_supervisor_rating > 5:
         #     message = {
