@@ -58,7 +58,7 @@
                             name="return_appraisal" 
                             string="Return" 
                             type="object"
-                            attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['functional_rating'])]}"
+                            attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['admin_rating', 'functional_rating'])]}"
                             confirm="Are you sure you want to return"
                         />
                             <!-- states="admin_rating,functional_rating" -->
@@ -109,7 +109,7 @@
                         </group>
                         <div class='alert alert-info' role="alert">
                             FIND USER MANUAL HERE ==>
-                            Download:  <a href='/hr_pms/static/TRAINING_FOR_HR_PMS.pdf' target="_blank"> <strong>USER MANUAL</strong> </a> <br/>
+                            Click to Download:  <a href='/hr_pms/static/TRAINING_FOR_HR_PMS.pdf' target="_blank"> <strong>USER MANUAL</strong> </a> <br/>
                         </div>
                         <notebook>
                             <page name="instruction_page" string="Instructions" invisible="0">
@@ -185,7 +185,7 @@
                                     context="{'default_section_avg_scale': dummy_kra_section_scale}">
                                     <tree string="KRA Sections" delete="true" editable="bottom" options="{'no_create':True, 'no_open': False}">
                                         <field name="name" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/> 
-                                        <field name="state" invisible="1"/> 
+                                        <field name="state" invisible="0" force_save="1"/> 
                                         <field name="appraisee_weightage" required="1" attrs="{'readonly': [('state', 'not in', ['draft'])],
                                         'required': [('state', 'in', ['draft'])]}" sum="total"/>
                                         <!-- self rating only for KRAs -->

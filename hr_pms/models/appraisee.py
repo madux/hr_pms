@@ -31,7 +31,7 @@ class PMS_Appraisee(models.Model):
     name = fields.Char(
         string="Description Name", 
         required=True,
-        size=70
+        size=120
         )
     active = fields.Boolean(
         string="Active", 
@@ -1022,6 +1022,16 @@ class PMS_Appraisee(models.Model):
             raise ValidationError(
                 f"""Please ensure the sum of KRA weight by Appraisee is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
                 )
+        weightage_with_zero = self.mapped('kra_section_line_ids').filtered(lambda self: self.appraisee_weightage < 1)
+        if weightage_with_zero:
+            raise ValidationError(
+                """Please ensure that each line weightage is above 0. Either delete the extra line or add a weight on it"""
+                )
+        self_rating_with_zero = self.mapped('kra_section_line_ids').filtered(lambda self: self.self_rating < 1)
+        if self_rating_with_zero:
+            raise ValidationError(
+                """Please ensure that each line's self rating is above 0. Either delete the line or add a self rating"""
+                )
         
     def validate_deadline(self):
         appraisee_deadline = self.sudo().pms_department_id.hr_category_id.online_deadline_date
@@ -1144,8 +1154,8 @@ class PMS_Appraisee(models.Model):
             )
         self.send_mail_notification(msg)
         self.write({
-                'state': 'reviewer_rating',
-                'reviewer_id': self.employee_id.reviewer_id.id,
+                'state': 'reviewer_rating' if self.employee_id.reviewer_id else 'done',
+                'reviewer_id': self.employee_id.reviewer_id.id if self.employee_id.reviewer_id else False,
             })
         # if self.manager_attachement_ids:
         #         self.manager_attachement_ids.write({'res_model': self._name, 'res_id': self.id})
@@ -1196,7 +1206,6 @@ class PMS_Appraisee(models.Model):
         self.write({
                 'state':'draft',
             })
-        
     
     # @api.model
     # def fields_view_get(self, view_id='hr_pms.view_hr_pms_appraisee_form', view_type='form', toolbar=False, submenu=False):
@@ -1317,11 +1326,14 @@ class PMS_Appraisee(models.Model):
     
     def _getpms_not_generated(self):
         pms = self.env['pms.appraisee'].search([])
-        employees = self.env['hr.employee'].search([]).ids
+        employees = [rec.id for rec in self.env['hr.employee'].search([])]
         pms_employee_ids = [rec.employee_id.id for rec in pms]
-        number_of_intersections = set(pms_employee_ids).intersection(employees)
-        return len(number_of_intersections) if number_of_intersections else 0
-    
+        number_of_intersections = []
+        for rec in employees:
+            if rec not in pms_employee_ids:
+                number_of_intersections.append(rec)
+        return len(number_of_intersections)
+
     @api.model
     def get_dashboard_details(self):
         return {

@@ -8,7 +8,17 @@ from lxml import etree
 
 _logger = logging.getLogger(__name__)
 
-
+def get_fa_rating(functional_supervisor_rating, administrative_supervisor_rating,reviewer_rating):
+    f_rating = 30
+    if functional_supervisor_rating > 0:
+        if administrative_supervisor_rating < 1 and reviewer_rating < 1:
+            f_rating = 100
+        elif reviewer_rating > 0 and administrative_supervisor_rating < 1:
+            f_rating = 60
+        elif reviewer_rating < 1 and administrative_supervisor_rating > 0:
+            f_rating = 70
+    return f_rating
+    
 class KRA_SectionLine(models.Model):
     _name = "kra.section.line"
     _description= "Employee appraisee KRA Section lines"
@@ -181,7 +191,7 @@ class KRA_SectionLine(models.Model):
             self.is_reviewer = True if current_user == self.kra_section_id.employee_id.reviewer_id.user_id.id else False
         else:
             self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
-    
+     
     @api.depends(
         'weightage',
         'administrative_supervisor_rating',
@@ -192,9 +202,12 @@ class KRA_SectionLine(models.Model):
         for rec in self:
             fc_avg_scale = rec.section_avg_scale or 4 # or 5 is set as default in case nothing was provided
             if rec.administrative_supervisor_rating or rec.functional_supervisor_rating or rec.reviewer_rating:
-
-                ar = rec.administrative_supervisor_rating * 40
-                f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+                ar = rec.administrative_supervisor_rating * 30 if rec.administrative_supervisor_rating > 0 else 0
+                # f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+                f_rating = get_fa_rating(
+                    rec.functional_supervisor_rating, 
+                    rec.administrative_supervisor_rating, 
+                    rec.reviewer_rating)
                 fr = rec.functional_supervisor_rating * f_rating
                 rr = rec.reviewer_rating * 40
                 ratings = (ar + fr + rr) / fc_avg_scale
@@ -365,8 +378,12 @@ class LC_SectionLine(models.Model):
         for rec in self:
             fc_avg_scale = rec.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
-                ar = rec.administrative_supervisor_rating * 30
-                f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+                ar = rec.administrative_supervisor_rating * 30 if rec.administrative_supervisor_rating > 0 else 0
+                # f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+                f_rating = get_fa_rating(
+                    rec.functional_supervisor_rating, 
+                    rec.administrative_supervisor_rating, 
+                    rec.reviewer_rating)
                 fr = rec.functional_supervisor_rating * f_rating
                 rr = rec.reviewer_rating * 40
                 ratings = (ar + fr + rr) / fc_avg_scale
@@ -523,8 +540,12 @@ class FC_SectionLine(models.Model):
         for rec in self:
             fc_avg_scale = rec.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
-                ar = rec.administrative_supervisor_rating * 30
-                f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+                ar = rec.administrative_supervisor_rating * 30 if rec.administrative_supervisor_rating > 0 else 0
+                # f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+                f_rating = get_fa_rating(
+                    rec.functional_supervisor_rating, 
+                    rec.administrative_supervisor_rating, 
+                    rec.reviewer_rating)
                 fr = rec.functional_supervisor_rating * f_rating
                 rr = rec.reviewer_rating * 40
                 ratings = (ar + fr + rr) / fc_avg_scale
