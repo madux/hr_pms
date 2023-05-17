@@ -90,11 +90,12 @@ class currentAssessmentSectionLine(models.Model):
         default=5
         )
     assessment_type = fields.Selection([
+        ('none', ''),
         ('Ordinary', 'Ordinary'),
         ('Diligent', 'Diligent'),
         ('Fantastic', 'Fantastic'),
         ('Superb', 'Superb'),
-        ], string="Choose", default = "", readonly=False)
+        ], string="Choose", default = "none", readonly=False)
     
     @api.onchange('assessment_type')
     def onchange_assessment_type(self):
@@ -236,11 +237,12 @@ class PotentialSectionLine(models.Model):
         default=5
         )
     assessment_type = fields.Selection([
+        ('none', ''),
         ('Low Potential', 'Low Potential'),
         ('Medium Potential', 'Medium Potential'),
         ('High Potential', 'High Potential'),
         ('Ready to go', 'Ready to go'),
-        ], string="Choose", default = "", readonly=False)
+        ], string="Choose", default = "none", readonly=False)
     
     @api.onchange('assessment_type')
     def onchange_assessment_type(self):
@@ -284,7 +286,7 @@ class PotentialSectionLine(models.Model):
     def validate_rating(self): # potential
         if self.state == 'functional_rating':
             if self.potential_section_id.employee_id.parent_id and self.env.user.id != self.potential_section_id.employee_id.parent_id.user_id.id:
-                self.assessment_type = ""
+                self.assessment_type = "none"
                 self.functional_supervisor_rating = False
                 # return {
                 #     'title': 'User Validation Issue',
@@ -293,22 +295,22 @@ class PotentialSectionLine(models.Model):
                 raise UserError("Ops ! You are not entitled to add a rating because you are not the employee's functional manager")
         if self.state == 'admin_rating':
             if self.potential_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.potential_section_id.employee_id.administrative_supervisor_id.user_id.id:
-                self.assessment_type = ""
+                self.assessment_type = "none"
                 self.administrative_supervisor_rating = False
-                # return {
-                #     'title': 'User Validation Issue',
-                #     'message': "Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor"
-                # }
-                raise UserError("Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor")
+                return {
+                    'title': 'User Validation Issue',
+                    'message': "Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor"
+                }
+                # raise UserError("Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor")
         if self.state == 'reviewer_rating':
             if self.potential_section_id.employee_id.reviewer_id and self.env.user.id != self.potential_section_id.employee_id.reviewer_id.user_id.id:
                 self.assessment_type = False
                 self.reviewer_rating = False
-                # return {
-                #     'title': 'Security Rule',
-                #     'message': """Ops ! You are not entitled to add a rating because you are not the employee's reviewer"""
-                # }
-                raise UserError("""Access Error !!! You are not entitled to add a rating because you are not the employee's reviewer""")
+                return {
+                    'title': 'Security Rule',
+                    'message': """Ops ! You are not entitled to add a rating because you are not the employee's reviewer"""
+                }
+                # raise UserError("""Access Error !!! You are not entitled to add a rating because you are not the employee's reviewer""")
             
         # if self.functional_supervisor_rating > 5:
         #     message = {
