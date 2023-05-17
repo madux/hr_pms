@@ -962,6 +962,12 @@ class PMS_Appraisee(models.Model):
             else:
                 rec.copy()
                 rec.lock_fields = True
+
+    def update_instruction(self):
+        rec_ids = self.env.context.get('active_ids', [])
+        for record in rec_ids:
+            rec = self.env['pms.appraisee'].browse([record])
+            rec.write({'instruction_html': rec.env.ref('hr_pms.pms_instruction_1').description})
     
     def send_mail_notification(self, msg):
         subject = "Appraisal Notification"
