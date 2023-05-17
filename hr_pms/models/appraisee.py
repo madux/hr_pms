@@ -108,7 +108,8 @@ class PMS_Appraisee(models.Model):
     department_id = fields.Many2one(
         'hr.department', 
         string="Department ID",
-        copy=True
+        copy=True,
+        related="employee_id.department_id",
         )
     reviewer_id = fields.Many2one(
         'hr.employee', 
@@ -580,7 +581,7 @@ class PMS_Appraisee(models.Model):
                 rec.overall_score = 0
     
     @api.depends(
-            'current_assessment_section_line_ids',
+            'current_assessment_section_line_ids.assessment_type',
             )
     def compute_current_assessment_score(self):
         'get the lines for appraisers and compute'
@@ -597,21 +598,11 @@ class PMS_Appraisee(models.Model):
             lambda s: s.state == 'reviewer_rating'
         )
         if ar:
-            ar_rating = ar[0].administrative_supervisor_rating or 0 # e.g 2
+            ar_rating = ar[0].administrative_supervisor_rating if self.employee_id.administrative_supervisor_id else 0
         if fa:
-            fa_rating = fa[0].functional_supervisor_rating or 0 # e.g 2
+            fa_rating = fa[0].functional_supervisor_rating if self.employee_id.parent_id else 0
         if fr:
-            fr_rating = fr[0].reviewer_rating or 0
-        # # fr_rt = 30 if self.employee_id.administrative_supervisor_id else 60
-        # if self.employee_id.administrative_supervisor_id:
-        #     ar_rating = ar_rating * 30
-        #     fa_rating = fa_rating * 30
-        # else:
-        #     ar_rating = ar_rating * 0
-        #     fa_rating = fa_rating * 60
-        # weightage = (ar_rating) + (fa_rating) + (fr_rating * 40)
-        # raise ValidationError(f"weightage =={weightage} fr_rt ==>{fr_rt} --- ar {ar_rating}--- fr_rating {fr_rating} fa_rating ==>{fa_rating}")
-
+            fr_rating = fr[0].reviewer_rating if self.employee_id.reviewer_id else 0
         aar = ar_rating * 30 if self.employee_id.administrative_supervisor_id else 0
         f_rating = self.get_fa_rating(
                     self.employee_id.parent_id, 
@@ -624,7 +615,6 @@ class PMS_Appraisee(models.Model):
 
     def get_fa_rating(self, manager_id, administrative_supervisor_id,reviewer_id):
         f_rating = 30
-        # if functional_supervisor_rating:
         if not administrative_supervisor_id and not reviewer_id:
             f_rating = 100
         elif reviewer_id and not administrative_supervisor_id:
@@ -651,11 +641,11 @@ class PMS_Appraisee(models.Model):
             lambda s: s.state == 'reviewer_rating'
         )
         if ar:
-            ar_rating = ar[0].administrative_supervisor_rating or 0
+            ar_rating = ar[0].administrative_supervisor_rating if self.employee_id.administrative_supervisor_id else 0
         if fa:
-            fa_rating = fa[0].functional_supervisor_rating or 0
+            fa_rating = fa[0].functional_supervisor_rating if self.employee_id.parent_id else 0
         if fr:
-            fr_rating = fr[0].reviewer_rating or 0
+            fr_rating = fr[0].reviewer_rating if self.employee_id.reviewer_id else 0
         
         aar = ar_rating * 30 if self.employee_id.administrative_supervisor_id else 0
         f_rating = self.get_fa_rating(
