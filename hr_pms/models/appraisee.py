@@ -356,6 +356,7 @@ class PMS_Appraisee(models.Model):
         store=True,
         compute="compute_final_lc_score"
         )
+    
     def _get_default_instructions(self):
         ins = self.env.ref('hr_pms.pms_instruction_1').description
         return ins
@@ -363,8 +364,8 @@ class PMS_Appraisee(models.Model):
     instruction_html = fields.Text(
         string='Instructions', 
         store=True,
-        default=lambda self: self._get_default_instructions(),
-        copy=True
+        copy=True,
+        default=lambda self: self._get_default_instructions()
         )
     
     # consider removing
@@ -962,6 +963,12 @@ class PMS_Appraisee(models.Model):
             else:
                 rec.copy()
                 rec.lock_fields = True
+
+    def update_instruction(self):
+        rec_ids = self.env.context.get('active_ids', [])
+        for record in rec_ids:
+            rec = self.env['pms.appraisee'].browse([record])
+            rec.write({'instruction_html': rec.env.ref('hr_pms.pms_instruction_1').description})
     
     def send_mail_notification(self, msg):
         subject = "Appraisal Notification"

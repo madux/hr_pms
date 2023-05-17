@@ -219,7 +219,7 @@
                                     </form>
                                 </field>
                                 <separator string="Functional Competency Sections" colspan="4"/>
-							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 4(Highest) scale</p>
+							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 5(Highest) scale</p>
                                 <field name="fc_section_line_ids" 
                                     required="1" options="{'no_quick_create':True}" attrs="{'readonly': [('state', 'not in', ['draft', 'admin_rating','functional_rating','reviewer_rating'])]}">
                                     <tree string="Functional Sections" delete="false" create="false" editable="bottom">
@@ -255,7 +255,7 @@
                                     </form>
                                 </field>
                                 <separator string="Leadership Competency Sections" colspan="4"/>
-							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 4(Highest) scale</p>
+							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 5(Highest) scale</p>
                                 <field name="lc_section_line_ids" 
                                     required="1" options="{'no_quick_create':True}" attrs="{'readonly': [('state', 'not in', ['draft', 'admin_rating','functional_rating','reviewer_rating'])]}">
                                     <tree string="Leadership Competency" delete="false" create="false" editable="bottom">
@@ -974,6 +974,19 @@
             ref('hr_pms.group_pms_officer_id'),
 			])]"/>
             <field name="code">action=model.sudo().bulk_copy_appraisal()</field>
+        </record>
+
+        <record id="ir_action_server_pms_instruction_update" model="ir.actions.server">
+			<field name="name">Update Instruction</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="hr_pms.model_pms_appraisee"/>
+            <field name="binding_model_id" ref="hr_pms.model_pms_appraisee"/>
+            <field name="state">code</field>
+            <field name="groups_id" eval="[(6, 0, [
+			ref('base.group_system'),
+            ref('hr_pms.group_pms_officer_id'),
+			])]"/>
+            <field name="code">action=model.update_instruction()</field>
         </record>
 
     <menuitem id="view_pms_appraisee_menu" name="Appraisal" sequence="1" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_appraisee_view_id"/>
