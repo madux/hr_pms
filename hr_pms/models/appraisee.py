@@ -701,7 +701,7 @@ class PMS_Appraisee(models.Model):
             if self.mapped('fc_section_line_ids').filtered(
                 lambda line: line.reviewer_rating < 1):
                 raise ValidationError(
-                    "Ops! Please ensure all functional manager rating's on functional competency line is at least rated 1"
+                    "Ops! Please ensure all reviewers manager rating's on functional competency line is at least rated 1"
                 ) 
             
     def check_lc_section_lines(self):
@@ -1125,10 +1125,10 @@ class PMS_Appraisee(models.Model):
         #         self.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': self.id})
         
     def button_functional_manager_rating(self):
-        if not self.employee_id.reviewer_id:
-            raise ValidationError(
-                "Ops ! please ensure that a reviewer is assigned to the employee"
-                )
+        # if not self.employee_id.reviewer_id:
+        #     raise ValidationError(
+        #         "Ops ! please ensure that a reviewer is assigned to the employee"
+        #         )
         sum_weightage = sum([weight.weightage for weight in self.mapped('kra_section_line_ids')])
         if sum_weightage != 100:
             value_diff = 100 - sum_weightage 
