@@ -219,7 +219,7 @@
                                     </form>
                                 </field>
                                 <separator string="Functional Competency Sections" colspan="4"/>
-							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 4(Highest) scale</p>
+							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 5(Highest) scale</p>
                                 <field name="fc_section_line_ids" 
                                     required="1" options="{'no_quick_create':True}" attrs="{'readonly': [('state', 'not in', ['draft', 'admin_rating','functional_rating','reviewer_rating'])]}">
                                     <tree string="Functional Sections" delete="false" create="false" editable="bottom">
@@ -255,7 +255,7 @@
                                     </form>
                                 </field>
                                 <separator string="Leadership Competency Sections" colspan="4"/>
-							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 4(Highest) scale</p>
+							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 5(Highest) scale</p>
                                 <field name="lc_section_line_ids" 
                                     required="1" options="{'no_quick_create':True}" attrs="{'readonly': [('state', 'not in', ['draft', 'admin_rating','functional_rating','reviewer_rating'])]}">
                                     <tree string="Leadership Competency" delete="false" create="false" editable="bottom">

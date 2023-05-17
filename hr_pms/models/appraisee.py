@@ -355,15 +355,23 @@ class PMS_Appraisee(models.Model):
         store=True,
         compute="compute_final_lc_score"
         )
+    
     def _get_default_instructions(self):
         ins = self.env.ref('hr_pms.pms_instruction_1').description
         return ins
+    
+    @api.depends('state')
+    def compute_default_instructions(self):
+        if self.state != "":
+            ins = self._get_default_instructions()
+            return ins
     
     instruction_html = fields.Text(
         string='Instructions', 
         store=True,
         default=lambda self: self._get_default_instructions(),
-        copy=True
+        copy=True,
+        compute="compute_default_instructions"
         )
     
     # consider removing
