@@ -360,16 +360,15 @@ class PMS_Appraisee(models.Model):
         ins = self.env.ref('hr_pms.pms_instruction_1').description
         return ins
     
+    
     @api.depends('state')
     def compute_default_instructions(self):
-        if self.state != "":
-            ins = self._get_default_instructions()
-            return ins
+        for record in self:
+            record.instruction_html = record._get_default_instructions()
     
     instruction_html = fields.Text(
         string='Instructions', 
         store=True,
-        default=lambda self: self._get_default_instructions(),
         copy=True,
         compute="compute_default_instructions"
         )
@@ -980,6 +979,12 @@ class PMS_Appraisee(models.Model):
             else:
                 rec.copy()
                 rec.lock_fields = True
+
+    def update_instruction(self):
+        rec_ids = self.env.context.get('active_ids', [])
+        for record in rec_ids:
+            rec = self.env['pms.appraisee'].browse([record])
+            rec.write({'instruction_html': rec.env.ref('hr_pms.pms_instruction_1').description})
     
     def send_mail_notification(self, msg):
         subject = "Appraisal Notification"
