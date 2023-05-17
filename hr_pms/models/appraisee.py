@@ -1270,25 +1270,23 @@ class PMS_Appraisee(models.Model):
     def write(self, vals): 
         self.validate_reviewer_commenter(vals)
         res = super().write(vals)
-        for template in self:
-            if template.appraisee_attachement_ids and template.appraisee_attachement_set == 0:
-                template.appraisee_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-                template.appraisee_attachement_set = 1
+        # for template in self:
+        #     if template.appraisee_attachement_ids and template.appraisee_attachement_set == 0:
+        #         template.appraisee_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+        #         template.appraisee_attachement_set = 1
 
-            if template.supervisor_attachement_ids and template.supervisor_attachement_set == 0:
-                template.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-                template.supervisor_attachement_set = 1
+        #     if template.supervisor_attachement_ids and template.supervisor_attachement_set == 0:
+        #         template.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+        #         template.supervisor_attachement_set = 1
 
-            if template.manager_attachement_ids and template.manager_attachement_set == 0:
-                template.manager_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-                template.manager_attachement_set = 1
+        #     if template.manager_attachement_ids and template.manager_attachement_set == 0:
+        #         template.manager_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+        #         template.manager_attachement_set = 1
 
-            if template.reviewer_attachement_ids and template.reviewer_attachement_set == 0:
-                template.reviewer_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
-                template.reviewer_attachement_set = 1
-            # if is_not_reviewer:
-            #     template.write({'reviewer_comment': old_comment})
-        return res
+        #     if template.reviewer_attachement_ids and template.reviewer_attachement_set == 0:
+        #         template.reviewer_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
+        #         template.reviewer_attachement_set = 1
+        # return res
     
     def _get_non_draft_pms(self):
         pms = self.env['pms.appraisee'].search_count([('state', '!=', 'draft')])
