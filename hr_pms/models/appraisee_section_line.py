@@ -31,7 +31,7 @@ class KRA_SectionLine(models.Model):
 
     name = fields.Char(
         string='Description',
-        size=70
+        size=300
         )
     weightage = fields.Float(
         string='FA Weight (Total 100%)', 

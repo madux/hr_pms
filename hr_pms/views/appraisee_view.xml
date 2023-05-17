@@ -111,7 +111,7 @@
                             <page name="instruction_page" string="Instructions" invisible="0">
 							    <p style="color: red;" attrs="{'invisible': [('instruction_html', '!=', False)]}">* All Appraisees should rate the min - max of 5 - 20 on KRA / Achievement. </p>
 							    <p style="color: red;" attrs="{'invisible': [('instruction_html', '!=', False)]}">* Kindly read instruction before rating on each line. </p>
-                                <field name="instruction_html" readonly="0" string="Instructions" widget="html"/>
+                                <field name="instruction_html" readonly="1" string="Instructions" widget="html"/>
                             </page>
                             <page name="employee_manager_info" string="Staff Profile">
                                 <form string="">

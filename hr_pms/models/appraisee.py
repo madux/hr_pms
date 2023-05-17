@@ -108,7 +108,8 @@ class PMS_Appraisee(models.Model):
     department_id = fields.Many2one(
         'hr.department', 
         string="Department ID",
-        copy=True
+        copy=True,
+        related="employee_id.department_id",
         )
     reviewer_id = fields.Many2one(
         'hr.employee', 
@@ -360,17 +361,11 @@ class PMS_Appraisee(models.Model):
         ins = self.env.ref('hr_pms.pms_instruction_1').description
         return ins
     
-    
-    @api.depends('state')
-    def compute_default_instructions(self):
-        for record in self:
-            record.instruction_html = record._get_default_instructions()
-    
     instruction_html = fields.Text(
         string='Instructions', 
         store=True,
         copy=True,
-        compute="compute_default_instructions"
+        default=lambda self: self._get_default_instructions()
         )
     
     # consider removing
@@ -587,7 +582,7 @@ class PMS_Appraisee(models.Model):
                 rec.overall_score = 0
     
     @api.depends(
-            'current_assessment_section_line_ids',
+            'current_assessment_section_line_ids.assessment_type',
             )
     def compute_current_assessment_score(self):
         'get the lines for appraisers and compute'
@@ -604,21 +599,11 @@ class PMS_Appraisee(models.Model):
             lambda s: s.state == 'reviewer_rating'
         )
         if ar:
-            ar_rating = ar[0].administrative_supervisor_rating or 0 # e.g 2
+            ar_rating = ar[0].administrative_supervisor_rating if self.employee_id.administrative_supervisor_id else 0
         if fa:
-            fa_rating = fa[0].functional_supervisor_rating or 0 # e.g 2
+            fa_rating = fa[0].functional_supervisor_rating if self.employee_id.parent_id else 0
         if fr:
-            fr_rating = fr[0].reviewer_rating or 0
-        # # fr_rt = 30 if self.employee_id.administrative_supervisor_id else 60
-        # if self.employee_id.administrative_supervisor_id:
-        #     ar_rating = ar_rating * 30
-        #     fa_rating = fa_rating * 30
-        # else:
-        #     ar_rating = ar_rating * 0
-        #     fa_rating = fa_rating * 60
-        # weightage = (ar_rating) + (fa_rating) + (fr_rating * 40)
-        # raise ValidationError(f"weightage =={weightage} fr_rt ==>{fr_rt} --- ar {ar_rating}--- fr_rating {fr_rating} fa_rating ==>{fa_rating}")
-
+            fr_rating = fr[0].reviewer_rating if self.employee_id.reviewer_id else 0
         aar = ar_rating * 30 if self.employee_id.administrative_supervisor_id else 0
         f_rating = self.get_fa_rating(
                     self.employee_id.parent_id, 
@@ -631,7 +616,6 @@ class PMS_Appraisee(models.Model):
 
     def get_fa_rating(self, manager_id, administrative_supervisor_id,reviewer_id):
         f_rating = 30
-        # if functional_supervisor_rating:
         if not administrative_supervisor_id and not reviewer_id:
             f_rating = 100
         elif reviewer_id and not administrative_supervisor_id:
@@ -658,11 +642,11 @@ class PMS_Appraisee(models.Model):
             lambda s: s.state == 'reviewer_rating'
         )
         if ar:
-            ar_rating = ar[0].administrative_supervisor_rating or 0
+            ar_rating = ar[0].administrative_supervisor_rating if self.employee_id.administrative_supervisor_id else 0
         if fa:
-            fa_rating = fa[0].functional_supervisor_rating or 0
+            fa_rating = fa[0].functional_supervisor_rating if self.employee_id.parent_id else 0
         if fr:
-            fr_rating = fr[0].reviewer_rating or 0
+            fr_rating = fr[0].reviewer_rating if self.employee_id.reviewer_id else 0
         
         aar = ar_rating * 30 if self.employee_id.administrative_supervisor_id else 0
         f_rating = self.get_fa_rating(
@@ -708,7 +692,7 @@ class PMS_Appraisee(models.Model):
             if self.mapped('fc_section_line_ids').filtered(
                 lambda line: line.reviewer_rating < 1):
                 raise ValidationError(
-                    "Ops! Please ensure all functional manager rating's on functional competency line is at least rated 1"
+                    "Ops! Please ensure all reviewers manager rating's on functional competency line is at least rated 1"
                 ) 
             
     def check_lc_section_lines(self):
@@ -1138,10 +1122,10 @@ class PMS_Appraisee(models.Model):
         #         self.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': self.id})
         
     def button_functional_manager_rating(self):
-        if not self.employee_id.reviewer_id:
-            raise ValidationError(
-                "Ops ! please ensure that a reviewer is assigned to the employee"
-                )
+        # if not self.employee_id.reviewer_id:
+        #     raise ValidationError(
+        #         "Ops ! please ensure that a reviewer is assigned to the employee"
+        #         )
         sum_weightage = sum([weight.weightage for weight in self.mapped('kra_section_line_ids')])
         if sum_weightage != 100:
             value_diff = 100 - sum_weightage 
