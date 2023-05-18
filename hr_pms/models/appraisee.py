@@ -1321,6 +1321,10 @@ class PMS_Appraisee(models.Model):
         pms = self.env['pms.appraisee'].search_count([('state', '=', 'reviewer_rating')])
         return int(pms) if pms else 0
     
+    def _get_draft_pms(self):
+        pms = self.env['pms.appraisee'].search_count([('state', '=', 'draft')])
+        return int(pms) if pms else 0
+    
     def _getpms_not_generated(self):
         pms = self.env['pms.appraisee'].search([])
         employees = [rec.id for rec in self.env['hr.employee'].search([])]
@@ -1341,6 +1345,7 @@ class PMS_Appraisee(models.Model):
             '_get_perception_disagreed_pms': self._get_perception_pms(['totally_disagreed', 'largely_disagreed']),
             '_get_reviewer_pms': self._get_reviewer_pms(),
             '_getpms_not_generated': self._getpms_not_generated(),
+            '_get_draft_pms': self._get_draft_pms(),
         }
     
     def overdue_pms(self):

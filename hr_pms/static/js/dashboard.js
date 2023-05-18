@@ -73,6 +73,13 @@ odoo.define('hr_pms.dashboard', function(require){
                     'Employee Appraisals Not generated', 
                     );
             },
+            "click .widget-8": function(){ 
+                var self = this;
+                self.onDashboardActionClickedTickets(
+                    "[('state', '=', 'draft')]",
+                    'Unsubmitted Appraisals', 
+                    );
+            },
         },
         onDashboardActionget_not_generatedPms: function (title) {
             var self = this; 
@@ -86,6 +93,7 @@ odoo.define('hr_pms.dashboard', function(require){
                     }
                 });
         },
+
 
         init: function(parent, context){
             this._super(parent, context);
@@ -125,6 +133,7 @@ odoo.define('hr_pms.dashboard', function(require){
                 self._get_perception_disagreed_pms = result['_get_perception_disagreed_pms'];
                 self._get_reviewer_pms = result['_get_reviewer_pms'];
                 self._getpms_not_generated = result['_getpms_not_generated'];
+                self._get_draft_pms = result['_get_draft_pms'];
 
             });
             return $.when(define_call);
