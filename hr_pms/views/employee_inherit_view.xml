@@ -201,7 +201,8 @@
             <field name="binding_model_id" ref="hr.model_hr_employee" />
             <field name="state">code</field>
             <field name="groups_id" eval="[(6, 0, [
-			ref('base.group_system'),
+			ref('base.group_system'), 
+            ref('hr.group_hr_manager')
 			])]"/>
             <field name="code">action=model.sudo().send_credential_notification()</field>
         </record>
