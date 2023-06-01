@@ -1050,9 +1050,10 @@ class PMS_Appraisee(models.Model):
         
     def validate_deadline(self):
         appraisee_deadline = self.sudo().pms_department_id.hr_category_id.online_deadline_date
+        deadline = self.sudo().pms_department_id.hr_category_id.deadline
         if appraisee_deadline and fields.Date.today() > appraisee_deadline:
             raise ValidationError('Your deadline for submission has exceeded !!!')
-        if self.deadline and fields.Date.today() > self.deadline:
+        if deadline and fields.Date.today() > deadline:
             raise ValidationError('You have exceeded deadline for the submission of your appraisal')
         
     def button_submit(self):
