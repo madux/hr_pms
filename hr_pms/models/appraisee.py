@@ -7,6 +7,9 @@ from odoo.exceptions import ValidationError, UserError
 from odoo import http
 import logging
 from lxml import etree
+import xlrd
+from xlrd import open_workbook
+import base64
 
 _logger = logging.getLogger(__name__)
 
@@ -338,6 +341,13 @@ class PMS_Appraisee(models.Model):
     post_normalization_score = fields.Float(
         string="Post normalization score", 
         store=True)
+    post_normalization_description = fields.Text(
+        string="Post normalization Description", 
+        store=True)
+    normalized_score_uploader_id = fields.Many2one(
+        'res.users',
+        string='Uploaded by'
+        )
 
     final_kra_score = fields.Float(
         string='Final KRA Score', 
@@ -1439,6 +1449,7 @@ class PMS_Appraisee(models.Model):
     #     action['views'] = [(False, view) for view in action['view_mode'].split(",")]
     #     action['domain'] = domain
     #     return {'action': action}
+
 
     
         

@@ -550,11 +550,15 @@
                                             <field name="overall_score" readonly="1" force_save="1"/> 
                                             <field name="current_assessment_score" readonly="1"/>
                                             <field name="potential_assessment_score"/>
-                                            <field name="post_normalization_score" readonly="1"/>
                                             <field name="approver_ids" invisible="1" required="0" widget="many2many_tags"/> 
                                             <field name="line_manager_id" readonly="1" invisible="1"/> 
                                             <field name="directed_user_id" readonly="1" invisible="1"/> 
                                             <field name="dummy_kra_section_scale" force_save="1" readonly="1" invisible="1"/> 
+                                        </group>
+                                        <group>
+                                            <field name="post_normalization_score" readonly="1"/>
+                                            <field name="post_normalization_description" readonly="1"/>
+                                            <field name="normalized_score_uploader_id" readonly="1"/>
                                         </group>
                                     </group>
                                 </form>

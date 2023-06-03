@@ -237,6 +237,6 @@
 			])]"/>
             <field name="code">action=model.sudo().button_mass_cancel()</field>
         </record>
-    <menuitem id="view_pms_department_menu" name="Department templates" sequence="10" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_department_view_id"
+    <menuitem id="view_pms_department_menu" name="Department templates" sequence="5" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_department_view_id"
     groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
 </odoo>
