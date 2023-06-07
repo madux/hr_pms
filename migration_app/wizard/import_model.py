@@ -67,7 +67,7 @@ class ImportRecords(models.TransientModel):
     
     def get_region_id(self, name):
         if not name:
-            return False
+            return False 
         rec = self.env['hr.region'].search([('name', '=', name)], limit=1)
         return rec.id if rec else self.env['hr.region'].create({'name': name}).id
 

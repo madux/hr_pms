@@ -550,11 +550,15 @@
                                             <field name="overall_score" readonly="1" force_save="1"/> 
                                             <field name="current_assessment_score" readonly="1"/>
                                             <field name="potential_assessment_score"/>
-                                            <field name="post_normalization_score" readonly="1"/>
                                             <field name="approver_ids" invisible="1" required="0" widget="many2many_tags"/> 
                                             <field name="line_manager_id" readonly="1" invisible="1"/> 
                                             <field name="directed_user_id" readonly="1" invisible="1"/> 
                                             <field name="dummy_kra_section_scale" force_save="1" readonly="1" invisible="1"/> 
+                                        </group>
+                                        <group>
+                                            <field name="post_normalization_score" readonly="1"/>
+                                            <field name="post_normalization_description" readonly="1"/>
+                                            <field name="normalized_score_uploader_id" readonly="1"/>
                                         </group>
                                     </group>
                                 </form>
@@ -988,6 +992,21 @@
 			])]"/>
             <field name="code">action=model.update_instruction()</field>
         </record>
+
+        <record id="ir_action_server_pms_post_normalisation_update" model="ir.actions.server">
+			<field name="name">Upload Post Normalisation</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="hr_pms.model_pms_appraisee"/>
+            <field name="binding_model_id" ref="hr_pms.model_pms_appraisee"/>
+            <field name="state">code</field>
+            <field name="groups_id" eval="[(6, 0, [
+			ref('base.group_system'),
+            ref('hr_pms.group_pms_officer_id'),
+			])]"/>
+            <field name="code">action=model.post_normalisation_upload_action()</field>
+        </record>
+
+
 
     <menuitem id="view_pms_appraisee_menu" name="Appraisal" sequence="1" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_appraisee_view_id"/>
     <menuitem id="view_pms_my_appraisal_menu" name="My Appraisal(s)" sequence="1" parent="hr_pms.view_pms_appraisee_menu" action="hr_pms.action_pms_appraisee_view_id"

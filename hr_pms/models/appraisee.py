@@ -1,15 +1,11 @@
 from datetime import datetime, timedelta
-import time
-import base64
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import ValidationError, UserError
 from odoo import http
 import logging
-from lxml import etree
+# from lxml import etree
 
 _logger = logging.getLogger(__name__)
-
 
 
 class PMS_Appraisee(models.Model):
@@ -338,6 +334,13 @@ class PMS_Appraisee(models.Model):
     post_normalization_score = fields.Float(
         string="Post normalization score", 
         store=True)
+    post_normalization_description = fields.Text(
+        string="Post normalization Description", 
+        store=True)
+    normalized_score_uploader_id = fields.Many2one(
+        'res.users',
+        string='Uploaded by'
+        )
 
     final_kra_score = fields.Float(
         string='Final KRA Score', 
@@ -969,6 +972,24 @@ class PMS_Appraisee(models.Model):
         for record in rec_ids:
             rec = self.env['pms.appraisee'].browse([record])
             rec.write({'instruction_html': rec.env.ref('hr_pms.pms_instruction_1').description})
+
+    def post_normalisation_upload_action(self):
+        rec_ids = self.env.context.get('active_ids', [])
+        return {
+              'name': 'Post Normalisation Upload',
+              'view_type': 'form',
+              "view_mode": 'form',
+              'res_model': 'pms.post_normalisation.wizard',
+              'type': 'ir.actions.act_window',
+              'target': 'new',
+              'context': {
+                  'default_appraisal_ids': rec_ids,
+                #   'default_date': fields.Datetime.now(),
+                #   'default_direct_employee_id': self.employee_id.id,
+                #   'default_resp':self.env.uid,
+              },
+        }
+
     
     def send_mail_notification(self, msg):
         subject = "Appraisal Notification"
@@ -1440,6 +1461,7 @@ class PMS_Appraisee(models.Model):
     #     action['views'] = [(False, view) for view in action['view_mode'].split(",")]
     #     action['domain'] = domain
     #     return {'action': action}
+
 
     
         
