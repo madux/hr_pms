@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
         <!-- SECTION STARTS -->
         <record model="pms.instruction" id="pms_instruction_1">
             <field name="name">Instruction 1</field>
@@ -81,7 +81,8 @@
         </record>
         <record model="pms.section" id="pms_kra_section_1">
             <field name="name">SECTION A: KRAs &amp; Achivements</field>
-            <field name="max_line_number">0</field>
+            <field name="min_line_number">5</field>
+            <field name="max_line_number">7</field>
             <field name="weighted_score">1</field>
             <field name="type_of_section">KRA</field>
             <field name="section_avg_scale">4</field>
@@ -105,28 +106,34 @@
             <field name="input_weightage">1</field>
         </record>
         <!-- PMS YEAR -->
+        <record model="pms.year" id="pms_year_2022_qrt2">
+            <field name="name">Annual Appraisal Cycle 2022</field>
+            <field name="date_from">2022-10-01</field>
+            <field name="date_end">2022-12-31</field>
+        </record>
+
         <record model="pms.year" id="pms_year_2023_qrt1">
-            <field name="name">April 2023 [Quarterly]</field>
-            <field name="date_from">2023-04-01</field>
-            <field name="date_end">2023-04-30</field>
+            <field name="name">Jan 2023 [Ist Quarter]</field>
+            <field name="date_from">2023-01-01</field>
+            <field name="date_end">2023-03-30</field>
         </record>
         <record model="pms.year" id="pms_year_2023_qrt2">
-            <field name="name">July 2023 [Quarterly]</field>
-            <field name="date_from">2023-07-01</field>
-            <field name="date_end">2023-07-31</field>
+            <field name="name">April - June 2023 [2nd Quarterly]</field>
+            <field name="date_from">2023-04-01</field>
+            <field name="date_end">2023-06-30</field>
         </record>
         <record model="pms.year" id="pms_year_2023_qrt3">
-            <field name="name">Oct 2023 [Quarterly]</field>
+            <field name="name">July - Sept 2023 [3rd Quarterly]</field>
+            <field name="date_from">2023-07-01</field>
+            <field name="date_end">2023-09-30</field>
+        </record>
+        <record model="pms.year" id="pms_year_2023_qrt4">
+            <field name="name">Annual Appraisal Cycle 2023</field>
             <field name="date_from">2023-10-01</field>
             <field name="date_end">2023-12-31</field>
         </record>
-        <record model="pms.year" id="pms_year_2023_qrt4">
-            <field name="name">Dec 2023 [End of year appraisal]</field>
-            <field name="date_from">2023-12-01</field>
-            <field name="date_end">2023-12-31</field>
-        </record>
 
-        <record model="pms.year" id="pms_year_2024_qrt1">
+        <!-- <record model="pms.year" id="pms_year_2024_qrt1">
             <field name="name">April 2024 [Quarterly]</field>
             <field name="date_from">2024-04-01</field>
             <field name="date_end">2024-04-30</field>
@@ -227,7 +234,7 @@
             <field name="name">Dec 2028 [End of year appraisal]</field>
             <field name="date_from">2028-12-01</field>
             <field name="date_end">2028-12-31</field>
-        </record>
+        </record> -->
         <!-- PMS YEAR ENDS  -->
         <!-- JOB CATEGORY -->
         <!-- <record model="pms.category" id="pms_snr_mgt">
