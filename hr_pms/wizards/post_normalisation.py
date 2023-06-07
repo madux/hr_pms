@@ -9,8 +9,9 @@ import base64
 _logger = logging.getLogger(__name__)
 
 
-class Post_Normalisation_Wizard(models.Model):
-    _name = "pms.post_normalisation.wizard"
+class Post_Normalisation_Wizard(models.TransientModel):
+    _name = 'pms.post_normalisation.wizard'
+    _description = 'Post Normalization Wizard'
 
     data_file = fields.Binary(string="Upload File (.xls)")
     filename = fields.Char("Filename")
@@ -19,6 +20,10 @@ class Post_Normalisation_Wizard(models.Model):
         'res.users',
         string='Requested by', 
         default=lambda self: self.env.uid,
+        )
+    appraisal_ids = fields.Many2many(
+        'pms.appraisee',
+        string='Appraisals', 
         )
 
 
@@ -37,28 +42,20 @@ class Post_Normalisation_Wizard(models.Model):
         success_records = []
         unsuccess_records = []
         message = ['The Status of Post Normalisation Upload']
-        # popup_message = 'The following staff ids were normalized:\n'
 
-        def find_appraisal(code):
-            employee_id = False 
-            if code:
-                code = str(int(code)) if type(code) == float else code 
-                appraisal = self.env['pms.appraisee'].search([
-                    '&', ('employee_number', '=', code),
-                    ('state', '=', 'signed')], limit = 1)
-                # raise ValidationError(appraisal.job_title)
-                if appraisal:
-                    return appraisal
-                else:
-                    return False
         
         for row in file_data:
-            employee_appraisal = find_appraisal(row[1])
+            emp_no = str(int(row[1])) if type(row[1]) in [float, int] else row[1]
+            employee_appraisal = self.mapped('appraisal_ids').filtered(lambda x: x.employee_number == emp_no and x.state in ['done', 'signed'])
+
             if employee_appraisal:
-                employee_appraisal.post_normalization_score = row[2]
-                employee_appraisal.post_normalization_description = row[3]
-                employee_appraisal.normalized_score_uploader_id = self.env.uid
-                success_records.append(row[1])
+                employee_appraisal.write({
+                    'post_normalization_score': row[3],
+                    'post_normalization_description': row[4],
+                    'normalized_score_uploader_id': self.env.uid,
+                    })
+                
+                success_records.append(employee_appraisal.employee_id.name)
                 count += 1
 
         message.append('Successful upload(s): '+str(count)+' Appraisal Record(s): See Record ids below \n {}'.format(success_records))
@@ -77,6 +74,8 @@ class Post_Normalisation_Wizard(models.Model):
                 'target':'new',
                 'context':context,
                 }
+    
+    
         
 class PostNormalisationDialogModel(models.TransientModel):
     _name="pms.post_normalisation.confirm.dialog"

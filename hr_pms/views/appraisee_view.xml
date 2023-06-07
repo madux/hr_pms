@@ -993,6 +993,21 @@
             <field name="code">action=model.update_instruction()</field>
         </record>
 
+        <record id="ir_action_server_pms_post_normalisation_update" model="ir.actions.server">
+			<field name="name">Upload Post Normalisation</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="hr_pms.model_pms_appraisee"/>
+            <field name="binding_model_id" ref="hr_pms.model_pms_appraisee"/>
+            <field name="state">code</field>
+            <field name="groups_id" eval="[(6, 0, [
+			ref('base.group_system'),
+            ref('hr_pms.group_pms_officer_id'),
+			])]"/>
+            <field name="code">action=model.post_normalisation_upload_action()</field>
+        </record>
+
+
+
     <menuitem id="view_pms_appraisee_menu" name="Appraisal" sequence="1" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_appraisee_view_id"/>
     <menuitem id="view_pms_my_appraisal_menu" name="My Appraisal(s)" sequence="1" parent="hr_pms.view_pms_appraisee_menu" action="hr_pms.action_pms_appraisee_view_id"
     groups="hr_pms.group_pms_user_id,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>

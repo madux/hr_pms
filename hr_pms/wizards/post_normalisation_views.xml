@@ -5,9 +5,9 @@
         <field name="name">pms_post_normalisation_wizard</field>
         <field name="model">pms.post_normalisation.wizard</field>
         <field name="arch" type="xml">
-            <form string="Import ">
+            <form string="Upload ">
                 <header>
-                    Import 
+                    Upload 
                 </header>
                 <group>
                         
@@ -17,6 +17,8 @@
                 <group>
                          
                     <field name="data_file" filename="name"/>
+                    <field name="appraisal_ids" widget="many2many_tags"/>
+                    
                 </group>
                 <footer>
                     <button name="post_normalisation_action" string="Upload Employee Scores" type="object"  class="oe_highlight"/>
@@ -41,15 +43,12 @@
         </field>	
 	</record>
 
-    <record id="action_wizard_hr_post_normalisation_record" model="ir.actions.act_window">
+    <!-- <record id="action_wizard_hr_post_normalisation_record" model="ir.actions.act_window">
         <field name="name">Post Normation</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">pms.post_normalisation.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
-    </record>
-
-    <menuitem id="view_post_normalisation_1_menu" name="Post Normalisation" sequence="6" parent="hr_pms.view_hr_pms_menu" groups="hr_pms.group_pms_user_id,base.group_user"/>
-    <menuitem id="view_post_normalisation_2_menu" name="Upload Post Normalisation Scores" sequence="1" parent="hr_pms.view_post_normalisation_1_menu" action="hr_pms.action_wizard_hr_post_normalisation_record" groups="hr_pms.group_pms_officer_id,base.group_user"/>
+    </record> -->
 
 </odoo>

@@ -979,6 +979,24 @@ class PMS_Appraisee(models.Model):
         for record in rec_ids:
             rec = self.env['pms.appraisee'].browse([record])
             rec.write({'instruction_html': rec.env.ref('hr_pms.pms_instruction_1').description})
+
+    def post_normalisation_upload_action(self):
+        rec_ids = self.env.context.get('active_ids', [])
+        return {
+              'name': 'Post Normalisation Upload',
+              'view_type': 'form',
+              "view_mode": 'form',
+              'res_model': 'pms.post_normalisation.wizard',
+              'type': 'ir.actions.act_window',
+              'target': 'new',
+              'context': {
+                  'default_appraisal_ids': rec_ids,
+                #   'default_date': fields.Datetime.now(),
+                #   'default_direct_employee_id': self.employee_id.id,
+                #   'default_resp':self.env.uid,
+              },
+        }
+
     
     def send_mail_notification(self, msg):
         subject = "Appraisal Notification"
