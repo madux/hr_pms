@@ -43,12 +43,5 @@
         </field>	
 	</record>
 
-    <!-- <record id="action_wizard_hr_post_normalisation_record" model="ir.actions.act_window">
-        <field name="name">Post Normation</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">pms.post_normalisation.wizard</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-    </record> -->
 
 </odoo>

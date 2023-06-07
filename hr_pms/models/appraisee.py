@@ -1,18 +1,11 @@
 from datetime import datetime, timedelta
-import time
-import base64
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import ValidationError, UserError
 from odoo import http
 import logging
-from lxml import etree
-import xlrd
-from xlrd import open_workbook
-import base64
+# from lxml import etree
 
 _logger = logging.getLogger(__name__)
-
 
 
 class PMS_Appraisee(models.Model):
