@@ -1173,7 +1173,8 @@ class PMS_Appraisee(models.Model):
         self.check_lc_section_lines()
         self.check_current_potential_assessment_section_lines()
         msg = """Dear {}, <br/> 
-        I wish to notify you that your appraisal has been reviewed successfully.\
+        I wish to notify you that your appraisal has been reviewed successfully.<br/>\
+        Kindly go to the 'Appraisees comment and Attachment Tab --> Select the perception on PMS options and then save.<br/>\
         Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
             self.employee_id.name,
             self.env.user.name,

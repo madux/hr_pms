@@ -559,7 +559,7 @@
                                     </group>
                                 </form>
                             </page>    
-                            <page name="app_section" string="Appraisee's Comment &amp; Attachments" invisible="0">
+                            <page name="app_section" string="Appraisee's Comment, Sign off &amp; Attachments" invisible="0">
                                 <separator string="Appraisee Section" colspan="4"/>
                                 <form string="">
                                     <group>
