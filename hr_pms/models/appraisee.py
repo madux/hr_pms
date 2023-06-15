@@ -1317,6 +1317,11 @@ class PMS_Appraisee(models.Model):
         #         template.reviewer_attachement_ids.write({'res_model': self._name, 'res_id': template.id})
         #         template.reviewer_attachement_set = 1
         # return res
+
+    draft_pms = fields.Integer(compute='_get_draft_pms')
+    admin_pms = fields.Integer(compute='_get_admin_pms')
+    functional_pms = fields.Integer(compute='_get_functional_pms')
+    reviewer_pms = fields.Integer(compute='_get_reviewer_pms')
     
     def _get_non_draft_pms(self):
         pms = self.env['pms.appraisee'].search_count([('state', '!=', 'draft')])
@@ -1338,6 +1343,14 @@ class PMS_Appraisee(models.Model):
     
     def _get_perception_pms(self, perception): 
         pms = self.env['pms.appraisee'].search_count([('appraisee_satisfaction', 'in', perception)])
+        return int(pms) if pms else 0
+    
+    def _get_admin_pms(self):
+        pms = self.env['pms.appraisee'].search_count([('state', '=', 'admin_rating')])
+        return int(pms) if pms else 0
+    
+    def _get_functional_pms(self):
+        pms = self.env['pms.appraisee'].search_count([('state', '=', 'functional_rating')])
         return int(pms) if pms else 0
     
     def _get_reviewer_pms(self):
