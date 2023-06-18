@@ -170,11 +170,55 @@
                                 </form>
                             </page>
                             <page name="section_line_ids" string="Sections" attrs="{'invisible': [('is_current_user', '=', True)]}">
-                                <separator string="SECTION (A) - KRA / Achievement(s)" colspan="4"/>
-							    <p style="color: red;" attrs="{'invisible': [('instruction_html', '!=', False)]}">* Minimum of 5 lines and Maximun of 7 Lines to be added on this section </p>
-							    <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 4 scale, where 4 is the HIGHEST rating </p>
-							    <p style="color: red;">* KRA Lines should be Minimum of 5 lines and Maximum of 7 Lines </p>
                                 
+                                <separator string="SECTION (A) - KRA / Achievement(s)" colspan="4"/>
+							    <div class="row" attrs="{'invisible': [('type_of_pms', '!=', 'hyr')]}">
+                                    <p style="color: red;" attrs="{'invisible': [('instruction_html', '!=', False)]}">* Minimum of 5 lines and Maximun of 7 Lines to be added on this section </p>
+                                    <p style="color: red;">* Instructions: At this stage, kindly add the target weightage. No score rating is done at this point </p>
+                                    <p style="color: red;">* Only Administrative or Functional managers are expected to fill at this stage</p>
+                                </div>
+                                <field name="hyr_kra_section_line_ids" options="{'no_quick_create':True,'no_open': True}" 
+                                    attrs="{
+                                        'readonly': [('state', 'not in', ['draft', 'admin_rating', 'functional_rating', 'reviewer_rating'])],
+                                        'invisible': [('type_of_pms', '!=', 'hyr')]
+                                        }">
+                                    <tree string="Half year review KRA Sections" delete="true" editable="bottom" options="{'no_create':True, 'no_open': False}">
+                                        <field name="name" required="1" attrs="{'readonly': [('state', 'not in', ['hyr_draft'])]}"/> 
+                                        <field name="state" invisible="1" force_save="1"/> 
+                                        <field name="appraisee_weightage" required="1" attrs="{'readonly': [('state', 'not in', ['hyr_draft'])],
+                                        'required': [('state', 'in', ['hyr_draft'])]}" sum="total"/>
+                                        <!-- self rating only for KRAs -->
+                                        <field name="weightage" required="1" sum="total" attrs="{'readonly': [('state', 'not in', ['hyr_functional_rating'])],
+                                        'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'in', ['hyr_draft', 'hyr_admin_rating'])]}" />
+                                        <!-- <field name="self_rating" force_save="1" invisible="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/> -->
+                                        <field name="hyr_kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
+                                        <field name="is_required" force_save="1" invisible="1"/> 
+                                        <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
+                                        <field name="is_functional_manager" force_save="1" invisible="1"/> 
+                                        <field name="is_administrative_supervisor" force_save="1" invisible="1"/> 
+                                        <field name="is_reviewer" force_save="1" invisible="1"/>
+                                    </tree>
+                                    <form string="">
+                                        <group>
+                                            <group>
+                                                <field name="name" required="1" attrs="{'readonly': [('state', 'not in', ['hyr_draft'])]}"/> 
+                                                <field name="appraisee_weightage" required="1" attrs="{'readonly': [('state', 'not in', ['hyr_draft'])],
+                                                'required': [('state', 'in', ['hyr_draft'])]}" sum="total"/>
+                                                <!-- self rating only for KRAs -->
+                                                <field name="weightage" required="1" sum="total" attrs="{'readonly': [('state', 'not in', ['hyr_functional_rating'])],
+                                                'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'in', ['hyr_draft', 'hyr_admin_rating'])]}" />
+                                                <!-- <field name="self_rating" force_save="1" invisible="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/> -->
+                                        
+                                            </group>
+                                            <group>
+                                                <field name="state" invisible="1" force_save="1"/>
+                                                <field name="hyr_kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
+                                            </group>
+                                        </group>
+                                    </form>
+                                </field>
+                                
+
                                 <field name="kra_section_line_ids" 
                                     required="1" options="{'no_quick_create':True,'no_open': True}" 
                                     attrs="{'readonly': [('state', 'not in', ['draft', 'admin_rating', 'functional_rating', 'reviewer_rating'])]}"

@@ -193,6 +193,11 @@ class PMS_Appraisee(models.Model):
         ('totally_disagreed', 'Totally Disagreed'),
         ], string="Perception on PMS", default = "none", 
         tracking=True, copy=False)
+    type_of_pms = fields.Selection([
+        ('hyr', 'Half year review'),
+        ('fyr', 'Full year review'),
+        ], string="Type of PMS", default = "hyr", 
+        copy=True)
     line_manager_id = fields.Many2one(
         'hr.employee', 
         string="Line Manager"
@@ -208,6 +213,12 @@ class PMS_Appraisee(models.Model):
         "kra_section_id",
         string="KRAs",
         copy=True
+    )
+    hyr_kra_section_line_ids = fields.One2many(
+        "hyr.kra.section.line",
+        "hyr_kra_section_id",
+        string="HYR KRAs",
+        copy=False
     )
     lc_section_line_ids = fields.One2many(
         "lc.section.line",
@@ -245,6 +256,9 @@ class PMS_Appraisee(models.Model):
         string="Quality check section"
     )
     state = fields.Selection([
+        ('hyr_draft', 'Draft'),
+        ('hyr_admin_rating', 'Admin Supervisor'),
+        ('hyr_functional_rating', 'Functional Supervisor'),
         ('draft', 'Draft'),
         ('admin_rating', 'Administrative Appraiser'),
         ('functional_rating', 'Functional Appraiser'),
