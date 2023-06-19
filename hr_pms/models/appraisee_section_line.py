@@ -92,6 +92,18 @@ class KRA_SectionLine(models.Model):
         string="Is required", 
         default=False
         )
+    hyr_fa_rating = fields.Selection([
+        ('none', ''),
+        ('poor_average', 'Poor Average'),
+        ('good_average', 'Good Average'),
+        ('excellent', 'Excellent'),
+        ], string="FA(HYR) Review", default = "", readonly=False)
+    hyr_aa_rating = fields.Selection([
+        ('none', ''),
+        ('poor_average', 'Poor Average'),
+        ('good_average', 'Good Average'),
+        ('excellent', 'Excellent'),
+        ], string="AA(HYR) Review", default = "", readonly=False)
     
     @api.onchange('appraisee_weightage')
     def onchange_appraisee_weightage(self):

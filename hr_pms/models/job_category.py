@@ -38,7 +38,11 @@ class PMSJobCategory(models.Model):
     
     pms_year_id = fields.Many2one(
         'pms.year', string="Period")
-    
+    type_of_pms = fields.Selection([
+        ('hyr', 'Half year review'),
+        ('fyr', 'Full year review'),
+        ], string="Type of PMS", default = "", 
+        copy=True)
     date_from = fields.Date(
         string="Date From", 
         readonly=False, 
@@ -212,6 +216,7 @@ class PMSJobCategory(models.Model):
                         'department_id': department_id.id,
                         'department_manager_id': department_id.manager_id.id,
                         'pms_year_id': self.pms_year_id.id,
+                        'type_of_pms': self.type_of_pms,
                         'date_from': self.pms_year_id.date_from,
                         'date_end': self.pms_year_id.date_end,
                         'deadline': self.deadline,

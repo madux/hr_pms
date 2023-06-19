@@ -128,6 +128,11 @@ class PMSDepartment(models.Model):
         "pms_department_id",
         string="Department Section Lines"
     )
+    type_of_pms = fields.Selection([
+        ('hyr', 'Half year review'),
+        ('fyr', 'Full year review'),
+        ], string="Type of PMS", default = "", 
+        copy=True)
     active = fields.Boolean(
         string="Active", 
         readonly=True, 
@@ -237,6 +242,7 @@ class PMSDepartment(models.Model):
                         'employee_id': emp.id, 
                         'pms_department_id': self.id,
                         'pms_year_id': self.pms_year_id.id,
+                        'type_of_pms': self.type_of_pms,
                         'date_from': self.pms_year_id.date_from,
                         'date_end': self.pms_year_id.date_end,
                         'deadline': self.deadline,
