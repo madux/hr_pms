@@ -49,17 +49,18 @@ class HYR_KRA_SectionLine(models.Model):
         compute="compute_user_rating_role"
         )
     state = fields.Selection([
-        ('hyr_draft', 'Draft'),
-        ('hyr_admin_rating', 'Admin Supervisor'),
-        ('hyr_functional_rating', 'Functional Supervisor'),
-        ('draft', 'Draft'),
-        ('admin_rating', 'Admin Supervisor'),
-        ('functional_rating', 'Functional Supervisor'),
+        ('hyr_draft', 'Half Year Review'),
+        ('hyr_admin_rating', 'Admin Supervisor(HYR)'),
+        ('hyr_functional_rating', 'Functional Appraiser(HYR)'),
+        ('draft', 'Start Full Year Review'),
+        ('admin_rating', 'Administrative Appraiser'),
+        ('functional_rating', 'Functional Appraiser'),
         ('reviewer_rating', 'Reviewer'),
         ('wating_approval', 'HR to Approve'),
-        ('done', 'Done'),
-        ('withdraw', 'Withdrawn'),
-        ], string="Status", default = "draft", readonly=True, related="hyr_kra_section_id.state")
+        ('done', 'Completed'),
+        ('signed', 'Signed Off'),
+        ('withdraw', 'Withdrawn'), 
+        ], string="Status", readonly=True, related="hyr_kra_section_id.state")
     hyr_fa_rating = fields.Selection([
         ('none', ''),
         ('poor_average', 'Poor Average'),

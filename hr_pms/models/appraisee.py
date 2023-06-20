@@ -255,7 +255,7 @@ class PMS_Appraisee(models.Model):
     )
     state = fields.Selection([
         ('hyr_draft', 'Half Year Review'),
-        ('hyr_admin_rating', 'Admin Supervisor'),
+        ('hyr_admin_rating', 'Admin Supervisor(HYR)'),
         ('hyr_functional_rating', 'Functional Appraiser(HYR)'),
         ('draft', 'Start Full Year Review'),
         ('admin_rating', 'Administrative Appraiser'),
@@ -1563,8 +1563,10 @@ class PMS_Appraisee(models.Model):
         return total_overdue_ids
     
     def compute_current_user(self):
+        '''This function ensures that the employee does not see
+        the section tab when the stage is currently in the FA, AA , FR Stage'''
         for rec in self:
-            if rec.employee_id.user_id.id == self.env.user.id and rec.state not in ['draft','done', 'signed']:
+            if rec.employee_id.user_id.id == self.env.user.id and rec.state not in ['hyr_draft', 'draft','done', 'signed']:
                 rec.is_current_user = True
             else:
                 rec.is_current_user = False
