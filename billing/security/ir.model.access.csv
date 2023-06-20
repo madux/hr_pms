@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_id_user_res_partner,access_name_user_res_partner,model_res_partner,billing_system.group_pms_user_id,1,0,0,0
+access_id_head_res_partner,access_name_head_res_partner,model_res_partner,billing_system.group_billing_head_id,1,1,1,0
+access_id_manager_res_partner,access_name_manager_res_partner,model_res_partner,billing_system.group_billing_manager_id,1,1,1,1
+access_id_data_center_res_partner,access_name_data_center_res_partner,model_res_partner,billing_system.group_billing_data_center_id,1,1,1,1
