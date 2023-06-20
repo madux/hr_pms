@@ -1128,7 +1128,7 @@ class PMS_Appraisee(models.Model):
             raise ValidationError('You have exceeded deadline for the submission of your appraisal')
 
     def validate_hyr_rating(self):
-        hyr_lines = self.mapped('hyr_kra_section_line_ids')
+        hyr_lines = self.mapped('hyr_kra_section_line_ids').filtered(lambda hyr: hyr.is_approved == True)
         validity_msg = []
         msg = """You cannot submit this appraisal if all KRA lines are not completely rated"""
         if self.state == "hyr_admin_rating":
@@ -1143,7 +1143,7 @@ class PMS_Appraisee(models.Model):
                 validity_msg.append(msg)
             if self.manager_comment == "":
                 validity_msg.append("""Please Ensure you provide manager's comment""")
-            sum_reverse_weightage_weightage = sum([weight.reverse_weightage for weight in self.mapped('hyr_kra_section_line_ids')])
+            sum_reverse_weightage_weightage = sum([weight.reverse_weightage for weight in self.mapped('hyr_kra_section_line_ids').filtered(lambda hyr: hyr.is_approved == True)])
             weightage = sum([weight.weightage for weight in self.mapped('hyr_kra_section_line_ids')])
             if weightage != 100:
                 value_diff = 100 - weightage 
@@ -1257,7 +1257,7 @@ class PMS_Appraisee(models.Model):
                 'functional_supervisor_rating': 0,
                 'hyr_fa_rating': hyr_line.hyr_fa_rating,
                 'hyr_aa_rating': hyr_line.hyr_aa_rating,
-                }) for hyr_line in self.hyr_kra_section_line_ids],
+                }) for hyr_line in self.mapped('hyr_kra_section_line_ids').filtered(lambda hyr: hyr.is_approved == True)],
         })
 
     def button_submit(self):

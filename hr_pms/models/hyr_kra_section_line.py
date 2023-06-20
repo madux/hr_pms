@@ -48,6 +48,10 @@ class HYR_KRA_SectionLine(models.Model):
         default=False,
         compute="compute_user_rating_role"
         )
+    is_approved = fields.Boolean(
+        string="is Approved", 
+        default=False,
+        )
     state = fields.Selection([
         ('hyr_draft', 'Half Year Review'),
         ('hyr_admin_rating', 'Admin Supervisor(HYR)'),
@@ -124,6 +128,12 @@ class HYR_KRA_SectionLine(models.Model):
             self.is_reviewer = True if current_user == self.hyr_kra_section_id.employee_id.reviewer_id.user_id.id else False
         else:
             self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
+    
+    def action_approve(self):
+        self.is_approved = True
+
+    def action_reject(self):
+        self.is_approved = False
 
     def unlink(self):
         for delete in self.filtered(lambda delete: delete.state not in ['hyr_draft']):

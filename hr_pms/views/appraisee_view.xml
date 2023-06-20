@@ -220,7 +220,7 @@
                                         'invisible': [('type_of_pms', '!=', 'hyr')]
                                         }"
                                 context="{'default_state': state}">
-                                    <tree string="Half year review KRA Sections" delete="true" editable="bottom" options="{'no_create':False, 'no_open': False}">
+                                    <tree string="Half year review KRA Sections" delete="true" editable="bottom" options="{'no_create':False, 'no_open': False}" decoration-success="is_approved == True" decoration-danger="is_approved == False">
                                         <field name="name" required="1" attrs="{'readonly': [('state', 'not in', ['hyr_draft'])]}"/> 
                                         <field name="state" invisible="1" force_save="1"/> 
                                         <field name="appraisee_weightage" required="1" attrs="{'readonly': [('state', 'not in', ['hyr_draft'])],
@@ -234,10 +234,13 @@
                                         <field name="reverse_weightage" force_save="1" required="0" attrs="{'readonly': [('state', 'not in', ['hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_functional_rating'])]}"/>
                                         <field name="hyr_kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
+                                        <button name="action_approve" type="object" title="Approve" icon="fa-check" attrs="{'invisible': [('state', '!=', 'hyr_functional_rating'), ('is_functional_manager', '!=', True)]}"/>
+                                        <button name="action_reject" type="object" title="Reject" icon="fa-times" attrs="{'invisible': [('state', '!=', 'hyr_functional_rating'), ('is_functional_manager', '!=', True)]}"/>
                                         <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
                                         <field name="is_functional_manager" force_save="1" invisible="1"/> 
                                         <field name="is_administrative_supervisor" force_save="1" invisible="1"/> 
                                         <field name="is_reviewer" force_save="1" invisible="1"/>
+                                        <field name="is_approved" force_save="1" invisible="1"/>
                                     </tree>
                                     <form string="">
                                         <group>
