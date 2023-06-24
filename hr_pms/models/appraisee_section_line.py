@@ -68,7 +68,10 @@ class KRA_SectionLine(models.Model):
         default=False,
         compute="compute_user_rating_role"
         )
-
+    target = fields.Char(
+        string='Target', 
+        size=8
+        )
     state = fields.Selection([
         ('draft', 'Draft'),
         ('admin_rating', 'Admin Supervisor'),

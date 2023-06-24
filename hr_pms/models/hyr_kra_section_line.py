@@ -24,15 +24,31 @@ class HYR_KRA_SectionLine(models.Model):
     weightage = fields.Float(
         string='FA Weight (Total 100%)', 
         )
-    
-    reverse_weightage = fields.Float(
-        string='Reverse Weightage (Total 100%)', 
+    revise_weightage = fields.Float(
+        string='Revise Weight', 
         store=True
         )
     
-    appraisee_weightage = fields.Float(
-        string='Weight (Total 100%)',
+    target = fields.Char(
+        string='Target', 
+        size=8
         )
+    revise_target = fields.Char(
+        string='Revise Target', 
+        size=8
+        )
+    
+    acceptance_status = fields.Selection([
+        ('none', ''),
+        ('Rejected', 'Rejected'),
+        ('Accepted', 'Accepted'),
+        ('Dropped', 'Dropped'),
+        ], string="Acceptance status", default = "Accepted", readonly=False)
+    
+    fa_comment = fields.Text(
+        string='Comment(s)', 
+        )
+    
     is_functional_manager = fields.Boolean(
         string="is functional manager", 
         default=False,
@@ -49,6 +65,7 @@ class HYR_KRA_SectionLine(models.Model):
         compute="compute_user_rating_role"
         )
     state = fields.Selection([
+        ('goal_setting_draft', 'Goal Settings'),
         ('hyr_draft', 'Draft'),
         ('hyr_admin_rating', 'Admin Supervisor'),
         ('hyr_functional_rating', 'Functional Supervisor'),
@@ -66,6 +83,13 @@ class HYR_KRA_SectionLine(models.Model):
         ('good_average', 'Good Average'),
         ('excellent', 'Excellent'),
         ], string="FA Review", default = "", readonly=False)
+    is_current_user = fields.Boolean(
+        default=False, 
+        compute="compute_current_user", 
+        store=False,
+        help="Used to determine what the appraisee sees"
+        )
+    
     hyr_aa_rating = fields.Selection([
         ('none', ''),
         ('poor_average', 'Poor Average'),
@@ -78,7 +102,30 @@ class HYR_KRA_SectionLine(models.Model):
         store=True,
         compute="compute_weighted_score"
         )
-    
+    # enable_line_edit: this helps to make name, weight and target field to become editable
+    enable_line_edit = fields.Selection([
+        ('yes', 'Yes'),
+        ('no', 'No'),
+        ],
+        string="Enable line edit-", default="yes",
+        )
+
+    @api.onchange(
+        'acceptance_status', 
+        )
+    def onchange_acceptance_status(self):
+        if self.acceptance_status and self.acceptance_status in ["none", "Dropped", "Rejected"]:
+            self.sudo().write({
+                'revise_weightage': 0,
+                # enable_line_edit: this helps to make name, weight and target field to become editable
+                # 'enable_line_edit': True,
+                })
+        elif self.acceptance_status and self.acceptance_status in ["", "Accepted"]:
+            self.sudo().write({
+                'revise_weightage': self.weightage, 
+                # 'enable_line_edit': "no",
+                })
+
     @api.onchange(
         'hyr_rating', 
         )
@@ -101,14 +148,24 @@ class HYR_KRA_SectionLine(models.Model):
         if self.weightage > 0 and self.weightage not in range (5, 26):
             self.weightage = 0
             raise UserError('Weightage must be within the range of 5 to 25')
-        self.reverse_weightage = self.weightage
+        self.revise_weightage = self.weightage
     
-    @api.onchange('appraisee_weightage',)
-    def onchange_appraisee_weightage(self):
-        if self.appraisee_weightage > 0 and self.appraisee_weightage not in range (5, 26):
-            self.appraisee_weightage = 0
-            raise UserError('Appraisee Weightage must be within the range of 5 to 25')
-             
+    @api.onchange('target')
+    def onchange_target(self):
+        self.revise_target = self.target
+    
+    # @api.onchange('appraisee_weightage',)
+    # def onchange_appraisee_weightage(self):
+    #     if self.appraisee_weightage > 0 and self.appraisee_weightage not in range (5, 26):
+    #         self.appraisee_weightage = 0
+    #         raise UserError('Appraisee Weightage must be within the range of 5 to 25')
+    def compute_current_user(self):
+        for rec in self:
+            if rec.hyr_kra_section_id.employee_id.user_id.id == self.env.user.id:
+                rec.is_current_user = True
+            else:
+                rec.is_current_user = False
+
     @api.depends('hyr_kra_section_id')
     def compute_user_rating_role(self):
         """

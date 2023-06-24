@@ -39,6 +39,7 @@ class PMSJobCategory(models.Model):
     pms_year_id = fields.Many2one(
         'pms.year', string="Period")
     type_of_pms = fields.Selection([
+        ('gs', 'Goal Setting'),
         ('hyr', 'Half year review'),
         ('fyr', 'Full year review'),
         ], string="Type of PMS", default = "", 

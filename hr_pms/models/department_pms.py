@@ -129,9 +129,10 @@ class PMSDepartment(models.Model):
         string="Department Section Lines"
     )
     type_of_pms = fields.Selection([
+        ('gs', 'Goal Setting'),
         ('hyr', 'Half year review'),
         ('fyr', 'Full year review'),
-        ], string="Type of PMS", default = "", 
+        ], string="Type of PMS", default = "gs", 
         copy=True)
     active = fields.Boolean(
         string="Active", 
