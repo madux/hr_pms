@@ -19,11 +19,12 @@
                             <field name="user_class_id"/>
                             <field name="tarrif_name"/>
                             <field name="tarrif_rate"/>
-                            <field name="customer_ids"/>
+                            <field name="customer_id"/>
                             <field name="prev_balance"/>
                             <field name="last_payment"/>
                             <field name="net_arreas"/>
                         </group>
+                        <group>
                             <field name="prev_read"/>
                             <field name="current_read"/>
                             <field name="number_class"/>
@@ -38,7 +39,6 @@
                             <field name="vat"/>
                             <field name="month_due"/>
                             <field name="total_due"/>
-                        <group>
                         </group>
                     </group>
                 </sheet>
@@ -63,5 +63,58 @@
             </tree>
         </field>
     </record> -->
+
+    <record id="action_feeder_reading_view_id" model="ir.actions.act_window">
+		<field name="name">Feeder Reading</field>
+		<field name="res_model">feeder.reading</field>
+		<field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+		<field name="view_id" eval="False"/>
+		<field name="help" type="html">
+			<p class="oe_view_noconten_create">
+				No Feeder Reading yet.
+			</p>
+		</field>
+	</record>
+
+    <record id="action_feeder_customer_details_view_id" model="ir.actions.act_window">
+		<field name="name">Customer Billing</field>
+		<field name="res_model">feeder.customer.details</field>
+		<field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+		<field name="view_id" eval="False"/>
+		<field name="help" type="html">
+			<p class="oe_view_noconten_create">
+				No Customer Bills yet.
+			</p>
+		</field>
+	</record>
+
+    <record id="action_feeder_feeder_view_id" model="ir.actions.act_window">
+		<field name="name">Feeder</field>
+		<field name="res_model">feeder.feeder</field>
+		<field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+		<field name="view_id" eval="False"/>
+		<field name="help" type="html">
+			<p class="oe_view_noconten_create">
+				No Feeder created yet.
+			</p>
+		</field>
+	</record>
+
+    <record id="action_feeder_transformer_view_id" model="ir.actions.act_window">
+		<field name="name">Transformer</field>
+		<field name="res_model">feeder.transformer</field>
+		<field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+		<field name="view_id" eval="False"/>
+		<field name="help" type="html">
+			<p class="oe_view_noconten_create">
+				No Transformer created yet.
+			</p>
+		</field>
+	</record>
+
 
 </odoo>

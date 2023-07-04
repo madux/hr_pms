@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="hr_view_employee_inherited_form_for_pms" >
+            <field name="name">hr.employee</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form" />
+            <field name="arch" type="xml"> 
+                <field name="work_email" position="before">
+                    <field name="employee_number" required="1"/>
+                </field>
+                <field name="work_email" position="after">
+                    <field name="address_home"/>
+                </field>
+
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="hr_view_employee_filter_pms_inherited" >
+            <field name="name">hr.employee</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_filter" />
+            <field name="arch" type="xml"> 
+                <field name="name" position="after">
+                    <field name="employee_number" string="Staff Number"/>   
+                </field>
+ 
+            </field>
+        </record>
+    </data>
+</odoo>

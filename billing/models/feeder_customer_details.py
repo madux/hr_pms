@@ -12,7 +12,7 @@ class FeederCustomerDetails(models.Model):
     #user_tarrif = fields.Many2one('feeder.extension', string='New tarrif')
     tarrif_name =  fields.Char()
     tarrif_rate = fields.Integer()
-    customer_ids = fields.Many2one('customer.billing.details')
+    customer_id = fields.Many2one('res.partner')
     prev_balance = fields.Float()
     last_payment = fields.Float()
     net_arreas = fields.Float()
@@ -59,9 +59,28 @@ class FeederCustomerDetails(models.Model):
     class FeederTransformer(models.Model):
         _name = 'feeder.transformer'
 
+        name = fields.Char(required=True, string='Transformer Name')
+        loc_address = fields.Char(required=True)
+        book_ids = fields.One2many('book.feeder', 'transformer_id')
+        feeder_id = fields.Many2one('feeder.feeder')
+
     
     class FeederFeeder(models.Model):
         _name = 'feeder.feeder'
+
+        name = fields.Char(required=True, string='Feeder Name')
+        code = fields.Char(required=True, string='Feeder code')
+        district_id = fields.Many2one('res.district', string='District')
+        loc_state = fields.Char(required=True, string='State')
+        state = fields.Selection(
+            selection=[
+                ('active', 'Active'),
+                ('suspended', 'Suspended')
+            ],
+            string='Status'
+        )
+        injection_id = fields.Many2one('injection.substation')
+        created_by = fields.Many2one('res.users', string='Created By')
 
     
     class FeederReading(models.Model):
