@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.billing</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- <xpath expr="//field[@name='name']" position="after">
+                <field name="vat"/>
+            </xpath> -->
+            <!-- <field name="category_id" position="after">
+                    <field name="book_id" widget="many2many_tags"/>
+             </field> -->
+            <notebook position="inside">
+                <page name="sales and purchases" string="SALES AND PURCHASES">
+                </page>
+                <page name="invoicing" string="INVOICING">
+                </page>
+                <page name="generated_bills" string="GENERATED BILLS">
+                    <field name="bill_ids">
+                        <tree editable="bottom">
+                            <field name="create_date"/>
+                            <field name="transformer_id"/>
+                            <field name="feeder_id"/>
+                            <field name="user_class_id"/>
+                            <field name="create_date"/>
+                            <field name="prev_read"/>
+                            <field name="current_read"/>
+                            <field name="consumed"/>
+                            <field name="amount"/>
+                        </tree>
+                        <!-- <form>
+                            <sheet>
+                                <field name="create_date"/>
+                                <field name="transformer_id"/>
+                                <field name="feeder_id"/>
+                                <field name="user_class_id"/>
+                                <field name="create_date"/>
+                                <field name="prev_read"/>
+                                <field name="current_read"/>
+                                <field name="consumed"/>
+                                <field name="amount"/>
+                            </sheet>
+                        </form>  -->
+                    </field>
+                </page>
+                <page name="electricity details" string="ELECTRICITY DETAILS">
+                    <group>
+                        <group>
+                            <field name="feeder_id"/>
+                            <field name="transformer_id"/>
+                            <field name="book_id"/>
+                            <field name="marketer"/>
+                            <field name="service_center_id"/>
+                        </group>
+                        <group>
+                            <field name="customer_class_id"/>
+                            <field name="band"/>
+                            <field name="customer_account"/>
+                            <field name="old_account_no"/>
+                            <field name="juice_location_id"/>
+                        </group>
+                    </group>
+                </page>
+                <page name="meter details" string="METER DETAILS">
+                </page>
+                <page name="support ticket" string="SUPPORT TICKET">
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <!-- <record id="view_users_kanban" model="ir.ui.view">
+        <field name="name">res.partner.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban records_draggable="0">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div>
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                            </div>
+                            <div>
+                                Phone: <field name="phone"/>
+                            </div>
+                            <div>
+                                Email: <field name="email"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record> -->
+
+    <record id="view_res_partner_kanban" model="ir.ui.view">
+        <field name="name">res.partner.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <div class="oe_kanban_description">
+                                    <field name="name"/>
+                                    <field name="phone"/>
+                                    <field name="email"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_res_partner_conf_tree" model="ir.ui.view">
+        <field name="name">res.partner.tree</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="book_id">
+                    <tree>
+                        <field name="transformer_id"/>
+                        <field name="service_center_id"/>
+                    </tree>
+                </field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_res_district_form" model="ir.ui.view">
+        <field name="name">res.district.form</field>
+        <field name="model">res.district</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <!-- <div>
+                        <field name=""/>
+                    </div> -->
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="loc_state"/>
+                        </group>
+                        <group>
+                            <field name="code"/>
+                            <field name="injection_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="feeders" string="FEEDERS">
+                            <field name="feeder_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="district_id"/>
+                                    <field name="created_by"/>
+                                    <field name="loc_state"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field> 
+                        </page>
+                        <page name="service_centers" string="SERVICE CENTERS">
+                            <field name="service_center_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                </tree>
+                            </field>
+                            
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_res_district_tree" model="ir.ui.view">
+        <field name="name">res.district.tree</field>
+        <field name="model">res.district</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_res_partner_view_id" model="ir.actions.act_window">
+		<field name="name">Customers</field>
+		<field name="res_model">res.partner</field>
+		<field name="view_mode">tree,form</field>
+        <field name="domain">['|', ('book_id', '!=', False), ('book_id', '=', False)]</field>
+		<field name="view_id" eval="False"/>
+		<field name="help" type="html">
+			<p class="oe_view_nocontent_create">
+				No customer added yet.
+			</p>
+		</field>
+	</record>
+
+    <record id="action_res_partner_conf_view_id" model="ir.actions.act_window">
+		<field name="name">Customers</field>
+		<field name="res_model">res.partner</field>
+		<field name="view_mode">tree</field>
+        <field name="domain">[]</field>
+		<field name="view_id" ref="billing.view_res_partner_conf_tree"/>
+		<field name="help" type="html">
+			<p class="oe_view_noconten_create">
+				No customer yet.
+			</p>
+		</field>
+	</record>
+
+    <record id="action_res_district_view_id" model="ir.actions.act_window">
+		<field name="name">Districts</field>
+		<field name="res_model">res.district</field>
+		<field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+		<field name="view_id" eval="False"/>
+		<field name="help" type="html">
+			<p class="oe_view_noconten_create">
+				No district added yet.
+			</p>
+		</field>
+	</record>
+
+     <record id="action_res_partner_kanban" model="ir.actions.act_window">
+        <field name="name">Customers</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create new customers here.
+            </p>
+        </field>
+    </record>
+
+</odoo>

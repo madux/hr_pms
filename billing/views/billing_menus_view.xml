@@ -1,0 +1,24 @@
+<odoo>
+
+    <menuitem id="view_billing_system_menu" name="Billing System" sequence="1"/>
+    <!-- <menuitem id="view_res_partner_menu" name="Customers" sequence="1" parent="billing.view_billing_system_menu" action="billing.action_res_partner_view_id"/> -->
+    <menuitem id="view_res_partner_kanban_menu" name="Customers" sequence="1" parent="billing.view_billing_system_menu" action="billing.action_res_partner_kanban"/>
+
+    <menuitem id="view_billing_menu" name="Billing" sequence="2" parent="billing.view_billing_system_menu"/>
+    <menuitem id="view_feeder_reading_menu" name="Feeder Reading" sequence="1" parent="billing.view_billing_menu" action="billing.action_feeder_reading_view_id"/>
+    <menuitem id="view_feeder_reading_menu" name="Customer Billing" sequence="2" parent="billing.view_billing_menu" action="billing.action_feeder_customer_details_view_id"/>
+
+    <menuitem id="view_meter_menu" name="Meter Menu" sequence="3" parent="billing.view_billing_system_menu"/>
+    <menuitem id="view_meter_details_menu" name="Meter Details" sequence="1" parent="billing.view_meter_menu" action="billing.action_meter_details_view_id"/>
+
+    <menuitem id="view_configuration_menu" name="Configuration" sequence="4" parent="billing.view_billing_system_menu"/>
+    <menuitem id="view_injection_substation_menu" name="Injection Substation" sequence="1" parent="billing.view_configuration_menu" action="billing.action_injection_substation_view_id"/>
+    <menuitem id="view_res_district_menu" name="District" sequence="2" parent="billing.view_configuration_menu" action="billing.action_res_district_view_id"/>
+    <menuitem id="view_feeder_feeder_menu" name="Feeder" sequence="3" parent="billing.view_configuration_menu" action="billing.action_feeder_feeder_view_id"/>
+    <menuitem id="view_feeder_transformer_menu" name="Transformer" sequence="4" parent="billing.view_configuration_menu" action="billing.action_feeder_transformer_view_id"/>
+    <menuitem id="view_service_center_menu" name="Service Center" sequence="5" parent="billing.view_configuration_menu" action="billing.action_service_center_view_id"/>
+    <menuitem id="view_book_feeder_menu" name="Book" sequence="6" parent="billing.view_configuration_menu" action="billing.action_book_feeder_view_id"/>
+    <menuitem id="view_feeder_customer_details_menu" name="Customer Class" sequence="7" parent="billing.view_configuration_menu" action="billing.action_feeder_customer_details_view_id"/>
+    <menuitem id="view_marketer_view_menu" name="Marketer" sequence="8" parent="billing.view_configuration_menu" action="billing.action_marketer_view_id"/>
+    <menuitem id="view_res_partner_conf_menu" name="Electricity Details" sequence="9" parent="billing.view_configuration_menu" action="billing.action_res_partner_conf_view_id"/>
+</odoo>

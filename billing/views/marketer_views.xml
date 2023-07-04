@@ -1,0 +1,73 @@
+<odoo>
+    <record id="view_marketer_form" model="ir.ui.view">
+        <field name="name">marketer.form</field>
+        <field name="model">marketer</field>
+        <field name="arch" type="xml">
+            <form>
+                <!-- <div class="alert alert-warning oe_edit_only" role="alert" attrs="{'invisible': [('same_employee_id', '=', False)]}">
+                  There is already an existing Marketerwith the same<span><span class="o_vat_label">Employee ID</span></span>, (<field name="same_employee_id"/>), do you still want to continue?
+                </div> -->
+                <sheet>
+                    <!-- <div>
+                        <field name=""/>
+                    </div> -->
+                    <div class="oe_edit_only" groups="billing.group_billing_manager_id">
+                        <label for="employee_id"/>
+                        <field name="employee_id" string="Employee"/>
+                    </div>
+                    <group>
+                        <group>
+                            <!-- <field name="employee_id"/> -->
+                            <field name="name"/>
+                            <field name="service_center_id"/>
+                            <field name="emp_phone"/>
+                            <field name="emp_no"/>
+                            <field name="emp_address"/>
+                        </group>
+                        <group>
+                            <field name="code"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="books" string="BOOKS">
+                            <field name="book_feeder_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="service_center_id"/>
+                                </tree>
+                            </field>
+                            
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_marketer_tree" model="ir.ui.view">
+        <field name="name">marketer.tree</field>
+        <field name="model">marketer</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_marketer_view_id" model="ir.actions.act_window">
+		<field name="name">Marketers</field>
+		<field name="res_model">marketer</field>
+		<field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+		<field name="view_id" eval="False"/>
+		<field name="help" type="html">
+			<p class="oe_view_noconten_create">
+				No Marketer Created yet.
+			</p>
+		</field>
+	</record>
+
+
+</odoo>

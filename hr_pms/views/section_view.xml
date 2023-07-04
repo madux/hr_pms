@@ -13,6 +13,7 @@
                     <group>
                         <group>
                             <field name="type_of_section" readonly="0"/> 
+                            <field name="min_line_number" required="0"/> 
                             <field name="max_line_number" required="0"/> 
                             
                         </group>
@@ -26,7 +27,7 @@
                         <page name="section_line_ids" string="Sections" invisible="0">
                             <field name="section_line_ids" 
                                 required="1" options="{'no_quick_create':True}">
-                                <tree string="Unit standards" delete="true" editable="bottom">
+                                <tree string="" delete="true" editable="bottom">
                                     <field name="name" required="1"/> 
                                     <field name="is_required"/> 
                                     <field name="section_id" invisible="1"/> 
@@ -42,9 +43,10 @@
 			<field name="name">view.pms.section.tree</field>
 			<field name="model">pms.section</field>
 			<field name="arch" type="xml">
-				<tree string="section" sample="1" multi_edit="1" create="0">
+				<tree string="section">
                     <field name="name"/>
                     <field name="type_of_section" readonly="0"/> 
+                    <field name="min_line_number" required="0"/> 
                     <field name="max_line_number" required="0"/> 
                     <field name="pms_category_id" readonly="1"/> 
                     <field name="section_avg_scale" required="1"/> 
@@ -85,6 +87,6 @@
 			</field>
 		</record>
 
-    <menuitem id="view_pms_section_menu" name="Sections" sequence="4" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_section_view"
+    <menuitem id="view_pms_section_menu" name="Sections" sequence="20" parent="hr_pms.view_hr_pms_config_menu" action="hr_pms.action_pms_section_view"
     groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_supervisor"/>
 </odoo>
