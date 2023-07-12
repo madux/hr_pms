@@ -28,6 +28,15 @@ class GoalSettingSectionLine(models.Model):
         string='Target', 
         size=24
         )
+    pms_uom = fields.Selection([
+        ('Desc', 'Desc'),
+        ('Naira', 'Naira'),
+        ('Percentage', 'Percentage'),
+        ('Day', 'Day(s)'),
+        ('Week', 'Week(s)'),
+        ('Month', 'Month(s)'),
+        ('Others', 'Others'),
+        ], string="Unit of Measure", default = "")
     # target_uom = fields.Many2one(
     #     'pms.uom',
     #     string="Goal Setting Section"
@@ -39,7 +48,7 @@ class GoalSettingSectionLine(models.Model):
     acceptance_status = fields.Selection([
         ('yes', 'Yes'),
         ('no', 'No'),
-        ], string="Acceptance status", default = "Yes", readonly=False)
+        ], string="Acceptance status", default = "yes", readonly=False)
     fa_comment = fields.Text(
         string='Comment(s)', 
         )

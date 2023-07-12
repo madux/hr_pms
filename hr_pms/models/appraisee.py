@@ -1696,6 +1696,23 @@ class PMS_Appraisee(models.Model):
                   'default_resp':self.env.uid,
               },
         }
+    
+    def button_goal_setting(self):
+        return {
+              'name': 'Goal Setting Excel Sheet',
+              'view_type': 'form',
+              "view_mode": 'form',
+              'res_model': 'pms.goal_setting.wizard',
+              'type': 'ir.actions.act_window',
+              'target': 'new',
+              'context': {
+                  'default_pms_id': self.id,
+                #   'default_date': fields.Datetime.now(),
+                #   'default_direct_employee_id': self.employee_id.id,
+                #   'default_resp':self.env.uid,
+              },
+        }
+
 
     @api.model
     def create_action(self, domain, title, is_overdue=False):
