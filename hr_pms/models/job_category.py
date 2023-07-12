@@ -42,7 +42,7 @@ class PMSJobCategory(models.Model):
         ('gs', 'Goal Setting'),
         ('hyr', 'Half year review'),
         ('fyr', 'Full year review'),
-        ], string="Type of PMS", default = "", 
+        ], string="Type of PMS", default = "gs", 
         copy=True)
     date_from = fields.Date(
         string="Date From", 

@@ -1,5 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
     <odoo>
+        <record id="view_pms_appraisee_filter" model="ir.ui.view">
+			<field name="name">appraisee</field>
+			<field name="model">pms.appraisee</field>
+			<field name="arch" type="xml">
+				<search string="Search appraisee">
+                    <field name="employee_id"/>
+                    <field name="employee_number"/>
+                    <field name="department_id"/>
+                    <field name="job_id"/>
+                    <field name="manager_id" string='Manager'/>
+                    <field name="administrative_supervisor_id" string='Administrative Supervisor'/>
+                    <field name="reviewer_id" string='Reviewer'/>
+                    <field name="pms_year_id" readonly="0"/>
+                    <field name="deadline" readonly="0"/>
+                    <field name="dummy_state" invisible="1" force_save="1"/>
+                    
+                    <filter string="Score: 0 - 19" name="score_0_10" domain="[('overall_score','&lt;', 20)]"/>
+                    <filter string="Score: 20 - 29" name="score_0_20" domain="[('overall_score','&gt;', 19),('overall_score','&lt;', 30)]"/>
+                    <filter string="Score: 30 - 39" name="score_0_30" domain="[('overall_score','&gt;', 29),('overall_score','&lt;', 40)]"/>
+                    <filter string="Score: 40 - 49" name="score_0_40" domain="[('overall_score','&gt;', 39),('overall_score','&lt;', 50)]"/>
+                    <filter string="Score: 50 - 59" name="score_0_50" domain="[('overall_score','&gt;', 49),('overall_score','&lt;', 60)]"/>
+                    <filter string="Score: 60 - 69" name="score_0_60" domain="[('overall_score','&gt;', 59),('overall_score','&lt;', 70)]"/>
+                    <filter string="Score: 70 - 79" name="score_0_70" domain="[('overall_score','&gt;', 69),('overall_score','&lt;', 80)]"/>
+                    <filter string="Score: 80 - 89" name="score_0_80" domain="[('overall_score','&gt;', 79),('overall_score','&lt;', 90)]"/>
+                    <filter string="Score: 90 - 99" name="score_0_90" domain="[('overall_score','&gt;', 89),('overall_score','&lt;', 100)]"/>
+                    <filter string="Score: 100" name="score_0_100" domain="[('overall_score','&gt;=', 100)]"/>
+                    <group  expand='0' string='Group by...'>
+                        <filter name="department_id" string='Department' domain="[]" context="{'group_by' : 'department_id'}"/>
+                        <filter name="employee_id" string='Employee' domain="[]" context="{'group_by' : 'employee_id'}"/>
+                        <filter name="group_pms_year_id" string='Period' domain="[]" context="{'group_by' : 'pms_year_id'}"/>
+                        <filter name="group_type_of_pms" string='Type of PMS' domain="[]" context="{'group_by' : 'type_of_pms'}"/>
+                        <filter name="manager_id" string='Manager' domain="[]" context="{'group_by' : 'manager_id'}"/>
+                        <filter name="administrative_supervisor_id" string='Administrative Supervisor' domain="[]" context="{'group_by' : 'administrative_supervisor_id'}"/>
+                        <filter name="reviewer_id" string='Reviewer' domain="[]" context="{'group_by' : 'reviewer_id'}"/>
+                        <filter name="overall_score" string='Overall Score' domain="[]" context="{'group_by' : 'overall_score'}"/>
+                        <filter name="appraisee_satisfaction" string='Appraisee Satisfaction' domain="[]" context="{'group_by' : 'appraisee_satisfaction'}"/>
+                        <filter name="state" string='Status' domain="[]" context="{'group_by' : 'state'}"/>
+                        <filter name="overall_score" string='Overall score' domain="[]" context="{'group_by' : 'overall_score'}"/> 
+                        <filter name="current_assessment_score" string='Current Assessment score' domain="[]" context="{'group_by' : 'current_assessment_score'}"/>
+                        <filter name="potential_assessment_score" string='Potential Assessment Score' domain="[]" context="{'group_by' : 'potential_assessment_score'}"/>
+                        <filter name="post_normalization_score" string='Post Normalization Score' domain="[]" context="{'group_by' : 'post_normalization_score'}"/>
+                    </group>
+				</search>
+			</field>
+		</record>
+        
 		<record id="view_hr_pms_appraisee_form" model="ir.ui.view">
 			<field name="name">PMS appraisee form</field>
 			<field name="model">pms.appraisee</field>
@@ -131,10 +177,10 @@
                         </div>
                         <group>
                             <group>
-                                <field name="type_of_pms" invisible="0" force_save="1" groups="base.group_system,hr_pms.group_pms_officer_id"/> 
+                                <field name="type_of_pms" invisible="0" readonly="1" force_save="1" groups="base.group_system,hr_pms.group_pms_officer_id"/> 
                                 <field name="pms_year_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="deadline" readonly="1" force_save="1"/> 
-
+                                <field name="dummy_state" invisible="1" force_save="1"/> 
                                 <!-- <field name="online_deadline_date" string="Appraisee Deadline Date" readonly="1" force_save="1"/>  -->
                             </group>
                             <group>
@@ -227,13 +273,15 @@
                                         <field name="state" invisible="1" force_save="1"/> 
                                         <field name="weightage" required="1" sum="total" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])],
                                         'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}" />
+                                        <field name="pms_uom" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])]}" />
                                         <field name="target" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])],
                                         'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}" />
                                         <field name="acceptance_status" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])],
                                         'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}" />
                                         <field name="goal_setting_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
-                                        <field name="fa_comment" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])],
-                                        'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}" />
+                                        <field name="fa_comment" required="0" invisible="1"/>
+                                        <!-- attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])],
+                                        'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}" /> -->
                                         <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
                                     </tree>
                                     <form string="">
@@ -252,7 +300,7 @@
                                     </form>
                                 </field>
                             </page>
-                            <page name="section_line_ids" string="Sections" attrs="{'invisible': [('state', 'not in', ['hyr_draft', 'hyr_functional_rating','draft', 'done','signed']),('is_current_user', '=', True)]}">
+                            <page name="section_line_ids" string="Sections" attrs="{'invisible': ['|', ('state', 'not in', ['hyr_draft', 'hyr_functional_rating','draft', 'done','signed']),('is_current_user', '=', True)]}">
                                 <div attrs="{'invisible': [('type_of_pms', '!=', 'hyr')]}">
                                     <p style="color: black;font-size: 14px;">MID YEAR KRA / Achievement(s)</p>
                                     <p style="color: red;" attrs="{'invisible': [('instruction_html', '!=', False)]}">* --Minimum of 5 lines and Maximun of 7 Lines to be added on this section </p>
@@ -268,21 +316,24 @@
                                     <tree string="Half year review KRA Sections" delete="true" editable="bottom" options="{'no_create':False, 'no_open': False}">
                                         <field name="name" required="1" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no'])]}"/> 
                                         <field name="state" invisible="1" force_save="1"/>
-                                        <field name="enable_line_edit" invisible="0" force_save="1"/> 
-                                        <field name="is_current_user" invisible="0" force_save="1"/> 
+                                        <field name="enable_line_edit" invisible="1" force_save="1"/> 
+                                        <field name="is_current_user" invisible="1" force_save="1"/> 
+                                        <field name="manager_can_edit" invisible="1" readonly="0" force_save="1"/> 
                                         <!-- <field name="appraisee_weightage" invisible="1" attrs="{'readonly': [('state', 'not in', ['hyr_draft'])],
                                         'required': [('state', 'in', ['hyr_draft'])]}" sum="total"/> -->
                                         <field name="weightage" sum="total" attrs="{'readonly': ['|', ('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
                                         <field name="target" attrs="{'readonly': ['|', ('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
                                         <field name="revise_weightage" required="1" sum="total" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
-                                        <field name="revise_target" required="1" sum="total" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
+                                        <field name="revise_target" required="1" sum="total" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
+                                        <!-- <field name="acceptance_status" attrs="{'readonly': [('is_current_user', '=', True),('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_functional_rating'])],
+                                        'required': [('state', 'in', ['hyr_draft','hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/> -->
+                                        <field name="acceptance_status" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],
+                                        'required': [('state', 'in', ['hyr_draft','hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
                                         <field name="hyr_fa_rating" required="0" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)],'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
-                                        <field name="acceptance_status" attrs="{'readonly': [('is_current_user', '=', True),('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_functional_rating'])],
-                                        'required': [('state', 'in', ['hyr_draft','hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
-                                        <field name="fa_comment" widget="text" force_save="1" attrs="{'required': [('state', 'in', ['hyr_draft','hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)]}"/>
+                                        <field name="fa_comment" widget="text" force_save="1" attrs="{'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)]}"/>
                                         <field name="hyr_kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <!-- attrs="{'invisible': [('is_current_user', '=', True)]}" -->
                                         <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
@@ -337,11 +388,8 @@
                                         <field name="name" required="1" readonly="1"/>
                                         <field name="hyr_aa_rating" required="0" readonly="1"/>
                                         <field name="hyr_fa_rating" required="0" readonly="1"/>
-                                         <!-- attrs="{'invisible': [('is_current_user', '=', True)]}"/>  -->
                                         <field name="appraisee_weightage" invisible="1" attrs="{'readonly': [('state', 'not in', ['draft'])],'required': [('state', 'in', ['draft'])]}" sum="total"/>
-                                        <!-- self rating only for KRAs -->
                                         <field name="weightage" required="1" readonly="1" sum="total" attrs="{'required': [('state', 'in', ['functional_rating'])],'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating'])]}"/>
-                                        <!-- 'readonly': [('state', 'not in', ['functional_rating'])], -->
                                         <field name="self_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'draft')],
                                         'required': [('state', '=', 'draft')]}"/>
                                         <field name="kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
@@ -725,7 +773,7 @@
                                     </group>
                                 </form>
                             </page>    
-                            <page name="app_section" string="Appraisee's Comment,Attachments &amp; Sign off">
+                            <page name="app_section" string="Appraisee's Comment,Attachments &amp; Sign off" attrs="{'invisible': [('type_of_pms', 'in', ['gs', 'hyr'])]}">
                                 <separator string="Appraisee Section" colspan="4"/>
                                 <form string="">
                                     <group> 
@@ -904,7 +952,7 @@
                                     </group>
                                 </form>
                             </page> -->
-                            <page string="Audit trail" >
+                            <page string="Audit trail" attrs="{'invisible': [('type_of_pms', 'in', ['gs', 'hyr'])]}">
                                 <div class="oe_chatter">
                                     <field name="message_follower_ids" widget="mail_followers"/>
                                     <field name="message_ids" widget="mail_thread"/>
@@ -937,50 +985,7 @@
 			</field>
 		</record>
 
-		<record id="view_pms_appraisee_filter" model="ir.ui.view">
-			<field name="name">appraisee</field>
-			<field name="model">pms.appraisee</field>
-			<field name="arch" type="xml">
-				<search string="Search appraisee">
-                    <field name="employee_id"/>
-                    <field name="employee_number"/>
-                    <field name="department_id"/>
-                    <field name="job_id"/>
-                    <field name="manager_id" string='Manager'/>
-                    <field name="administrative_supervisor_id" string='Administrative Supervisor'/>
-                    <field name="reviewer_id" string='Reviewer'/>
-                    <field name="pms_year_id" readonly="0"/>
-                    <field name="deadline" readonly="0"/>
-                    
-                    <filter string="Score: 0 - 19" name="score_0_10" domain="[('overall_score','&lt;', 20)]"/>
-                    <filter string="Score: 20 - 29" name="score_0_20" domain="[('overall_score','&gt;', 19),('overall_score','&lt;', 30)]"/>
-                    <filter string="Score: 30 - 39" name="score_0_30" domain="[('overall_score','&gt;', 29),('overall_score','&lt;', 40)]"/>
-                    <filter string="Score: 40 - 49" name="score_0_40" domain="[('overall_score','&gt;', 39),('overall_score','&lt;', 50)]"/>
-                    <filter string="Score: 50 - 59" name="score_0_50" domain="[('overall_score','&gt;', 49),('overall_score','&lt;', 60)]"/>
-                    <filter string="Score: 60 - 69" name="score_0_60" domain="[('overall_score','&gt;', 59),('overall_score','&lt;', 70)]"/>
-                    <filter string="Score: 70 - 79" name="score_0_70" domain="[('overall_score','&gt;', 69),('overall_score','&lt;', 80)]"/>
-                    <filter string="Score: 80 - 89" name="score_0_80" domain="[('overall_score','&gt;', 79),('overall_score','&lt;', 90)]"/>
-                    <filter string="Score: 90 - 99" name="score_0_90" domain="[('overall_score','&gt;', 89),('overall_score','&lt;', 100)]"/>
-                    <filter string="Score: 100" name="score_0_100" domain="[('overall_score','&gt;=', 100)]"/>
-                    <group  expand='0' string='Group by...'>
-                        <filter name="department_id" string='Department' domain="[]" context="{'group_by' : 'department_id'}"/>
-                        <filter name="employee_id" string='Employee' domain="[]" context="{'group_by' : 'employee_id'}"/>
-                        <filter name="group_pms_year_id" string='Period' domain="[]" context="{'group_by' : 'pms_year_id'}"/>
-                        <filter name="group_type_of_pms" string='Type of PMS' domain="[]" context="{'group_by' : 'type_of_pms'}"/>
-                        <filter name="manager_id" string='Manager' domain="[]" context="{'group_by' : 'manager_id'}"/>
-                        <filter name="administrative_supervisor_id" string='Administrative Supervisor' domain="[]" context="{'group_by' : 'administrative_supervisor_id'}"/>
-                        <filter name="reviewer_id" string='Reviewer' domain="[]" context="{'group_by' : 'reviewer_id'}"/>
-                        <filter name="overall_score" string='Overall Score' domain="[]" context="{'group_by' : 'overall_score'}"/>
-                        <filter name="appraisee_satisfaction" string='Appraisee Satisfaction' domain="[]" context="{'group_by' : 'appraisee_satisfaction'}"/>
-                        <filter name="state" string='Status' domain="[]" context="{'group_by' : 'state'}"/>
-                        <filter name="overall_score" string='Overall score' domain="[]" context="{'group_by' : 'overall_score'}"/> 
-                        <filter name="current_assessment_score" string='Current Assessment score' domain="[]" context="{'group_by' : 'current_assessment_score'}"/>
-                        <filter name="potential_assessment_score" string='Potential Assessment Score' domain="[]" context="{'group_by' : 'potential_assessment_score'}"/>
-                        <filter name="post_normalization_score" string='Post Normalization Score' domain="[]" context="{'group_by' : 'post_normalization_score'}"/>
-                    </group>
-				</search>
-			</field>
-		</record>
+		
         <record id="view_pms_appraisee_kanban" model="ir.ui.view">
 			<field name="name">Kanban appraisee</field>
 			<field name="model">pms.appraisee</field>

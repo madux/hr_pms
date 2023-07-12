@@ -238,7 +238,7 @@ class PMSDepartment(models.Model):
             if employees:
                 for emp in employees:
                     pms_appraisee = PMS_Appraisee.create({
-                        'name': self.name + ': - '+ emp.name, 
+                        'name': f'GOAL SETTINGS: {self.name} {emp.name}', 
                         'department_id': emp.department_id.id, 
                         'employee_id': emp.id, 
                         'pms_department_id': self.id,
