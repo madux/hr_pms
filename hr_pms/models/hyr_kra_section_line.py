@@ -18,11 +18,11 @@ class HYR_KRA_SectionLine(models.Model):
     )
 
     name = fields.Char(
-        string='Description',
+        string='KRA',
         size=300
         )
     weightage = fields.Float(
-        string='FA Weight (Total 100%)', 
+        string='Weightage', 
         )
     revise_weightage = fields.Float(
         string='Revise Weight', 
@@ -43,7 +43,7 @@ class HYR_KRA_SectionLine(models.Model):
         ('Rejected', 'Rejected'),
         ('Accepted', 'Accepted'),
         ('Dropped', 'Dropped'),
-        ], string="Acceptance status", default = "Accepted", readonly=False)
+        ], string="Acceptance", default = "Accepted", readonly=False)
     
     fa_comment = fields.Text(
         string='Comment(s)', 
@@ -68,7 +68,7 @@ class HYR_KRA_SectionLine(models.Model):
         ('goal_setting_draft', 'Goal Settings'),
         ('hyr_draft', 'Draft'),
         ('hyr_admin_rating', 'Admin Supervisor'),
-        ('hyr_functional_rating', 'Functional Supervisor'),
+        ('hyr_functional_rating', 'Functional Manager'),
         ('draft', 'Draft'),
         ('admin_rating', 'Admin Supervisor'),
         ('functional_rating', 'Functional Supervisor'),
@@ -78,11 +78,10 @@ class HYR_KRA_SectionLine(models.Model):
         ('withdraw', 'Withdrawn'),
         ], string="Status", default = "draft", readonly=True, related="hyr_kra_section_id.state")
     hyr_fa_rating = fields.Selection([
-        ('none', ''),
-        ('poor_average', 'Poor Average'),
-        ('good_average', 'Good Average'),
-        ('excellent', 'Excellent'),
-        ], string="FA Review", default = "", readonly=False)
+        ('poor_progress', 'Poor Progress'),
+        ('good_progress', 'Good Progress'),
+        ('average_progress', 'Average Progress'),
+        ], string="Progress Status", default = "", readonly=False)
     is_current_user = fields.Boolean(
         default=False, 
         compute="compute_current_user", 
@@ -90,11 +89,10 @@ class HYR_KRA_SectionLine(models.Model):
         help="Used to determine what the appraisee sees"
         )
     
-    hyr_aa_rating = fields.Selection([
-        ('none', ''),
-        ('poor_average', 'Poor Average'),
-        ('good_average', 'Good Average'),
-        ('excellent', 'Excellent'),
+    hyr_aa_rating = fields.Selection([ 
+        ('poor_progress', 'Poor Progress'),
+        ('good_progress', 'Good Progress'),
+        ('average_progress', 'Average Progress'),
         ], string="AA Review", default = "", readonly=False)
     
     weighted_score = fields.Float(
@@ -109,6 +107,20 @@ class HYR_KRA_SectionLine(models.Model):
         ],
         string="Enable line edit-", default="yes",
         )
+    manager_can_edit = fields.Selection([
+        ('yes', 'Yes'),
+        ('no', 'No'),
+        ],
+        compute="check_manager_user",
+        string="Manager can edit-", default="yes",
+        )
+    
+    def check_manager_user(self):
+        for rec in self:
+            if rec.hyr_kra_section_id.manager_id.user_id.id == self.env.user.id and rec.state in ['hyr_functional_rating']:
+                rec.manager_can_edit = 'yes'
+            else:
+                rec.manager_can_edit = 'no'
 
     @api.onchange(
         'acceptance_status', 

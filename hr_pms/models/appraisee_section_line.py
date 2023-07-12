@@ -30,15 +30,15 @@ class KRA_SectionLine(models.Model):
     )
 
     name = fields.Char(
-        string='Description',
+        string='KRA',
         size=300
         )
     weightage = fields.Float(
-        string='FA Weight (Total 100%)', 
+        string='Weightage', 
         )
     
     appraisee_weightage = fields.Float(
-        string='Weight (Total 100%)',
+        string='AA Weightage',
         )
     administrative_supervisor_rating = fields.Integer(
         string='AA Rating', 
@@ -95,17 +95,20 @@ class KRA_SectionLine(models.Model):
         string="Is required", 
         default=False
         )
+    # hyr_fa_rating = fields.Selection([
+    #     ('poor_average', 'Poor Progress'),
+    #     ('good_average', 'Good Average'),
+    #     ('excellent', 'Excellent'),
+        # ], string="FA(HYR) Review", default = "", readonly=False)
     hyr_fa_rating = fields.Selection([
-        ('none', ''),
-        ('poor_average', 'Poor Average'),
-        ('good_average', 'Good Average'),
-        ('excellent', 'Excellent'),
+        ('poor_progress', 'Poor Progress'),
+        ('good_progress', 'Good Progress'),
+        ('average_progress', 'Average Progress'),
         ], string="FA(HYR) Review", default = "", readonly=False)
     hyr_aa_rating = fields.Selection([
-        ('none', ''),
-        ('poor_average', 'Poor Average'),
-        ('good_average', 'Good Average'),
-        ('excellent', 'Excellent'),
+        ('poor_progress', 'Poor Progress'),
+        ('good_progress', 'Good Progress'),
+        ('average_progress', 'Average Progress'),
         ], string="AA(HYR) Review", default = "", readonly=False)
     
     @api.onchange('appraisee_weightage')
@@ -251,7 +254,7 @@ class LC_SectionLine(models.Model):
         size=70
         )
     weightage = fields.Float(
-        string='Weight (Total 100%)', 
+        string='Weightage', 
         default=20,
         readonly=True
         )
@@ -423,7 +426,7 @@ class FC_SectionLine(models.Model):
         string='Description', 
         )
     weightage = fields.Integer(
-        string='Weight (Total 100%)', 
+        string='Weightage', 
         required=False,
         readonly=True
         )

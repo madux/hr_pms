@@ -284,6 +284,10 @@ class PMS_Appraisee(models.Model):
         copy=False
     )
     dummy_state = fields.Selection([
+        ('gs', 'Goal Settings'),
+        ('my', 'Mid Year Review'),
+        ('hyr_a', 'Admin Supervisor'),
+        ('hyr_f', 'Functional Appraiser(HYR)'),
         ('a', 'Draft'),
         ('b', 'Administrative Appraiser'),
         ('c', 'Functional Appraiser'),
@@ -318,7 +322,15 @@ class PMS_Appraisee(models.Model):
     @api.depends('state')
     def _compute_new_state(self):
         for rec in self:
-            if rec.state == 'draft':
+            if rec.state == 'goal_setting_draft':
+                rec.dummy_state = 'gs'
+            elif rec.state == 'hyr_draft':
+                rec.dummy_state = 'my'
+            elif rec.state == 'hyr_admin_rating':
+                rec.dummy_state = 'hyr_a'
+            elif rec.state == 'hyr_functional_rating':
+                rec.dummy_state = 'hyr_f'
+            elif rec.state == 'draft':
                 rec.dummy_state = 'a'
             elif rec.state == 'admin_rating':
                 rec.dummy_state = 'b'
@@ -333,7 +345,7 @@ class PMS_Appraisee(models.Model):
             elif rec.state == 'signed':
                 rec.dummy_state = 'g'
             else:
-                rec.dummy_state = 'h'
+                rec.dummy_state = 'gs'
 
     pms_year_id = fields.Many2one(
         'pms.year', string="Period", copy=True)
@@ -1224,6 +1236,7 @@ class PMS_Appraisee(models.Model):
         self.generate_hyr_kra_lines()
         self.send_mail_notification(msg)
         self.write({
+                'name': f'MID Year Review for {self.employee_id.name}', 
                 'state': 'hyr_draft',
                 'submitted_date': fields.Date.today(),
                 'manager_id': self.employee_id.parent_id.id,
@@ -1266,18 +1279,19 @@ class PMS_Appraisee(models.Model):
             self.department_id.name,
             )
         self.send_mail_notification(msg)
-        if self.employee_id.administrative_supervisor_id:
-            self.write({
-                'state': 'hyr_admin_rating',
-                'submitted_date': fields.Date.today(),
-                'administrative_supervisor_id': self.employee_id.administrative_supervisor_id.id,
-            })
-        else:
-            self.write({
-                'state': 'hyr_functional_rating',
-                'submitted_date': fields.Date.today(),
-                'manager_id': self.employee_id.parent_id.id,
-            })
+        # if self.employee_id.administrative_supervisor_id:
+        #     self.write({
+        #         'name': f'MID YEAR PMS for {self.employee_id.name}', 
+        #         'state': 'hyr_admin_rating',
+        #         'submitted_date': fields.Date.today(),
+        #         'administrative_supervisor_id': self.employee_id.administrative_supervisor_id.id,
+        #     })
+        # else:
+        self.write({
+            'state': 'hyr_functional_rating',
+            'submitted_date': fields.Date.today(),
+            'manager_id': self.employee_id.parent_id.id,
+        })
 
     def hyr_button_admin_supervisor_rating(self): 
         self.validate_hyr_rating()
@@ -1332,6 +1346,7 @@ class PMS_Appraisee(models.Model):
         self.write({
             'state': 'draft',
             'type_of_pms': 'fyr',
+            'name': f'FULL YEAR PMS for {self.employee_id.name}', 
             'kra_section_line_ids': [(0, 0, {
                 'kra_section_id': self.id,
                 'name': hyr_line.name,

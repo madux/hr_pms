@@ -18,37 +18,30 @@ class GoalSettingSectionLine(models.Model):
         string="Goal Setting Section"
     )
     name = fields.Char(
-        string='KRA Description',
+        string='KRA',
         size=300
         )
     weightage = fields.Integer(
-        string='Weight(Total 100%)', 
+        string='Weightage', 
         )
-    target = fields.Char(
-        string='Target', 
-        size=24
-        )
+    
     pms_uom = fields.Selection([
         ('Desc', 'Desc'),
         ('Naira', 'Naira'),
-        ('Percentage', 'Percentage'),
+        ('Percentage', 'Percentage(s)'),
         ('Day', 'Day(s)'),
         ('Week', 'Week(s)'),
         ('Month', 'Month(s)'),
         ('Others', 'Others'),
         ], string="Unit of Measure", default = "")
-    # target_uom = fields.Many2one(
-    #     'pms.uom',
-    #     string="Goal Setting Section"
-    # )
-    target_uom = fields.Many2one(
-        'pms.uom',
-        string="Goal Setting Section"
-    )
+    target = fields.Char(
+        string='Target', 
+        size=15
+        )       
     acceptance_status = fields.Selection([
         ('yes', 'Yes'),
         ('no', 'No'),
-        ], string="Acceptance status", default = "yes", readonly=False)
+        ], string="Acceptance", default = "yes", readonly=False)
     fa_comment = fields.Text(
         string='Comment(s)', 
         )
@@ -68,11 +61,38 @@ class GoalSettingSectionLine(models.Model):
     
     @api.onchange('weightage')
     def onchange_weightage(self):
-        if self.weightage > 0 and self.weightage not in range (5, 26):
+        if self.weightage > 0 and self.weightage not in range (0, 26):
             self.weightage = 0
-            raise UserError('Weightage must be within the range of 5 to 25')
+            raise UserError('Weightage must be within the range of 1 to 25')
         
+    @api.onchange('pms_uom')
+    def onchange_pms_uom(self):
+        self.ensure_one()
+        if self.pms_uom:
+            self.target = False
+
+    @api.onchange('target')
+    def onchange_target(self):
+        self.ensure_one()
+        if self.target:
+            if self.pms_uom in ['Naira', 'Day', 'Month', 'week', 'Percentage']:
+                value = self.target.replace(',', '')
+                value_uom = value
+                if self.pms_uom in ['Naira']:
+                    try:
+                        value_uom = float(value_uom) if '.' in value_uom else int(value_uom) 
+                        value_uom = "₦ {:0,.2f}".format(float(value_uom))
+                    except Exception as e:
+                        raise ValidationError("Wrong value provided for Naira Unit of measure")
+                if self.pms_uom == 'Percentage':
+                    try:
+                        value_uom = f"{float(value_uom)} %" if '.' in value_uom else f"{int(value_uom)} %" 
+                    except Exception as e:
+                        value_uom = value 
+                        # raise ValidationError("Wroskss")
+                self.target = value_uom
+
     def unlink(self):
-        for delete in self.filtered(lambda delete: delete.state not in ['hyr_draft']):
+        for delete in self.filtered(lambda delete: delete.state not in ['goal_setting_draft']):
             raise ValidationError(_('You cannot delete a KRA section once submitted Click the Ok and then discard button to go back'))
         return super(GoalSettingSectionLine, self).unlink()
