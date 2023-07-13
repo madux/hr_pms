@@ -284,8 +284,6 @@
                                         <field name="pms_uom" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])]}" />
                                         <field name="target" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])],
                                         'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}" />
-                                        <field name="pms_uom" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])],
-                                        'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}" />
                                         <field name="acceptance_status" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])],
                                         'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}" />
                                         <field name="goal_setting_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
@@ -335,13 +333,15 @@
                                         <field name="target" attrs="{'readonly': ['|', ('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
                                         <field name="revise_weightage" required="1" sum="total" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
+                                        <field name="pms_uom" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],
+                                        'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
                                         <field name="revise_target" required="1" sum="total" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
                                         <!-- <field name="acceptance_status" attrs="{'readonly': [('is_current_user', '=', True),('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_draft','hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/> -->
                                         <field name="acceptance_status" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_draft','hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
-                                        <field name="hyr_fa_rating" required="0" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
+                                        <field name="hyr_fa_rating" required="0" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)],'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
                                         <field name="fa_comment" widget="text" force_save="1" attrs="{'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)]}"/>
                                         <field name="hyr_kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 

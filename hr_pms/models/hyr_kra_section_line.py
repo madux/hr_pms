@@ -29,13 +29,23 @@ class HYR_KRA_SectionLine(models.Model):
         store=True
         )
     
+    pms_uom = fields.Selection([
+        ('Desc', 'Description'),
+        ('Naira', 'Naira'),
+        ('Percentage', 'Percentage(s)'),
+        ('Day', 'Day(s)'),
+        ('Week', 'Week(s)'),
+        ('Month', 'Month(s)'),
+        ('Others', 'Others'),
+        ], string="Unit of Measure")
+    
     target = fields.Char(
         string='Target', 
-        size=8
+        size=15
         )
     revise_target = fields.Char(
         string='Revise Target', 
-        size=8
+        size=15
         )
     
     acceptance_status = fields.Selection([
@@ -115,6 +125,35 @@ class HYR_KRA_SectionLine(models.Model):
         string="Manager can edit-", default="yes",
         )
     
+    @api.onchange('revise_target')
+    def onchange_revise_target(self):
+        self.ensure_one()
+        if self.revise_target:
+            if self.pms_uom in ['Naira', 'Day', 'Month', 'week', 'Percentage']:
+                value = self.revise_target.replace(',', '')
+                value_uom = value
+                if self.pms_uom in ['Naira']:
+                    try:
+                        value_uom = float(value_uom) if '.' in value_uom else int(value_uom) 
+                        value_uom = "₦ {:0,.2f}".format(float(value_uom))
+                    except Exception as e:
+                        raise ValidationError("Wrong value provided for Naira Unit of measure")
+                if self.pms_uom == 'Percentage':
+                    try:
+                        value_uom = f"{float(value_uom)} %" if '.' in value_uom else f"{int(value_uom)} %" 
+                    except Exception as e:
+                        value_uom = value  
+                if self.pms_uom in ['Day', 'Month', 'Week']:
+                    suffix = f"- day(s)" if self.pms_uom == 'Day' else "-Week(s)" if self.pms_uom == "Week" else "-Month(s)"
+                    value_uom = f"{value_uom} {suffix}" 
+                self.revise_target = value_uom
+    
+    @api.onchange('pms_uom')
+    def onchange_pms_uom(self):
+        self.ensure_one()
+        if self.pms_uom:
+            self.revise_target = False
+
     def check_manager_user(self):
         for rec in self:
             if rec.hyr_kra_section_id.manager_id.user_id.id == self.env.user.id and rec.state in ['hyr_functional_rating']:

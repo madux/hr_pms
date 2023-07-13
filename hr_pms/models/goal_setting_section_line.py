@@ -26,7 +26,7 @@ class GoalSettingSectionLine(models.Model):
         )
     
     pms_uom = fields.Selection([
-        ('Desc', 'Desc'),
+        ('Desc', 'Description'),
         ('Naira', 'Naira'),
         ('Percentage', 'Percentage(s)'),
         ('Day', 'Day(s)'),
@@ -90,6 +90,9 @@ class GoalSettingSectionLine(models.Model):
                     except Exception as e:
                         value_uom = value 
                         # raise ValidationError("Wroskss")
+                if self.pms_uom in ['Day', 'Month', 'Week']:
+                    suffix = f"- day(s)" if self.pms_uom == 'Day' else "-Week(s)" if self.pms_uom == "Week" else "-Month(s)"
+                    value_uom = f"{value_uom} {suffix}" 
                 self.target = value_uom
 
     def unlink(self):

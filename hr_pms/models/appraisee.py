@@ -1140,15 +1140,15 @@ class PMS_Appraisee(models.Model):
     def validate_hyr_rating(self):
         hyr_lines = self.mapped('hyr_kra_section_line_ids')
         validity_msg = []
-        msg = """You cannot submit this appraisal if all KRA lines are not completely rated"""
+        msg = """You cannot submit this appraisal if all KRA lines progress status is not selected"""
         if self.state == "hyr_admin_rating":
-            non_rated_aa_hyr_lines = hyr_lines.filtered(lambda hyr: hyr.hyr_aa_rating == "none")
+            non_rated_aa_hyr_lines = hyr_lines.filtered(lambda hyr: hyr.hyr_aa_rating == False)
             if non_rated_aa_hyr_lines:
                 validity_msg.append(msg)
             if self.supervisor_comment == "":
                 validity_msg.append("""Please Ensure you provide supervisor's comment""")
         if self.state == "hyr_functional_rating":
-            non_rated_fa_hyr_lines = hyr_lines.filtered(lambda hyr: hyr.hyr_fa_rating == "none")
+            non_rated_fa_hyr_lines = hyr_lines.filtered(lambda hyr: hyr.hyr_fa_rating == False)
             if non_rated_fa_hyr_lines:
                 validity_msg.append(msg)
             if self.manager_comment == "":
@@ -1252,6 +1252,7 @@ class PMS_Appraisee(models.Model):
             'hyr_kra_section_line_ids': [(0, 0, {
                 'hyr_kra_section_id': self.id,
                 'name': hyr_line.name,
+                'pms_uom': hyr_line.pms_uom, 
                 'weightage': hyr_line.weightage,
                 'revise_weightage': hyr_line.weightage,
                 'target': hyr_line.target,
