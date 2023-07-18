@@ -555,6 +555,8 @@ class PMS_Appraisee(models.Model):
         related="employee_id.administrative_supervisor_id.employee_number",
         store=True
         )
+    is_functional_appraiser = fields.Boolean(string='Is functional appraiser', compute="compute_functional_appraiser")
+    reason_back = fields.Text(string='Return Reasons', tracking=True)
     
     @api.depends('pms_department_id')
     def get_kra_section_scale(self):
@@ -1671,8 +1673,6 @@ class PMS_Appraisee(models.Model):
                 rec.is_current_user = True
             else:
                 rec.is_current_user = False
-    reason_back = fields.Text(string='Return Reasons', tracking=True)
-    is_functional_appraiser = fields.Boolean(string='Is functional appraiser', compute="compute_functional_appraiser")
 
     def compute_functional_appraiser(self):
         if self.manager_id and self.manager_id.user_id.id == self.env.user.id:

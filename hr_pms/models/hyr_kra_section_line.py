@@ -233,6 +233,6 @@ class HYR_KRA_SectionLine(models.Model):
             self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
 
     def unlink(self):
-        for delete in self.filtered(lambda delete: delete.state not in ['hyr_draft']):
+        for delete in self.filtered(lambda delete: delete.enable_line_edit == 'no'):
             raise ValidationError(_('You cannot delete a KRA section once submitted Click the Ok and then discard button to go back'))
         return super(HYR_KRA_SectionLine, self).unlink()

@@ -140,7 +140,7 @@
                             name="hyr_return_appraisal" 
                             string="Return" 
                             type="object"
-                            attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['hyr_draft','draft','hyr_admin_rating', 'hyr_functional_rating'])]}"
+                            attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['hyr_draft'])]}"
                             confirm="Are you sure you want to return"
                         />
                             <!-- states="admin_rating,functional_rating" -->
@@ -177,7 +177,7 @@
                         </div>
                         <group>
                             <group>
-                                <field name="type_of_pms" invisible="0" readonly="1" force_save="1" groups="base.group_system,hr_pms.group_pms_officer_id"/> 
+                                <field name="type_of_pms" invisible="0" readonly="1" force_save="1"/> 
                                 <field name="pms_year_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="deadline" readonly="1" force_save="1"/> 
                                 <field name="dummy_state" invisible="1" force_save="1"/> 
@@ -288,9 +288,6 @@
                                         'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}" />
                                         <field name="goal_setting_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <field name="fa_comment" required="0" invisible="1"/>
-                                        <!-- attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])],
-                                        'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}" /> -->
-                                        <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
                                     </tree>
                                     <form string="">
                                         <group>
@@ -308,7 +305,7 @@
                                     </form>
                                 </field>
                             </page>
-                            <page name="section_line_ids" string="Sections" attrs="{'invisible': ['|', ('state', 'not in', ['hyr_draft', 'hyr_functional_rating','draft', 'done','signed']),('is_current_user', '=', True)]}">
+                            <page name="section_line_ids" string="Sections" attrs="{'invisible': [('state', 'not in', ['draft', 'hyr_draft', 'hyr_functional_rating','functional_rating', 'reviewer_rating', 'done','signed'])]}">
                                 <div attrs="{'invisible': [('type_of_pms', '!=', 'hyr')]}">
                                     <p style="color: black;font-size: 14px;">MID YEAR KRA / Achievement(s)</p>
                                     <p style="color: red;" attrs="{'invisible': [('instruction_html', '!=', False)]}">* --Minimum of 5 lines and Maximun of 7 Lines to be added on this section </p>
@@ -329,9 +326,10 @@
                                         <field name="manager_can_edit" invisible="1" readonly="0" force_save="1"/> 
                                         <!-- <field name="appraisee_weightage" invisible="1" attrs="{'readonly': [('state', 'not in', ['hyr_draft'])],
                                         'required': [('state', 'in', ['hyr_draft'])]}" sum="total"/> -->
-                                        <field name="weightage" sum="total" attrs="{'readonly': ['|', ('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
-                                        <field name="target" attrs="{'readonly': ['|', ('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
-                                        <field name="revise_weightage" required="1" sum="total" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
+                                        <field name="weightage" sum="total" readonly ="1"/> 
+                                        <!-- attrs="{'readonly': ['|', ('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/> -->
+                                        <field name="target" readonly ="1"/>
+                                        <field name="revise_weightage" readonly="1" sum="total" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
                                         <field name="pms_uom" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
@@ -392,14 +390,15 @@
                                 <field name="kra_section_line_ids" 
                                     required="1" options="{'no_quick_create':True,'no_open': True}" 
                                     attrs="{'readonly': [('state', 'not in', ['draft', 'admin_rating', 'functional_rating', 'reviewer_rating'])],
-                                    'invisible': [('type_of_pms', '!=', 'fyr')]}"
+                                    'invisible': ['|',('is_current_user', '=', True),('type_of_pms', '!=', 'fyr')]}"
                                     context="{'default_section_avg_scale': dummy_kra_section_scale}">
                                     <tree string="KRA Sections" delete="true" editable="bottom" options="{'no_create':True, 'no_open': False}">
                                         <field name="name" required="1" readonly="1"/>
-                                        <field name="hyr_aa_rating" required="0" readonly="1"/>
+                                        <field name="hyr_aa_rating" required="0" readonly="1" invisible="1"/>
                                         <field name="hyr_fa_rating" required="0" readonly="1"/>
                                         <field name="appraisee_weightage" invisible="1" attrs="{'readonly': [('state', 'not in', ['draft'])],'required': [('state', 'in', ['draft'])]}" sum="total"/>
-                                        <field name="weightage" required="1" readonly="1" sum="total" attrs="{'required': [('state', 'in', ['functional_rating'])],'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating'])]}"/>
+                                        <field name="weightage" readonly="1" sum="total" attrs="{'required': [('state', 'in', ['functional_rating'])]}"/>
+                                        <!-- 'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating'])] -->
                                         <field name="self_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'draft')],
                                         'required': [('state', '=', 'draft')]}"/>
                                         <field name="kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
@@ -416,7 +415,7 @@
                                         'required': [('state', '=', 'reviewer_rating')],'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating','functional_rating'])]}"/> 
                                         <field name="is_required" force_save="1" invisible="1"/> 
                                         <field name="section_avg_scale" force_save="1" readonly="0" invisible="1"/> 
-                                        <field name="weighted_score" force_save="1"/> 
+                                        <field name="weighted_score" force_save="1" invisible="1"/> 
                                         <field name="state" invisible="1"/>
                                     </tree>
                                     <form string="">
@@ -1086,12 +1085,11 @@
 				</p>
 			</field>
 		</record>
-
         <record id="action_pms_fa_view_id" model="ir.actions.act_window">
 			<field name="name">Functional Appraisal</field>
 			<field name="res_model">pms.appraisee</field>
 			<field name="view_mode">tree,form</field>
-            <field name="domain">[('state','=','functional_rating'),('manager_id.user_id','=',uid)]</field>
+            <field name="domain">[('state','in',['goal_setting_draft','hyr_functional_rating','functional_rating']),('manager_id.user_id','=',uid)]</field>
             <!-- <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field> -->
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />

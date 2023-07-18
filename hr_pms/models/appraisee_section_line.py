@@ -72,7 +72,12 @@ class KRA_SectionLine(models.Model):
         string='Target', 
         size=8
         )
+
     state = fields.Selection([
+        ('goal_setting_draft', 'Goal Settings'),
+        ('hyr_draft', 'Draft'),
+        ('hyr_admin_rating', 'Admin Supervisor'),
+        ('hyr_functional_rating', 'Functional Supervisor'),
         ('draft', 'Draft'),
         ('admin_rating', 'Admin Supervisor'),
         ('functional_rating', 'Functional Supervisor'),
@@ -80,7 +85,7 @@ class KRA_SectionLine(models.Model):
         ('wating_approval', 'HR to Approve'),
         ('done', 'Done'),
         ('withdraw', 'Withdrawn'),
-        ], string="Status", default = "draft", readonly=True, related="kra_section_id.state")
+        ], string="Status", readonly=True, related="kra_section_id.state")
     
     weighted_score = fields.Float(
         string='Weighted (%) Score of specific KRA', 
@@ -234,7 +239,7 @@ class KRA_SectionLine(models.Model):
                 rec.weighted_score = 0
 
     def unlink(self):
-        for delete in self.filtered(lambda delete: delete.state not in ['draft']):
+        for delete in self.filtered(lambda delete: delete.state not in ['goal_setting_draft']):
             raise ValidationError(_('You cannot delete a KRA section once submitted Click the Ok and then discard button to go back'))
         return super(KRA_SectionLine, self).unlink()
     
