@@ -75,6 +75,7 @@ class KRA_SectionLine(models.Model):
 
     state = fields.Selection([
         ('goal_setting_draft', 'Goal Settings'),
+        ('gs_fa', 'Goal Settings: FA TO APPROVE'),
         ('hyr_draft', 'Draft'),
         ('hyr_admin_rating', 'Admin Supervisor'),
         ('hyr_functional_rating', 'Functional Supervisor'),

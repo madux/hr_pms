@@ -194,8 +194,8 @@ class PMS_Appraisee(models.Model):
         tracking=True, copy=False)
     type_of_pms = fields.Selection([
         ('gs', 'Goal Setting'),
-        ('hyr', 'Half year review'),
-        ('fyr', 'Full year review'),
+        ('hyr', 'Mid year review'),
+        ('fyr', 'Annual review'),
         ], string="Type of PMS", default = "", 
         copy=True)
     line_manager_id = fields.Many2one(
@@ -264,6 +264,7 @@ class PMS_Appraisee(models.Model):
     )
     state = fields.Selection([
         ('goal_setting_draft', 'Goal Settings'),
+        ('gs_fa', 'Goal Settings: FA TO APPROVE'),
         ('hyr_draft', 'Mid Year Review'),
         ('hyr_admin_rating', 'Admin Supervisor'),
         ('hyr_functional_rating', 'Functional Appraiser(HYR)'),
@@ -285,6 +286,7 @@ class PMS_Appraisee(models.Model):
     )
     dummy_state = fields.Selection([
         ('gs', 'Goal Settings'),
+        ('gs_fa', 'Goal Settings FA For Approval'),
         ('my', 'Mid Year Review'),
         ('hyr_a', 'Admin Supervisor'),
         ('hyr_f', 'Functional Appraiser(HYR)'),
@@ -301,7 +303,7 @@ class PMS_Appraisee(models.Model):
     @api.onchange('type_of_pms')
     def onchange_type_of_pms(self):
         """This is to enable status move directly to
-          final year review or half year review when 
+          final year review or Mid year review when 
           the type of pms is triggered
         """
         self.ensure_one()
@@ -324,6 +326,8 @@ class PMS_Appraisee(models.Model):
         for rec in self:
             if rec.state == 'goal_setting_draft':
                 rec.dummy_state = 'gs'
+            elif rec.state == 'gs_fa':
+                rec.dummy_state = 'gs_fa'
             elif rec.state == 'hyr_draft':
                 rec.dummy_state = 'my'
             elif rec.state == 'hyr_admin_rating':
@@ -1036,8 +1040,19 @@ class PMS_Appraisee(models.Model):
         reviewer_id = self.employee_id.reviewer_id
         # doing this to avoid making calls that will impact optimization
         department_manager = self.employee_id.parent_id
-
-        if self.state == "hyr_draft":
+        if self.state == "goal_setting_draft":
+            email_to = department_manager.work_email
+            email_cc = [
+            department_manager.work_email,
+            administrative_supervisor.work_email,
+        ]
+        elif self.state == "gs_fa":
+            email_to = self.employee_id.work_email
+            email_cc = [
+            department_manager.work_email,
+            administrative_supervisor.work_email,
+        ]
+        elif self.state == "hyr_draft":
             email_to = administrative_supervisor.work_email if self.administrative_supervisor_id.work_email else department_manager.work_email
             email_cc = [
             department_manager.work_email,
@@ -1174,7 +1189,19 @@ class PMS_Appraisee(models.Model):
             raise ValidationError(error_msg)
         
     def validate_kra_setting(self):
-        if self.state == "goal_setting_draft":
+        if self.state in ["goal_setting_draft"]:
+            weightage = sum([
+                weight.weightage for weight in self.mapped(
+                'goal_setting_section_line_ids'
+                )])
+            if weightage != 100:
+                value_diff = 100 - weightage 
+                needed_value_msg = f'''
+                You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
+                raise ValidationError(
+                    f"""Ensure KRAs weight with acceptance status is 'YES' is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+                    )
+        elif self.state in ["gs_fa"]:
             weightage = sum([
                 weight.weightage for weight in self.mapped(
                 'goal_setting_section_line_ids'
@@ -1188,8 +1215,9 @@ class PMS_Appraisee(models.Model):
                 raise ValidationError(
                     f"""Ensure KRAs weight with acceptance status is 'YES' is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
                     )
+            
         elif self.state == "hyr_draft":
-            weightage = sum([weight.revise_weightage for weight in self.mapped('hyr_kra_section_line_ids').filtered(lambda self: self.acceptance_status == "Accepted")])
+            weightage = sum([weight.revise_weightage for weight in self.mapped('hyr_kra_section_line_ids').filtered(lambda self: self.acceptance_status in ["Revised", "Accepted"])])
             if weightage != 100:
                 value_diff = 100 - weightage 
                 needed_value_msg = f'''You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
@@ -1225,6 +1253,30 @@ class PMS_Appraisee(models.Model):
         self.overall_validate_weightage()
         self.validate_kra_setting()
         msg = """Dear {}, <br/> 
+        I wish to notify you that my PMS Goal Settings {} \
+        has been submitted for approval.\
+        <br/>Kindly {} to review <br/>\
+        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+            self.manager_id.name or self.employee_id.parent_id.name,
+            self.employee_id.name,
+            self.get_url(self.department_id.id, self._name),
+            self.env.user.name,
+            self.department_id.name,
+            )
+        # self.generate_hyr_kra_lines()
+        self.send_mail_notification(msg)
+        self.write({
+                'state': 'gs_fa',
+                'submitted_date': fields.Date.today(),
+                'manager_id': self.employee_id.parent_id.id,
+            })
+        
+    def manager_submit_goal_setting_button(self):
+        self.lock_fields = False
+        self.validate_deadline()
+        self.overall_validate_weightage()
+        self.validate_kra_setting()
+        msg = """Dear {}, <br/> 
         I wish to notify you that an employee PMS Goal Settings {} \
         has been submitted for review.\
         <br/>Kindly {} to review <br/>\
@@ -1241,7 +1293,6 @@ class PMS_Appraisee(models.Model):
                 'name': f'MID Year Review for {self.employee_id.name}', 
                 'state': 'hyr_draft',
                 'submitted_date': fields.Date.today(),
-                'manager_id': self.employee_id.parent_id.id,
                 'type_of_pms': 'hyr',
             })
         
@@ -1256,10 +1307,11 @@ class PMS_Appraisee(models.Model):
                 'name': hyr_line.name,
                 'pms_uom': hyr_line.pms_uom, 
                 'weightage': hyr_line.weightage,
-                'revise_weightage': hyr_line.weightage,
+                'revise_weightage': hyr_line.weightage if hyr_line.acceptance_status == 'yes' else 0,
                 'target': hyr_line.target,
                 'revise_target': hyr_line.target,
                 'enable_line_edit': 'no',
+                'acceptance_status': 'Dropped' if hyr_line.acceptance_status == 'no' else 'Accepted',
                 }) for hyr_line in self.goal_setting_section_line_ids],
         })
 
@@ -1686,7 +1738,7 @@ class PMS_Appraisee(models.Model):
         
     def hyr_return_appraisal(self):
         self.check_employer_manager()
-        if self.state == 'hyr_draft':
+        if self.state == 'gs_fa':
             self.state = 'goal_setting_draft'
             self.type_of_pms = 'gs'
         elif self.state == 'hyr_admin_rating':
@@ -1696,6 +1748,10 @@ class PMS_Appraisee(models.Model):
         elif self.state == 'draft':
             self.state = 'hyr_functional_rating'
             self.type_of_pms = 'hyr'
+        elif self.state == 'hyr_draft':
+            self.state = 'goal_setting_draft'
+            self.type_of_pms = 'gs'
+
         
     def return_appraisal(self):
         return {

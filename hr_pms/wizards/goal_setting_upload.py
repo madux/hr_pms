@@ -72,6 +72,7 @@ class GoalSettingDummy(models.TransientModel):
     pms_uom = fields.Selection([
         ('Desc', 'Desc'),
         ('Naira', 'Naira'),
+        ('Number', 'Number(s)'),
         ('Percentage', 'Percentage'),
         ('Day', 'Day(s)'),
         ('Week', 'Week(s)'),

@@ -28,6 +28,7 @@ class GoalSettingSectionLine(models.Model):
     pms_uom = fields.Selection([
         ('Desc', 'Description'),
         ('Naira', 'Naira'),
+        ('Number', 'Number(s)'),
         ('Percentage', 'Percentage(s)'),
         ('Day', 'Day(s)'),
         ('Week', 'Week(s)'),
@@ -47,6 +48,7 @@ class GoalSettingSectionLine(models.Model):
         )
     state = fields.Selection([
         ('goal_setting_draft', 'Goal Settings'),
+        ('gs_fa', 'Goal Settings: FA TO APPROVE'),
         ('hyr_draft', 'Draft'),
         ('hyr_admin_rating', 'Admin Supervisor'),
         ('hyr_functional_rating', 'Functional Supervisor'),
@@ -75,7 +77,7 @@ class GoalSettingSectionLine(models.Model):
     def onchange_target(self):
         self.ensure_one()
         if self.target:
-            if self.pms_uom in ['Naira', 'Day', 'Month', 'week', 'Percentage']:
+            if self.pms_uom in ['Naira', 'Day', 'Month', 'week', 'Percentage', 'Number']:
                 value = self.target.replace(',', '')
                 value_uom = value
                 if self.pms_uom in ['Naira']:
@@ -89,10 +91,14 @@ class GoalSettingSectionLine(models.Model):
                         value_uom = f"{float(value_uom)} %" if '.' in value_uom else f"{int(value_uom)} %" 
                     except Exception as e:
                         value_uom = value 
-                        # raise ValidationError("Wroskss")
                 if self.pms_uom in ['Day', 'Month', 'Week']:
                     suffix = f"- day(s)" if self.pms_uom == 'Day' else "-Week(s)" if self.pms_uom == "Week" else "-Month(s)"
-                    value_uom = f"{value_uom} {suffix}" 
+                    value_uom = f"{value_uom} {suffix}"
+                if self.pms_uom in ['Number']:
+                    if self.target.isdigit():
+                        value_uom = self.target
+                    else:
+                        raise ValidationError("Wrong value provided for Number Unit of measure. eg (1, 2, 3, 4, 5)") 
                 self.target = value_uom
 
     def unlink(self):

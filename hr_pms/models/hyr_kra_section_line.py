@@ -32,6 +32,7 @@ class HYR_KRA_SectionLine(models.Model):
     pms_uom = fields.Selection([
         ('Desc', 'Description'),
         ('Naira', 'Naira'),
+        ('Number', 'Number(s)'),
         ('Percentage', 'Percentage(s)'),
         ('Day', 'Day(s)'),
         ('Week', 'Week(s)'),
@@ -50,13 +51,14 @@ class HYR_KRA_SectionLine(models.Model):
     
     acceptance_status = fields.Selection([
         ('none', ''),
-        ('Rejected', 'Rejected'),
+        ('Revised', 'Revised'),
         ('Accepted', 'Accepted'),
         ('Dropped', 'Dropped'),
         ], string="Acceptance", default = "Accepted", readonly=False)
     
     fa_comment = fields.Text(
         string='Comment(s)', 
+        size=200
         )
     
     is_functional_manager = fields.Boolean(
@@ -76,6 +78,7 @@ class HYR_KRA_SectionLine(models.Model):
         )
     state = fields.Selection([
         ('goal_setting_draft', 'Goal Settings'),
+        ('gs_fa', 'Goal Settings: FA TO APPROVE'),
         ('hyr_draft', 'Draft'),
         ('hyr_admin_rating', 'Admin Supervisor'),
         ('hyr_functional_rating', 'Functional Manager'),
@@ -129,7 +132,7 @@ class HYR_KRA_SectionLine(models.Model):
     def onchange_revise_target(self):
         self.ensure_one()
         if self.revise_target:
-            if self.pms_uom in ['Naira', 'Day', 'Month', 'week', 'Percentage']:
+            if self.pms_uom in ['Number', 'Naira', 'Day', 'Month', 'week', 'Percentage']:
                 value = self.revise_target.replace(',', '')
                 value_uom = value
                 if self.pms_uom in ['Naira']:
@@ -146,6 +149,11 @@ class HYR_KRA_SectionLine(models.Model):
                 if self.pms_uom in ['Day', 'Month', 'Week']:
                     suffix = f"- day(s)" if self.pms_uom == 'Day' else "-Week(s)" if self.pms_uom == "Week" else "-Month(s)"
                     value_uom = f"{value_uom} {suffix}" 
+                if self.pms_uom in ['Number']:
+                    if self.target.isdigit():
+                        value_uom = self.target
+                    else:
+                        raise ValidationError("Wrong value provided for Number Unit of measure. eg (1, 2, 3, 4, 5)")  
                 self.revise_target = value_uom
     
     @api.onchange('pms_uom')
