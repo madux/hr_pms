@@ -132,7 +132,7 @@ class HYR_KRA_SectionLine(models.Model):
     def onchange_revise_target(self):
         self.ensure_one()
         if self.revise_target:
-            if self.pms_uom in ['Number', 'Naira', 'Day', 'Month', 'week', 'Percentage']:
+            if self.pms_uom in ['Naira', 'Day', 'Month', 'week', 'Percentage', 'Number']:
                 value = self.revise_target.replace(',', '')
                 value_uom = value
                 if self.pms_uom in ['Naira']:
@@ -150,8 +150,8 @@ class HYR_KRA_SectionLine(models.Model):
                     suffix = f"- day(s)" if self.pms_uom == 'Day' else "-Week(s)" if self.pms_uom == "Week" else "-Month(s)"
                     value_uom = f"{value_uom} {suffix}" 
                 if self.pms_uom in ['Number']:
-                    if self.target.isdigit():
-                        value_uom = self.target
+                    if self.revise_target.isdigit():
+                        value_uom = self.revise_target
                     else:
                         raise ValidationError("Wrong value provided for Number Unit of measure. eg (1, 2, 3, 4, 5)")  
                 self.revise_target = value_uom
