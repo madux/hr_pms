@@ -7,7 +7,7 @@ class PMS_Kba_description(models.Model):
     _name = "kba.descriptions"
 
     name = fields.Text(
-        string="KBA descriptions", 
+        string="KBA", 
         required=True)
 
     section_line_id = fields.Many2one(
@@ -19,8 +19,8 @@ class PMS_Kba_description(models.Model):
         'pms.department.section.line', 
         string="PMS Section Line ID"
         )
-    
-    
+
+
 class PMS_SectionLine(models.Model):
     _name = "pms.section.line"
     _description= "Section lines"

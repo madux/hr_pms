@@ -58,6 +58,7 @@
                             <separator string="Details" colspan="4"/>
                             <group>
                                 <field name="sequence" readonly="1"/>
+                                <field name="type_of_pms" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="department_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="department_manager_id" readonly="1" force_save="1" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                             </group>
@@ -193,7 +194,9 @@
                     <field name="is_department_head"/>
                     <group  expand='0' string='Group by...'>
                         <filter name="name" string='Name' domain="[]" context="{'group_by' : 'name'}"/>
-                        <filter name="pms_year_id" string='Period' domain="[]" context="{'group_by' : 'pms_year_id'}"/>
+                        <filter name="group_pms_year_id" string='Period' domain="[]" context="{'group_by' : 'pms_year_id'}"/>
+                        <filter name="group_hr_category_id" string='Category' domain="[]" context="{'group_by' : 'hr_category_id'}"/>
+                        <filter name="group_department_id" string='Department' domain="[]" context="{'group_by' : 'department_id'}"/>
                         <filter name="state" string='State' domain="[]" context="{'group_by' : 'state'}"/>
                     </group>
 				</search>
@@ -205,6 +208,7 @@
 			<field name="res_model">pms.department</field>
 			<field name="view_mode">tree,form</field>
               <field name="domain">[]</field>
+             <field name="context">{'search_default_group_pms_year_id': 1,'search_default_group_hr_category_id': 1,'search_default_group_department_id': 1}</field>
              <!-- <field name="search_view_id" ref="hr_pms.view_pms_department_filter" /> -->
 			<field name="view_id" eval="False"/>
 			<field name="help" type="html">

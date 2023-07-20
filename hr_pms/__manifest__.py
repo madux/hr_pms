@@ -20,6 +20,7 @@
             'views/pms_department_view.xml',
             'views/section_view.xml',
             'wizards/post_normalisation_views.xml',
+            'wizards/goal_setting_upload_views.xml',
             'views/appraisee_view.xml',
             'views/employee_inherit_view.xml',
             'views/hr_level_category.xml',

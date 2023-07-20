@@ -56,7 +56,7 @@ class currentAssessmentSectionLine(models.Model):
         string='Description', 
         )
     weightage = fields.Float(
-        string='Weight (Total 100%)'
+        string='Weightage'
         )
     
     administrative_supervisor_rating = fields.Integer(
@@ -157,7 +157,7 @@ class PotentialSectionLine(models.Model):
         string='Description', 
         )
     weightage = fields.Float(
-        string='Weight (Total 100%)', 
+        string='Weightage', 
         )
     administrative_supervisor_rating = fields.Integer(
         string='AA Rating', 
