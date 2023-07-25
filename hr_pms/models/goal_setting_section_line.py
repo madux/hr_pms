@@ -60,12 +60,13 @@ class GoalSettingSectionLine(models.Model):
         ('done', 'Done'),
         ('withdraw', 'Withdrawn'),
         ], string="Status", readonly=True, related="goal_setting_section_id.state")
+    can_edit = fields.Boolean(string="Can edit", default=False, compute="_check_manager_access")
     
     @api.onchange('weightage')
     def onchange_weightage(self):
-        if self.weightage > 0 and self.weightage not in range (0, 26):
+        if self.weightage > 0 and self.weightage not in list(range(0, 30, 5)):
             self.weightage = 0
-            raise UserError('Weightage must be within the range of 1 to 25')
+            raise UserError('Weightage must be within the range of 1 to 25:')
         
     @api.onchange('pms_uom')
     def onchange_pms_uom(self):
@@ -101,7 +102,18 @@ class GoalSettingSectionLine(models.Model):
                         raise ValidationError("Wrong value provided for Number Unit of measure. eg (1, 2, 3, 4, 5)") 
                 self.target = value_uom
 
+    def _check_manager_access(self):
+        for rec in self:
+            if rec.state == "gs_fa":
+                if rec.goal_setting_section_id.manager_id.user_id.id == rec.env.uid:
+                    rec.can_edit = True 
+                else:
+                    rec.can_edit = False
+            else:
+                rec.can_edit = False 
+
     def unlink(self):
-        for delete in self.filtered(lambda delete: delete.state not in ['goal_setting_draft']):
+        for delete in self.filtered(lambda delete: delete.state in ['gs_fa']):
             raise ValidationError(_('You cannot delete a KRA section once submitted Click the Ok and then discard button to go back'))
         return super(GoalSettingSectionLine, self).unlink()
+    

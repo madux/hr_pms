@@ -29,7 +29,7 @@
                     <group  expand='0' string='Group by...'>
                         <filter name="department_id" string='Department' domain="[]" context="{'group_by' : 'department_id'}"/>
                         <filter name="employee_id" string='Employee' domain="[]" context="{'group_by' : 'employee_id'}"/>
-                        <filter name="group_pms_year_id" string='Period' domain="[]" context="{'group_by' : 'pms_year_id'}"/>
+                        <!-- <filter name="group_pms_year_id" string='Period' domain="[]" context="{'group_by' : 'pms_year_id'}"/> -->
                         <filter name="group_type_of_pms" string='Type of PMS' domain="[]" context="{'group_by' : 'type_of_pms'}"/>
                         <filter name="manager_id" string='Manager' domain="[]" context="{'group_by' : 'manager_id'}"/>
                         <filter name="administrative_supervisor_id" string='Administrative Supervisor' domain="[]" context="{'group_by' : 'administrative_supervisor_id'}"/>
@@ -186,7 +186,7 @@
                         <group>
                             <group>
                                 <field name="type_of_pms" invisible="0" readonly="1" force_save="1"/> 
-                                <field name="pms_year_id" invisible="1" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="pms_year_id" invisible="0" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="deadline" readonly="1" force_save="1"/> 
                                 <field name="dummy_state" invisible="1" force_save="1"/> 
                                 <!-- <field name="online_deadline_date" string="Appraisee Deadline Date" readonly="1" force_save="1"/>  -->
@@ -214,7 +214,7 @@
                             <page name="employee_manager_info" string="Staff Profile">
                                 <form string="">
                                     <group>
-                                    <separator class="alert alert-info" role="alert" string="Appraisee’s Personal Information (employee must have worked for minimum 6 months in the appraisal period)" colspan="4"/>
+                                    <separator class="alert alert-info" role="alert" string="Appraisee’s Personal Information (employee must have worked for minimum 4 months in the appraisal period)" colspan="4"/>
                                     <group>
                                         <field name="employee_id" attrs="{'readonly': [('lock_fields', '=', False)]}" readonly="0" options="{'no_create': True,'no_open': True}"/> 
                                         <field name="job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
@@ -227,7 +227,7 @@
                                         <field name="job_title" readonly="1" force_save="1" string="Designation"/>
                                         <field name="work_unit_id" readonly="1" string="Unit/SC/Workshop/Substation" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                     </group>
-                                        <separator class="alert alert-info" role="alert" string="Current Functional Appraiser’s (should have supervised appraisee for minimum 3 months) Personal Information" colspan="4"/>
+                                        <separator class="alert alert-info" role="alert" string="Current Functional Appraiser’s (should have supervised appraisee for minimum 4 months) Personal Information" colspan="4"/>
                                         <group>
                                             <field name="manager_id" readonly="1" string="Manager" options="{'no_create': True,'no_open': True}"/> 
                                             <field name="manager_job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
@@ -239,7 +239,7 @@
                                             <field name="manager_job_title" readonly="1" force_save="1" string="Designation"/>
                                             <field name="manager_work_unit" readonly="1" string="Unit/SC/Workshop/Substation" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                         </group>
-                                        <separator class="alert alert-info" role="alert" string="Current Administrative Appraiser’s (should have supervised appraisee for minimum 3 months) Personal Information" colspan="4"/>
+                                        <separator class="alert alert-info" role="alert" string="Current Administrative Appraiser’s (should have supervised appraisee for minimum 4 months) Personal Information" colspan="4"/>
                                         <group>
                                             <field name="administrative_supervisor_id" readonly="1" string="Name" options="{'no_create': True,'no_open': True}"/> 
                                             <field name="supervisor_job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
@@ -270,29 +270,31 @@
 							    <div attrs="{'invisible': [('type_of_pms', '!=', 'gs')]}">
                                     <p style="color: black;font-size: 14px;">Goal Setting</p>
                                     <p style="color: red;">* Only Employee and Functional managers are expected to fill at this stage</p>
+                                    <p style="color: red;">* FA should also discuss with AA at this stage</p>
                                 </div>
-                                <button 
+                                <!-- <button 
                                     name="button_goal_setting" 
                                     string="Upload goals using excel" 
                                     class="oe_highlight btn-sm" 
                                     type="object"
                                     states="goal_setting_draft" 
                                     groups="hr_pms.group_pms_user_id"
-                                /> 
+                                />  -->
                                 <field name="goal_setting_section_line_ids" options="{'no_quick_create':True,'no_open': True}" 
                                     attrs="{
                                         'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])],
                                         'invisible': [('type_of_pms', '!=', 'gs')]
                                         }">
                                     <tree string="Goal Setting" delete="true" editable="bottom" options="{'no_create':False, 'no_open': False}">
-                                        <field name="name" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])]}"/> 
+                                        <field name="name" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])]}"/> 
                                         <field name="state" invisible="1" force_save="1"/> 
-                                        <field name="weightage" required="1" sum="total" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])],
+                                        <field name="can_edit" invisible="1" force_save="1"/> 
+                                        <field name="weightage" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],
                                         'required': [('state', 'in', ['goal_setting_draft', 'gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft', 'gs_fa'])]}" />
-                                        <field name="pms_uom" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])]}" />
-                                        <field name="target" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])],
-                                        'required': [('state', 'in', ['goal_setting_draft', 'gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft', 'gs_fa'])]}" />
-                                        <field name="acceptance_status" required="1" attrs="{'readonly': [('state', 'not in', ['gs_fa'])],
+                                        <field name="pms_uom" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])]}" />
+                                        <field name="target" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],
+                                        'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft', 'gs_fa'])]}" />
+                                        <field name="acceptance_status" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],
                                         'required': [('state', 'in', ['gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['gs_fa'])]}" />
                                         <field name="goal_setting_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <field name="fa_comment" required="0" invisible="1"/>
@@ -349,7 +351,8 @@
                                         'required': [('state', 'in', ['hyr_draft','hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
                                         <field name="hyr_fa_rating" required="0" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)],'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
-                                        <field name="fa_comment" widget="text" force_save="1" attrs="{'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)]}"/>
+                                        <field name="fa_comment" widget="text" force_save="1" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
+                                        'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)]}"/>
                                         <field name="hyr_kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <!-- attrs="{'invisible': [('is_current_user', '=', True)]}" -->
                                         <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
@@ -379,10 +382,10 @@
                                     <field name="appraisee_comment" widget="text" force_save="1" placeholder="Start typing" attrs="{
                                         'invisible': [('state', 'not in', ['hyr_draft', 'hyr_admin_rating', 'hyr_functional_rating'])],
                                         'readonly': [('state', 'not in', ['hyr_draft'])]}"/><br/>
-                                    <separator string="Supervisor Comments" colspan="4"/><br/>
+                                    <!-- <separator string="Supervisor Comments" colspan="4"/><br/>
                                     <field name="supervisor_comment" force_save="1" widget="text" placeholder="Start typing" attrs="{
                                         'invisible': [('state', 'not in', ['hyr_draft','hyr_admin_rating','hyr_functional_rating'])],
-                                        'readonly': [('state', 'not in', ['hyr_admin_rating'])]}"/><br/>
+                                        'readonly': [('state', 'not in', ['hyr_admin_rating'])]}"/><br/> -->
                                     <separator string="Manager Comments" colspan="4" /><br/>
                                     <field name="manager_comment" widget="text" force_save="1" placeholder="Start typing" attrs="{
                                         'invisible': [('state', 'not in', ['hyr_draft','hyr_admin_rating','hyr_functional_rating'])],
@@ -1097,7 +1100,7 @@
 			<field name="name">Functional Appraisal</field>
 			<field name="res_model">pms.appraisee</field>
 			<field name="view_mode">tree,form</field>
-            <field name="domain">[('state','in',['goal_setting_draft','hyr_functional_rating','functional_rating']),('manager_id.user_id','=',uid)]</field>
+            <field name="domain">[('state','in',['gs_fa', 'hyr_functional_rating','functional_rating']),('manager_id.user_id','=',uid)]</field>
             <!-- <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field> -->
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
@@ -1191,8 +1194,6 @@
 			])]"/>
             <field name="code">action=model.post_normalisation_upload_action()</field>
         </record>
-
-
 
     <menuitem id="view_pms_appraisee_menu" name="Appraisal" sequence="1" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_appraisee_view_id"/>
     <menuitem id="view_pms_my_appraisal_menu" name="My Appraisal(s)" sequence="1" parent="hr_pms.view_pms_appraisee_menu" action="hr_pms.action_pms_appraisee_view_id"

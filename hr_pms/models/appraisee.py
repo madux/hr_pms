@@ -1247,11 +1247,22 @@ class PMS_Appraisee(models.Model):
             if len(type_kra_section_ids) not in range(min_limit, max_limit + 1): # not in [5, 6, limit]:
                 raise ValidationError("""Please ensure the number of KRA / Achievement section is within the range of {} to {} line(s)""".format(int(min_limit), int(max_limit)))
 
+    def check_employee_right(self):
+        self.ensure_one()
+        if not self.employee_id.user_id.id == self.env.uid:
+            raise ValidationError("Sorry!!! You are not allowed to submit this record")
+    
+    # def check_manager_right(self):
+    #     self.ensure_one()
+    #     if not self.manager_id.user_id.id == self.env.uid:
+    #         raise ValidationError("Sorry!!! Only the employee manager is allowed to submit this record")
+        
     def goal_setting_button_submit(self):
         self.lock_fields = False
         self.validate_deadline()
         self.overall_validate_weightage()
         self.validate_kra_setting()
+        self.check_employee_right()
         msg = """Dear {}, <br/> 
         I wish to notify you that my PMS Goal Settings {} \
         has been submitted for approval.\
@@ -1276,6 +1287,7 @@ class PMS_Appraisee(models.Model):
         self.validate_deadline()
         self.overall_validate_weightage()
         self.validate_kra_setting()
+        self.check_employer_manager()
         msg = """Dear {}, <br/> 
         I wish to notify you that an employee PMS Goal Settings {} \
         has been submitted for review.\
@@ -1302,6 +1314,7 @@ class PMS_Appraisee(models.Model):
         self.write({
             'state': 'hyr_draft',
             'type_of_pms': 'hyr',
+            'pms_year_id': self.env.ref('hr_pms.pms_year_2023_md').id,
             'hyr_kra_section_line_ids': [(0, 0, {
                 'hyr_kra_section_id': self.id,
                 'name': hyr_line.name,
@@ -1401,6 +1414,7 @@ class PMS_Appraisee(models.Model):
         self.write({
             'state': 'draft',
             'type_of_pms': 'fyr',
+            'pms_year_id': self.env.ref('hr_pms.pms_year_2023_ap').id,
             'name': f'FULL YEAR PMS for {self.employee_id.name}', 
             'kra_section_line_ids': [(0, 0, {
                 'kra_section_id': self.id,
@@ -1751,7 +1765,6 @@ class PMS_Appraisee(models.Model):
         elif self.state == 'hyr_draft':
             self.state = 'goal_setting_draft'
             self.type_of_pms = 'gs'
-
         
     def return_appraisal(self):
         return {
