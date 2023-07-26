@@ -66,7 +66,7 @@ class GoalSettingSectionLine(models.Model):
     def onchange_weightage(self):
         if self.weightage > 0 and self.weightage not in list(range(0, 30, 5)):
             self.weightage = 0
-            raise UserError('Weightage must be within the range of 1 to 25:')
+            raise UserError('Weightage must be either 5, 10, 15, 20 or 25:')
         
     @api.onchange('pms_uom')
     def onchange_pms_uom(self):

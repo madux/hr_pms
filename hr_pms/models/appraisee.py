@@ -916,17 +916,20 @@ class PMS_Appraisee(models.Model):
         
     def get_email_from(self):
         email_from = ""
+        if self.state in ["goal_setting_draft", 'hyr_draft']:
+            email_from = self.employee_id.work_email
+        if self.state in ["gs_fa", "hyr_functional_rating", "functional_rating"]:
+            email_from = self.manager_id.work_email
         if self.state == "admin_rating":
             email_from = self.administrative_supervisor_id.work_email
-        if self.state == "functional_rating":
-            email_from = self.manager_id.work_email
         if self.state == "reviewer_rating":
-            email_from = self.manager_id.work_email or self.administrative_supervisor_id.work_email
+            email_from = self.reviewer_id.work_email
         return email_from
         
     def action_notify(self, subject, msg, email_to, email_cc):
         sender_email_from = self.env.user.email
         email_from = sender_email_from or self.get_email_from()
+        # raise ValidationError(email_from)
         if email_to and email_from:
             email_ccs = list(filter(bool, email_cc))
             reciepients = (','.join(items for items in email_ccs)) if email_ccs else False
@@ -1414,7 +1417,7 @@ class PMS_Appraisee(models.Model):
         self.write({
             'state': 'draft',
             'type_of_pms': 'fyr',
-            'pms_year_id': self.env.ref('hr_pms.pms_year_2023_ap').id,
+            'pms_year_id': self.env.ref('hr_pms.pms_year_2022_ap').id,
             'name': f'FULL YEAR PMS for {self.employee_id.name}', 
             'kra_section_line_ids': [(0, 0, {
                 'kra_section_id': self.id,
@@ -1748,7 +1751,7 @@ class PMS_Appraisee(models.Model):
 
     def check_employer_manager(self):
         if self.employee_id.parent_id.user_id.id != self.env.uid:
-            raise ValidationError("You are not responsible to return this record.")
+            raise ValidationError("You are not responsible to do this operation")
         
     def hyr_return_appraisal(self):
         self.check_employer_manager()
