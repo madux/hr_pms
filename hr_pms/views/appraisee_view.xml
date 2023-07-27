@@ -339,7 +339,7 @@
                                         <field name="weightage" sum="total" readonly ="1"/> 
                                         <!-- attrs="{'readonly': ['|', ('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/> -->
                                         <field name="target" readonly ="1"/>
-                                        <field name="revise_weightage" readonly="1" sum="total" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
+                                        <field name="revise_weightage" readonly="0" sum="total" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
                                         <field name="pms_uom" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />

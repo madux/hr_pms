@@ -1160,7 +1160,9 @@ class PMS_Appraisee(models.Model):
     def validate_hyr_rating(self):
         hyr_lines = self.mapped('hyr_kra_section_line_ids')
         validity_msg = []
-        msg = """You cannot submit this appraisal if all KRA lines progress status is not selected"""
+        msg = """
+        You cannot submit this appraisal if all KRA lines progress status are not selected
+        Also ensure the revise weightage is not less than 5"""
         if self.state == "hyr_admin_rating":
             non_rated_aa_hyr_lines = hyr_lines.filtered(lambda hyr: hyr.hyr_aa_rating == False)
             if non_rated_aa_hyr_lines:
@@ -1168,7 +1170,7 @@ class PMS_Appraisee(models.Model):
             if self.supervisor_comment == "":
                 validity_msg.append("""Please Ensure you provide supervisor's comment""")
         if self.state == "hyr_functional_rating":
-            non_rated_fa_hyr_lines = hyr_lines.filtered(lambda hyr: hyr.hyr_fa_rating == False)
+            non_rated_fa_hyr_lines = hyr_lines.filtered(lambda hyr: hyr.hyr_fa_rating == False or hyr.revise_weightage < 5)
             if non_rated_fa_hyr_lines:
                 validity_msg.append(msg)
             if self.manager_comment == "":
@@ -1431,7 +1433,7 @@ class PMS_Appraisee(models.Model):
                 'functional_supervisor_rating': 0,
                 'hyr_fa_rating': hyr_line.hyr_fa_rating,
                 'hyr_aa_rating': hyr_line.hyr_aa_rating,
-                }) for hyr_line in self.mapped('hyr_kra_section_line_ids').filtered(lambda s: s.acceptance_status == "Accepted")],
+                }) for hyr_line in self.mapped('hyr_kra_section_line_ids').filtered(lambda s: s.acceptance_status in ["Revised", "Accepted"])],
         })
 
     def button_submit(self):
