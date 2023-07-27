@@ -106,22 +106,28 @@
             <field name="input_weightage">1</field>
         </record>
         <!-- PMS YEAR -->
+        
+
         <record model="pms.year" id="pms_year_2023_gs">
-            <field name="name">Goal Setting</field>
+            <field name="name">Goal Setting 2023</field>
             <field name="date_from">2023-08-01</field>
             <field name="date_end">2023-10-30</field>
         </record>
         <record model="pms.year" id="pms_year_2023_md">
-            <field name="name">Mid year Review</field>
+            <field name="name">Mid year Review 2023</field>
             <field name="date_from">2023-09-01</field>
             <field name="date_end">2023-10-30</field>
         </record>
         <record model="pms.year" id="pms_year_2022_ap">
-            <field name="name">Annual Appraisal</field>
+            <field name="name">Annual Appraisal 2023</field>
             <field name="date_from">2023-11-01</field>
             <field name="date_end">2023-12-31</field>
         </record>
-
+        <record model="pms.year" id="pms_year_2022_qrt2">
+            <field name="name">Annual Appraisal 2022</field>
+            <field name="date_from">2023-10-01</field>
+            <field name="date_end">2023-12-30</field>
+        </record>
         
         
         <!-- <record model="pms.year" id="pms_year_2023_qrt3">
