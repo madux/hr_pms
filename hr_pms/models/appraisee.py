@@ -1354,14 +1354,6 @@ class PMS_Appraisee(models.Model):
             self.department_id.name,
             )
         self.send_mail_notification(msg)
-        # if self.employee_id.administrative_supervisor_id:
-        #     self.write({
-        #         'name': f'MID YEAR PMS for {self.employee_id.name}', 
-        #         'state': 'hyr_admin_rating',
-        #         'submitted_date': fields.Date.today(),
-        #         'administrative_supervisor_id': self.employee_id.administrative_supervisor_id.id,
-        #     })
-        # else:
         self.write({
             'state': 'hyr_functional_rating',
             'submitted_date': fields.Date.today(),
