@@ -53,7 +53,8 @@ class PMS_Appraisee(models.Model):
     pms_department_id = fields.Many2one(
         'pms.department', 
         string="PMS Department ID",
-        copy=True
+        copy=True,
+        store=True
         )
     section_id = fields.Many2one(
         'pms.section', 
@@ -105,6 +106,7 @@ class PMS_Appraisee(models.Model):
         'hr.department', 
         string="Department ID",
         copy=True,
+        store=True,
         related="employee_id.department_id",
         )
     reviewer_id = fields.Many2one(
@@ -1170,7 +1172,7 @@ class PMS_Appraisee(models.Model):
             if self.supervisor_comment == "":
                 validity_msg.append("""Please Ensure you provide supervisor's comment""")
         if self.state == "hyr_functional_rating":
-            non_rated_fa_hyr_lines = hyr_lines.filtered(lambda hyr: hyr.hyr_fa_rating == False or hyr.revise_weightage < 5)
+            non_rated_fa_hyr_lines = hyr_lines.filtered(lambda hyr: hyr.hyr_fa_rating == False and hyr.acceptance_status != "Dropped") # or hyr.revise_weightage < 5 and hyr.acceptance_status != "Dropped")
             if non_rated_fa_hyr_lines:
                 validity_msg.append(msg)
             if self.manager_comment == "":
