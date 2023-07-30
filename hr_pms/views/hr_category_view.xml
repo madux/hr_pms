@@ -60,6 +60,7 @@
                             <group>
                                 <field name="category" required="1"/>
                                 <field name="sequence" readonly="1"/>
+                                <field name="type_of_pms" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="pms_year_id" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="date_from" readonly="1" force_save="1"/>
                                 <field name="date_end" readonly="1" force_save="1"/>

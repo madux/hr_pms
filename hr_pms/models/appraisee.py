@@ -133,7 +133,8 @@ class PMS_Appraisee(models.Model):
     appraisee_comment = fields.Text(
         string="Appraisee Comment",
         tracking=True,
-        copy=False
+        copy=False,
+        store=True,
         )
     appraisee_attachement_ids = fields.Many2many(
         'ir.attachment', 
@@ -144,8 +145,6 @@ class PMS_Appraisee(models.Model):
         copy=False
     )
     appraisee_attachement_set = fields.Integer(default=0, required=1) # Added to field to check whether attachment have been updated
-    
-    
     supervisor_comment = fields.Text(
         string="Supervisor Comment", 
         # tracking=True
@@ -193,6 +192,12 @@ class PMS_Appraisee(models.Model):
         ('totally_disagreed', 'Totally Disagreed'),
         ], string="Perception on PMS", default = "none", 
         tracking=True, copy=False)
+    type_of_pms = fields.Selection([
+        ('gs', 'Goal Setting'),
+        ('hyr', 'Mid year review'),
+        ('fyr', 'Annual review'),
+        ], string="Type of PMS", default = "", 
+        copy=True)
     line_manager_id = fields.Many2one(
         'hr.employee', 
         string="Line Manager"
@@ -203,12 +208,25 @@ class PMS_Appraisee(models.Model):
         string="Appraisal with ?", 
         readonly=True
         )
+    goal_setting_section_line_ids = fields.One2many(
+        "goal.setting.section.line",
+        "goal_setting_section_id",
+        string="Goal Settings",
+        copy=False
+    )
+    hyr_kra_section_line_ids = fields.One2many(
+        "hyr.kra.section.line",
+        "hyr_kra_section_id",
+        string="HYR KRAs",
+        copy=False
+    )
     kra_section_line_ids = fields.One2many(
         "kra.section.line",
         "kra_section_id",
         string="KRAs",
         copy=True
     )
+    
     lc_section_line_ids = fields.One2many(
         "lc.section.line",
         "lc_section_id",
@@ -245,7 +263,12 @@ class PMS_Appraisee(models.Model):
         string="Quality check section"
     )
     state = fields.Selection([
-        ('draft', 'Draft'),
+        ('goal_setting_draft', 'Goal Settings'),
+        ('gs_fa', 'Goal Settings: FA TO APPROVE'),
+        ('hyr_draft', 'Mid Year Review'),
+        ('hyr_admin_rating', 'Admin Supervisor'),
+        ('hyr_functional_rating', 'Functional Appraiser(HYR)'),
+        ('draft', 'Start Full Year Review'),
         ('admin_rating', 'Administrative Appraiser'),
         ('functional_rating', 'Functional Appraiser'),
         ('reviewer_rating', 'Reviewer'),
@@ -253,9 +276,20 @@ class PMS_Appraisee(models.Model):
         ('done', 'Completed'),
         ('signed', 'Signed Off'),
         ('withdraw', 'Withdrawn'), 
-        ], string="Status", default = "draft", readonly=True, store=True, tracking=True, copy=False)
-
+        ], 
+        string="Status", 
+        default = "goal_setting_draft", 
+        readonly=True, 
+        store=True, 
+        tracking=True, 
+        copy=False
+    )
     dummy_state = fields.Selection([
+        ('gs', 'Goal Settings'),
+        ('gs_fa', 'Goal Settings FA For Approval'),
+        ('my', 'Mid Year Review'),
+        ('hyr_a', 'Admin Supervisor'),
+        ('hyr_f', 'Functional Appraiser(HYR)'),
         ('a', 'Draft'),
         ('b', 'Administrative Appraiser'),
         ('c', 'Functional Appraiser'),
@@ -266,6 +300,16 @@ class PMS_Appraisee(models.Model):
         ('h', 'Withdrawn'),
         ], string="Dummy Status", readonly=True,compute="_compute_new_state", store=True,copy=False)
     
+    @api.onchange('type_of_pms')
+    def onchange_type_of_pms(self):
+        """This is to enable status move directly to
+          final year review or Mid year review when 
+          the type of pms is triggered
+        """
+        self.ensure_one()
+        if self.type_of_pms:
+            self.state = 'hyr_draft' if self.type_of_pms == "hyr" else "draft"
+
     @api.onchange('appraisee_satisfaction')
     def onchange_appraisee_satisfaction(self):
         '''
@@ -280,7 +324,17 @@ class PMS_Appraisee(models.Model):
     @api.depends('state')
     def _compute_new_state(self):
         for rec in self:
-            if rec.state == 'draft':
+            if rec.state == 'goal_setting_draft':
+                rec.dummy_state = 'gs'
+            elif rec.state == 'gs_fa':
+                rec.dummy_state = 'gs_fa'
+            elif rec.state == 'hyr_draft':
+                rec.dummy_state = 'my'
+            elif rec.state == 'hyr_admin_rating':
+                rec.dummy_state = 'hyr_a'
+            elif rec.state == 'hyr_functional_rating':
+                rec.dummy_state = 'hyr_f'
+            elif rec.state == 'draft':
                 rec.dummy_state = 'a'
             elif rec.state == 'admin_rating':
                 rec.dummy_state = 'b'
@@ -295,7 +349,7 @@ class PMS_Appraisee(models.Model):
             elif rec.state == 'signed':
                 rec.dummy_state = 'g'
             else:
-                rec.dummy_state = 'h'
+                rec.dummy_state = 'gs'
 
     pms_year_id = fields.Many2one(
         'pms.year', string="Period", copy=True)
@@ -347,7 +401,6 @@ class PMS_Appraisee(models.Model):
         store=True,
         compute="compute_final_kra_score"
         )
-    
     final_fc_score = fields.Float(
         string='Final FC Score', 
         store=True,
@@ -408,18 +461,6 @@ class PMS_Appraisee(models.Model):
         related="employee_id.reviewer_id.work_unit_id",
         store=True
         )
-    
-    # @api.depends()
-    # def compute_reviewer_details(self):
-    #     reviewer_work_unit=self.employee_id.reviewer_id.hr_work_unit.name
-    #     self.reviewer_work_unit = reviewer_work_unit
-
-    #     reviewer_job_id =self.employee_id.reviewer_id.job_id.name
-    #     self.reviewer_work_unit = reviewer_job_id
-
-    #     reviewer_job_id =self.employee_id.reviewer_id.job_id.name
-    #     self.reviewer_work_unit = reviewer_job_id
-
     reviewer_job_title = fields.Char(
         string="Reviewer Designation", 
         related="employee_id.reviewer_id.job_title",
@@ -518,6 +559,8 @@ class PMS_Appraisee(models.Model):
         related="employee_id.administrative_supervisor_id.employee_number",
         store=True
         )
+    is_functional_appraiser = fields.Boolean(string='Is functional appraiser', compute="compute_functional_appraiser")
+    reason_back = fields.Text(string='Return Reasons', tracking=True)
     
     @api.depends('pms_department_id')
     def get_kra_section_scale(self):
@@ -873,17 +916,20 @@ class PMS_Appraisee(models.Model):
         
     def get_email_from(self):
         email_from = ""
+        if self.state in ["goal_setting_draft", 'hyr_draft']:
+            email_from = self.employee_id.work_email
+        if self.state in ["gs_fa", "hyr_functional_rating", "functional_rating"]:
+            email_from = self.manager_id.work_email
         if self.state == "admin_rating":
             email_from = self.administrative_supervisor_id.work_email
-        if self.state == "functional_rating":
-            email_from = self.manager_id.work_email
         if self.state == "reviewer_rating":
-            email_from = self.manager_id.work_email or self.administrative_supervisor_id.work_email
+            email_from = self.reviewer_id.work_email
         return email_from
         
     def action_notify(self, subject, msg, email_to, email_cc):
         sender_email_from = self.env.user.email
         email_from = sender_email_from or self.get_email_from()
+        # raise ValidationError(email_from)
         if email_to and email_from:
             email_ccs = list(filter(bool, email_cc))
             reciepients = (','.join(items for items in email_ccs)) if email_ccs else False
@@ -997,7 +1043,38 @@ class PMS_Appraisee(models.Model):
         reviewer_id = self.employee_id.reviewer_id
         # doing this to avoid making calls that will impact optimization
         department_manager = self.employee_id.parent_id
-        if self.state == "draft":
+        if self.state == "goal_setting_draft":
+            email_to = department_manager.work_email
+            email_cc = [
+            department_manager.work_email,
+            administrative_supervisor.work_email,
+        ]
+        elif self.state == "gs_fa":
+            email_to = self.employee_id.work_email
+            email_cc = [
+            department_manager.work_email,
+            administrative_supervisor.work_email,
+        ]
+        elif self.state == "hyr_draft":
+            email_to = administrative_supervisor.work_email if self.administrative_supervisor_id.work_email else department_manager.work_email
+            email_cc = [
+            department_manager.work_email,
+            administrative_supervisor.work_email,
+        ]
+        elif self.state == "hyr_admin_rating":
+            email_to = department_manager.work_email
+            email_cc = [
+                department_manager.work_email,
+                self.employee_id.work_email
+                ]
+        elif self.state == "hyr_functional_rating":
+            email_to = self.employee_id.work_email
+            email_cc = [
+                department_manager.work_email,
+                administrative_supervisor.work_email,
+                ]
+            
+        elif self.state == "draft":
             email_to = administrative_supervisor.work_email if self.administrative_supervisor_id.work_email else department_manager.work_email
             email_cc = [
             department_manager.work_email,
@@ -1049,22 +1126,25 @@ class PMS_Appraisee(models.Model):
                 max_category_line_number = category_kra_line[0].max_line_number if category_kra_line and category_kra_line[0].max_line_number > 0 else max_limit
                 max_limit = max_category_line_number
                 min_limit = min_category_line_number
-            if len(self.kra_section_line_ids.ids) not in range(min_limit, max_limit + 1): # not in [5, 6, limit]:
+            
+            type_kra_section_ids = self.hyr_kra_section_line_ids.ids if self.type_of_pms == 'hyr' else self.kra_section_line_ids.ids
+            if len(type_kra_section_ids) not in range(min_limit, max_limit + 1): # not in [5, 6, limit]:
                 raise ValidationError("""Please ensure the number of KRA / Achievement section is within the range of {} to {} line(s)""".format(int(min_limit), int(max_limit)))
-        sum_weightage = sum([weight.appraisee_weightage for weight in self.mapped('kra_section_line_ids')])
-        if sum_weightage != 100:
-            value_diff = 100 - sum_weightage 
-            needed_value_msg = f'''You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
-            raise ValidationError(
-                f"""Please ensure the sum of KRA weight by Appraisee is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
-                )
-        weightage_with_zero = self.mapped('kra_section_line_ids').filtered(lambda self: self.appraisee_weightage < 1)
-        if weightage_with_zero:
-            raise ValidationError(
-                """Please ensure that each line weightage is above 0. Either delete the extra line or add a weight on it"""
-                )
-        self_rating_with_zero = self.mapped('kra_section_line_ids').filtered(lambda self: self.self_rating < 1)
-        if self_rating_with_zero:
+        type_kra_section_line = 'hyr_kra_section_line_ids' if self.state == 'hyr' else 'kra_section_line_ids'
+        # sum_weightage = sum([weight.appraisee_weightage for weight in self.mapped(type_kra_section_line)])
+        # if sum_weightage != 100 and self.type_of_pms == 'fyr':
+        #     value_diff = 100 - sum_weightage 
+        #     needed_value_msg = f'''You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
+        #     raise ValidationError(
+        #         f"""Please ensure the sum of KRA weight by Appraisee is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+        #         )
+        # weightage_with_zero = self.mapped(type_kra_section_line).filtered(lambda self: self.appraisee_weightage < 1)
+        # if weightage_with_zero and self.type_of_pms == 'fyr':
+        #     raise ValidationError(
+        #         """Please ensure that each line weightage is above 0. Either delete the extra line or add a weight on it"""
+        #         )
+        self_rating_with_zero = self.mapped(type_kra_section_line).filtered(lambda self: self.self_rating < 1)
+        if self_rating_with_zero and self.type_of_pms == 'fyr':
             raise ValidationError(
                 """Please ensure that each line's self rating is above 0. Either delete the line or add a self rating"""
                 )
@@ -1076,7 +1156,284 @@ class PMS_Appraisee(models.Model):
             raise ValidationError('Your deadline for submission has exceeded !!!')
         if deadline and fields.Date.today() > deadline:
             raise ValidationError('You have exceeded deadline for the submission of your appraisal')
+
+    def validate_hyr_rating(self):
+        hyr_lines = self.mapped('hyr_kra_section_line_ids')
+        validity_msg = []
+        msg = """You cannot submit this appraisal if all KRA lines progress status is not selected"""
+        if self.state == "hyr_admin_rating":
+            non_rated_aa_hyr_lines = hyr_lines.filtered(lambda hyr: hyr.hyr_aa_rating == False)
+            if non_rated_aa_hyr_lines:
+                validity_msg.append(msg)
+            if self.supervisor_comment == "":
+                validity_msg.append("""Please Ensure you provide supervisor's comment""")
+        if self.state == "hyr_functional_rating":
+            non_rated_fa_hyr_lines = hyr_lines.filtered(lambda hyr: hyr.hyr_fa_rating == False)
+            if non_rated_fa_hyr_lines:
+                validity_msg.append(msg)
+            if self.manager_comment == "":
+                validity_msg.append("""Please Ensure you provide manager's comment""")
+            # sum_reverse_weightage_weightage = sum([weight.reverse_weightage for weight in self.mapped('hyr_kra_section_line_ids')])
+            weightage = sum([weight.revise_weightage for weight in self.mapped('hyr_kra_section_line_ids')])
+            if weightage != 100:
+                value_diff = 100 - weightage 
+                needed_value_msg = f'''You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
+                raise ValidationError(
+                    f"""Ensure KRA weight by FA is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+                    )
+            # if sum_reverse_weightage_weightage != 100:
+            #     value_diff = 100 - sum_reverse_weightage_weightage 
+            #     needed_value_msg = f'''You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
+            #     raise ValidationError(
+            #         f"""Reverse KRA weight was tampered. Please ensure the sum of reverse KRA weight by FA is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+            #         )
+        if validity_msg:
+            error_msg = '\n'.join(validity_msg)
+            raise ValidationError(error_msg)
         
+    def validate_kra_setting(self):
+        if self.state in ["goal_setting_draft"]:
+            weightage = sum([
+                weight.weightage for weight in self.mapped(
+                'goal_setting_section_line_ids'
+                )])
+            if weightage != 100:
+                value_diff = 100 - weightage 
+                needed_value_msg = f'''
+                You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
+                raise ValidationError(
+                    f"""Ensure KRAs weight with acceptance status is 'YES' is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+                    )
+        elif self.state in ["gs_fa"]:
+            weightage = sum([
+                weight.weightage for weight in self.mapped(
+                'goal_setting_section_line_ids'
+                ).filtered(
+                lambda self: self.acceptance_status == "yes"
+                )])
+            if weightage != 100:
+                value_diff = 100 - weightage 
+                needed_value_msg = f'''
+                You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
+                raise ValidationError(
+                    f"""Ensure KRAs weight with acceptance status is 'YES' is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+                    )
+            
+        elif self.state == "hyr_draft":
+            weightage = sum([weight.revise_weightage for weight in self.mapped('hyr_kra_section_line_ids').filtered(lambda self: self.acceptance_status in ["Revised", "Accepted"])])
+            if weightage != 100:
+                value_diff = 100 - weightage 
+                needed_value_msg = f'''You need to add {value_diff}%''' if value_diff > 0 else f'''You need to deduct {abs(value_diff)}%'''
+                raise ValidationError(
+                    f"""Ensure KRAs weight with acceptance status is 'Accepted' is equal to 100 %.\n {needed_value_msg} weightage to complete it"""
+                    )
+            
+    def overall_validate_weightage(self):
+        kra_line = self.sudo().pms_department_id.mapped('section_line_ids').filtered(
+                    lambda res: res.type_of_section == "KRA")
+        if kra_line:
+            max_line_number = kra_line[0].max_line_number
+            min_line_number = kra_line[0].min_line_number
+            min_limit = 5
+            max_limit = 7
+            if max_line_number > 0:
+                max_limit = max_line_number
+                min_limit = min_line_number
+            else:
+                category_kra_line = self.sudo().pms_department_id.hr_category_id.sudo().mapped('section_ids').filtered(
+                    lambda res: res.type_of_section == "KRA")
+                min_category_line_number = category_kra_line[0].min_line_number if category_kra_line and category_kra_line[0].max_line_number > 0 else min_limit
+                max_category_line_number = category_kra_line[0].max_line_number if category_kra_line and category_kra_line[0].max_line_number > 0 else max_limit
+                max_limit = max_category_line_number
+                min_limit = min_category_line_number
+            type_kra_section_ids = self.goal_setting_section_line_ids.ids if self.type_of_pms == 'gs' else self.hyr_kra_section_line_ids.ids if self.type_of_pms == 'hyr' else self.kra_section_line_ids.ids
+            if len(type_kra_section_ids) not in range(min_limit, max_limit + 1): # not in [5, 6, limit]:
+                raise ValidationError("""Please ensure the number of KRA / Achievement section is within the range of {} to {} line(s)""".format(int(min_limit), int(max_limit)))
+
+    def check_employee_right(self):
+        self.ensure_one()
+        if not self.employee_id.user_id.id == self.env.uid:
+            raise ValidationError("Sorry!!! You are not allowed to submit this record")
+    
+    # def check_manager_right(self):
+    #     self.ensure_one()
+    #     if not self.manager_id.user_id.id == self.env.uid:
+    #         raise ValidationError("Sorry!!! Only the employee manager is allowed to submit this record")
+        
+    def goal_setting_button_submit(self):
+        self.lock_fields = False
+        self.validate_deadline()
+        self.overall_validate_weightage()
+        self.validate_kra_setting()
+        self.check_employee_right()
+        msg = """Dear {}, <br/> 
+        I wish to notify you that my PMS Goal Settings {} \
+        has been submitted for approval.\
+        <br/>Kindly {} to review <br/>\
+        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+            self.manager_id.name or self.employee_id.parent_id.name,
+            self.employee_id.name,
+            self.get_url(self.department_id.id, self._name),
+            self.env.user.name,
+            self.department_id.name,
+            )
+        # self.generate_hyr_kra_lines()
+        self.send_mail_notification(msg)
+        self.write({
+                'state': 'gs_fa',
+                'submitted_date': fields.Date.today(),
+                'manager_id': self.employee_id.parent_id.id,
+            })
+        
+    def manager_submit_goal_setting_button(self):
+        self.lock_fields = False
+        self.validate_deadline()
+        self.overall_validate_weightage()
+        self.validate_kra_setting()
+        self.check_employer_manager()
+        msg = """Dear {}, <br/> 
+        I wish to notify you that an employee PMS Goal Settings {} \
+        has been submitted for review.\
+        <br/>Kindly {} to review <br/>\
+        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+            self.manager_id.name or self.employee_id.parent_id.name,
+            self.employee_id.name,
+            self.get_url(self.department_id.id, self._name),
+            self.env.user.name,
+            self.department_id.name,
+            )
+        self.generate_hyr_kra_lines()
+        self.send_mail_notification(msg)
+        self.write({
+                'name': f'MID Year Review for {self.employee_id.name}', 
+                'state': 'hyr_draft',
+                'submitted_date': fields.Date.today(),
+                'type_of_pms': 'hyr',
+            })
+        
+    def generate_hyr_kra_lines(self):
+        """Generates HYR Section lines"""
+        self.hyr_kra_section_line_ids = False #.unlink()
+        self.write({
+            'state': 'hyr_draft',
+            'type_of_pms': 'hyr',
+            'pms_year_id': self.env.ref('hr_pms.pms_year_2023_md').id,
+            'hyr_kra_section_line_ids': [(0, 0, {
+                'hyr_kra_section_id': self.id,
+                'name': hyr_line.name,
+                'pms_uom': hyr_line.pms_uom, 
+                'weightage': hyr_line.weightage,
+                'revise_weightage': hyr_line.weightage if hyr_line.acceptance_status == 'yes' else 0,
+                'target': hyr_line.target,
+                'revise_target': hyr_line.target,
+                'enable_line_edit': 'no',
+                'acceptance_status': 'Dropped' if hyr_line.acceptance_status == 'no' else 'Accepted',
+                }) for hyr_line in self.goal_setting_section_line_ids],
+        })
+
+    def hyr_button_submit(self):
+        # send notification
+        self.lock_fields = False
+        self.validate_deadline()
+        self.validate_weightage()
+        self.validate_kra_setting()
+        admin_or_functional_user = self.administrative_supervisor_id.name or self.manager_id.name
+        msg = """Dear {}, <br/> 
+        I wish to notify you that an appraisal for {} \
+        has been submitted for review.\
+        <br/>Kindly {} to review <br/>\
+        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+            admin_or_functional_user,
+            self.employee_id.name,
+            self.get_url(self.department_id.id, self._name),
+            self.env.user.name,
+            self.department_id.name,
+            )
+        self.send_mail_notification(msg)
+        # if self.employee_id.administrative_supervisor_id:
+        #     self.write({
+        #         'name': f'MID YEAR PMS for {self.employee_id.name}', 
+        #         'state': 'hyr_admin_rating',
+        #         'submitted_date': fields.Date.today(),
+        #         'administrative_supervisor_id': self.employee_id.administrative_supervisor_id.id,
+        #     })
+        # else:
+        self.write({
+            'state': 'hyr_functional_rating',
+            'submitted_date': fields.Date.today(),
+            'manager_id': self.employee_id.parent_id.id,
+        })
+
+    def hyr_button_admin_supervisor_rating(self): 
+        self.validate_hyr_rating()
+        if not self.employee_id.parent_id:
+            raise ValidationError(
+                'Ops ! please ensure that a manager is assigned to the employee'
+                )
+        if self.employee_id.administrative_supervisor_id and self.env.user.id != self.administrative_supervisor_id.user_id.id:
+            raise ValidationError(
+                "Ops ! You are not entitled to submit this rating because you are not the employee's administrative supervisor"
+                )
+        msg = """Dear {}, <br/> 
+        I wish to notify you that an appraisal for {} \
+        has been submitted for functional manager's review.\
+        <br/>Kindly {} to review <br/>\
+        Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
+            self.employee_id.parent_id.name,
+            self.employee_id.name,
+            self.get_url(self.department_id.id, self._name),
+            self.env.user.name,
+            self.administrative_supervisor_id.department_id.name,
+            )
+        
+        self.send_mail_notification(msg)
+        self.write({
+                'state': 'hyr_functional_rating',
+                'manager_id': self.employee_id.parent_id.id,
+            })
+        
+    def hyr_button_functional_manager_rating(self):
+        self.validate_hyr_rating()
+        if self.employee_id.parent_id and self.env.user.id != self.employee_id.parent_id.user_id.id:
+            raise ValidationError(
+                "Ops ! You are not entitled to submit this rating because you are not the employee's functional manager"
+                )
+        msg = """Dear {}, <br/> 
+        I wish to notify you that an appraisal for {} \
+        has been submitted for reviewer's ratings.\
+        <br/>Kindly {} to review <br/>\
+        Yours Faithfully<br/>{}<br/> ({})""".format(
+            self.employee_id.parent_id.name,
+            self.employee_id.name,
+            self.get_url(self.department_id.id, self._name),
+            self.env.user.name,
+            self.manager_id.department_id.name,
+            )
+        self.generate_kra_lines()
+        self.send_mail_notification(msg)
+         
+    def generate_kra_lines(self):
+        self.kra_section_line_ids = False #.unlink()
+        self.write({
+            'state': 'draft',
+            'type_of_pms': 'fyr',
+            'pms_year_id': self.env.ref('hr_pms.pms_year_2022_ap').id,
+            'name': f'FULL YEAR PMS for {self.employee_id.name}', 
+            'kra_section_line_ids': [(0, 0, {
+                'kra_section_id': self.id,
+                'name': hyr_line.name,
+                'section_avg_scale': self.dummy_kra_section_scale, # hyr_line.section_avg_scale,
+                'weightage': hyr_line.revise_weightage,
+                'appraisee_weightage': hyr_line.revise_weightage,
+                'target': hyr_line.target,
+                'self_rating': 0,
+                'administrative_supervisor_rating': 0,
+                'functional_supervisor_rating': 0,
+                'hyr_fa_rating': hyr_line.hyr_fa_rating,
+                'hyr_aa_rating': hyr_line.hyr_aa_rating,
+                }) for hyr_line in self.mapped('hyr_kra_section_line_ids').filtered(lambda s: s.acceptance_status == "Accepted")],
+        })
+
     def button_submit(self):
         # send notification
         self.lock_fields = False
@@ -1385,15 +1742,33 @@ class PMS_Appraisee(models.Model):
                 rec.is_current_user = True
             else:
                 rec.is_current_user = False
-    reason_back = fields.Text(string='Return Reasons', tracking=True)
-    is_functional_appraiser = fields.Boolean(string='Is functional appraiser', compute="compute_functional_appraiser")
 
     def compute_functional_appraiser(self):
         if self.manager_id and self.manager_id.user_id.id == self.env.user.id:
             self.is_functional_appraiser = True 
         else:
-            self.is_functional_appraiser = False
+            self.is_functional_appraiser = False 
 
+    def check_employer_manager(self):
+        if self.employee_id.parent_id.user_id.id != self.env.uid:
+            raise ValidationError("You are not responsible to do this operation")
+        
+    def hyr_return_appraisal(self):
+        self.check_employer_manager()
+        if self.state == 'gs_fa':
+            self.state = 'goal_setting_draft'
+            self.type_of_pms = 'gs'
+        elif self.state == 'hyr_admin_rating':
+            self.state = 'hyr_draft' 
+        elif self.state == 'hyr_functional_rating':
+            self.state = 'hyr_draft'
+        elif self.state == 'draft':
+            self.state = 'hyr_functional_rating'
+            self.type_of_pms = 'hyr'
+        elif self.state == 'hyr_draft':
+            self.state = 'goal_setting_draft'
+            self.type_of_pms = 'gs'
+        
     def return_appraisal(self):
         return {
               'name': 'Reason for Return',
@@ -1409,6 +1784,23 @@ class PMS_Appraisee(models.Model):
                   'default_resp':self.env.uid,
               },
         }
+    
+    def button_goal_setting(self):
+        return {
+              'name': 'Goal Setting Excel Sheet',
+              'view_type': 'form',
+              "view_mode": 'form',
+              'res_model': 'pms.goal_setting.wizard',
+              'type': 'ir.actions.act_window',
+              'target': 'new',
+              'context': {
+                  'default_pms_id': self.id,
+                #   'default_date': fields.Datetime.now(),
+                #   'default_direct_employee_id': self.employee_id.id,
+                #   'default_resp':self.env.uid,
+              },
+        }
+
 
     @api.model
     def create_action(self, domain, title, is_overdue=False):

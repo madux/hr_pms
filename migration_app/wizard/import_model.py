@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta as rd
 import xlrd
 from xlrd import open_workbook
 import base64
+import re
 
 _logger = logging.getLogger(__name__)
 
@@ -101,7 +102,9 @@ class ImportRecords(models.TransientModel):
             workbook = xlrd.open_workbook(file_contents=file_datas)
             sheet_index = int(self.index) if self.index else 0
             sheet = workbook.sheet_by_index(sheet_index)
-            data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
+            data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] 
+                    for r in range(sheet.nrows) ]# if any(sheet.cell_value(r, c) for c in range(sheet.ncols))
+                    #]
             data.pop(0)
             file_data = data
         else:
@@ -235,6 +238,8 @@ class ImportRecords(models.TransientModel):
 				'login' : login,
 				'password': password,
                 }
+                _logger.info(f"Creating user: {fullname}")
+                _logger.info(f"Email: {login}")
                 _logger.info(f"Creating employee Rep User..with password {password} and {user_vals.get('password')}.")
                 User = self.env['res.users'].sudo()
                 user = User.search([('login', '=', login)],limit=1)
@@ -252,7 +257,9 @@ class ImportRecords(models.TransientModel):
         if self.import_type == "employee":
             for row in file_data:
                 # try:
-                if find_existing_employee(row[1]):
+                if not row[2] or not row[1]:
+                    unsuccess_records.append(f'Employee Name/Staff ID with serial {str(row[0])} is empty')
+                elif find_existing_employee(row[1]):
                     unsuccess_records.append(f'Employee with {str(row[1])} Already exists')
                 else:
                     static_emp_date = '01/01/2014'
@@ -266,12 +273,12 @@ class ImportRecords(models.TransientModel):
                             if '-' in row[14]:
                                 # pref = str(row[14]).strip()[0:7] # 12-Jul-
                                 # suff = '20'+ row[14].strip()[-2:] # 2022
-                                datesplit = row[14].split('-') # eg. 09, jul, 22
+                                datesplit = row[14].strip().split('-') # eg. 09, jul, 22
                                 d, m, y = datesplit[0], datesplit[1], datesplit[2]
                                 appt_date = f"{d}-{m}-20{y}"
                                 appt_date = datetime.strptime(appt_date, '%d-%b-%Y') 
                             elif '-' in row[14]:
-                                datesplit = row[14].split('/') # eg. 09, jul, 22
+                                datesplit = row[14].strip().split('/') # eg. 09, jul, 22
                                 d, m, y = datesplit[0], datesplit[1], datesplit[2]
                                 appt_date = f"{d}-{m}-20{y}"
                                 appt_date = datetime.strptime(appt_date, '%d-%b-%Y') 
@@ -282,8 +289,9 @@ class ImportRecords(models.TransientModel):
                     departmentid = self.create_department(row[11])
                     vals = dict(
                         serial = row[0],
-                        staff_number = str(int(row[1])),
-                        fullname = row[2].capitalize(),
+                        staff_number = str(int(row[1])) if type(row[1]) == float else row[1],
+                        # staff_number = re.search(r'\d+', str(row[1])).group(),
+                        fullname = row[2],
                         level_id = self.get_level_id(row[3].strip()),
                         district = self.get_district_id(row[9].strip()),
                         gender = 'male' if row[10] in ['m', 'M'] else 'female' if row[10] in ['f', 'F'] else 'other',
@@ -320,6 +328,7 @@ class ImportRecords(models.TransientModel):
             for row in file_data:
                 ########################### This is for update purposes:
                 employee_code = str(int(row[1])) if type(row[1]) == float else row[1]
+                # employee_code = re.search(r'\d+', str(row[1])).group()
                 static_emp_date = '01/01/2014'
                 emp_date = datetime.strptime(static_emp_date, '%d/%m/%Y')
                 appt_date = None
@@ -335,12 +344,12 @@ class ImportRecords(models.TransientModel):
                         appt_date = datetime(*xlrd.xldate_as_tuple(row[14], 0)) 
                     elif type(row[14]) in [str]:
                         if '-' in row[14]:
-                            datesplit = row[14].split('-') # eg. 09, jul, 22
+                            datesplit = row[14].strip().split('-') # eg. 09, jul, 22
                             d, m, y = datesplit[0], datesplit[1], datesplit[2]
                             appt_date = f"{d}-{m}-20{y}"
                             appt_date = datetime.strptime(appt_date, '%d-%b-%Y') 
                         elif '-' in row[14]:
-                            datesplit = row[14].split('/') # eg. 09, jul, 22
+                            datesplit = row[14].strip().split('/') # eg. 09, jul, 22
                             d, m, y = datesplit[0], datesplit[1], datesplit[2]
                             appt_date = f"{d}-{m}-20{y}"
                             appt_date = datetime.strptime(appt_date, '%d-%b-%Y') 
@@ -349,7 +358,7 @@ class ImportRecords(models.TransientModel):
                 dt = appt_date or emp_date
                 departmentid = self.create_department(row[11])
                 employee_vals = dict(
-                    employee_number = str(int(row[1])),
+                    employee_number = str(int(row[1])) if type(row[1]) == float else row[1],
                     # employee_identification_code = employee_code,
                     name = row[2].capitalize(),
                     level_id = self.get_level_id(row[3].strip()),
