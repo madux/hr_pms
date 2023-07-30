@@ -103,8 +103,8 @@ class ImportRecords(models.TransientModel):
             sheet_index = int(self.index) if self.index else 0
             sheet = workbook.sheet_by_index(sheet_index)
             data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] 
-                    for r in range(sheet.nrows) if any(sheet.cell_value(r, c) for c in range(sheet.ncols))
-                    ]
+                    for r in range(sheet.nrows) ]# if any(sheet.cell_value(r, c) for c in range(sheet.ncols))
+                    #]
             data.pop(0)
             file_data = data
         else:
@@ -257,7 +257,7 @@ class ImportRecords(models.TransientModel):
         if self.import_type == "employee":
             for row in file_data:
                 # try:
-                if not str(row[2]).strip() or not str(row[1]).strip():
+                if not row[2] or not row[1]:
                     unsuccess_records.append(f'Employee Name/Staff ID with serial {str(row[0])} is empty')
                 elif find_existing_employee(row[1]):
                     unsuccess_records.append(f'Employee with {str(row[1])} Already exists')
