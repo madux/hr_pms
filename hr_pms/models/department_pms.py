@@ -131,7 +131,7 @@ class PMSDepartment(models.Model):
     type_of_pms = fields.Selection([
         ('gs', 'Goal Setting'),
         ('hyr', 'Mid year review'),
-        ('fyr', 'Annaul review'),
+        ('fyr', 'Annual review'),
         ], string="Type of PMS", default = "gs", 
         copy=True)
     active = fields.Boolean(

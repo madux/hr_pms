@@ -41,7 +41,7 @@ class PMSJobCategory(models.Model):
     allow_mid_year_review = fields.Boolean(string="Allow Mid year review",
                                            help="Allow the appraisee to start Mid year review")
     allow_annual_review_submission = fields.Boolean(
-        string="Allow Annaul review", 
+        string="Allow Annual review", 
         help="Allow the appraisee to start Annual year review")
     type_of_pms = fields.Selection([
         ('gs', 'Goal Setting'),

@@ -1335,8 +1335,18 @@ class PMS_Appraisee(models.Model):
                 }) for hyr_line in self.goal_setting_section_line_ids],
         })
 
+    def check_review_period(self):
+        """args: state is either 'hyr_draft' or 'draft' """
+        allow_mid_year_review = self.pms_department_id.sudo().hr_category_id.allow_mid_year_review   
+        allow_annual_review_submission = self.pms_department_id.sudo().hr_category_id.allow_annual_review_submission
+        if self.state == "hyr_draft" and not allow_mid_year_review:
+            raise ValidationError("Mid year Review is not yet open for submission now. Try Later")
+        elif self.state == "draft" and not allow_annual_review_submission:
+            raise ValidationError("Annual Review is not yet open for submission now. Try Later")
+            
     def hyr_button_submit(self):
         # send notification
+        self.check_review_period()
         self.lock_fields = False
         self.validate_deadline()
         self.validate_weightage()
@@ -1432,6 +1442,7 @@ class PMS_Appraisee(models.Model):
 
     def button_submit(self):
         # send notification
+        self.check_review_period()
         self.lock_fields = False
         self.validate_deadline()
         self.validate_weightage()
@@ -1464,7 +1475,8 @@ class PMS_Appraisee(models.Model):
         
     def back_forth_button_test(self):
         self.state = "hyr_draft"
-            
+
+    
     def button_admin_supervisor_rating(self): 
         msg = """Dear {}, <br/> 
         I wish to notify you that an appraisal for {} \
@@ -1500,10 +1512,6 @@ class PMS_Appraisee(models.Model):
         #         self.supervisor_attachement_ids.write({'res_model': self._name, 'res_id': self.id})
         
     def button_functional_manager_rating(self):
-        # if not self.employee_id.reviewer_id:
-        #     raise ValidationError(
-        #         "Ops ! please ensure that a reviewer is assigned to the employee"
-        #         )
         sum_weightage = sum([weight.weightage for weight in self.mapped('kra_section_line_ids')])
         if sum_weightage != 100:
             value_diff = 100 - sum_weightage 

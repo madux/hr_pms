@@ -1067,7 +1067,7 @@
                                                     </span>
                                                 </div>
                                                 <div class="float-right" t-if="record.state.raw_value == 'draft'" name="draft_state">
-                                                    <span class="fa fa-circle-o text-muted" role="img" aria-label="Draft" title="Draft" name="draft_state">
+                                                    <span class="fa fa-circle-o text-muted" role="img" aria-label="Draft" title="Ready For Annual Review" name="draft_state">
                                                     </span>
                                                 </div>
                                                 <div class="float-right" t-if="record.state.raw_value == 'functional_rating'" name="functional_rating_state">
