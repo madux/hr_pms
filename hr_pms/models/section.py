@@ -16,8 +16,13 @@ class PmsSection(models.Model):
         string="Section Name", 
         required=True)
 
-    max_line_number = fields.Float(
-        string="Maximum Number of Input"
+    min_line_number = fields.Integer(
+        string="Minimum Number of Input",
+        default=5
+        )
+    max_line_number = fields.Integer(
+        string="Maximum Number of Input",
+        default=7
         )
      
     type_of_section = fields.Selection([
@@ -46,6 +51,39 @@ class PmsSection(models.Model):
         store=True,
         compute="compute_section_weight"
         )
+        
+    section_line_ids = fields.One2many(
+        "pms.section.line",
+        "section_id",
+        string="Section Lines"
+    )
+    # consider removing or make invisible N/B not to be used
+    weighted_score = fields.Integer(
+        string='Section Weighted', 
+        required=False,
+        )
+    
+    # @api.constrains('section_line_ids')
+    # def _check_lines(self):
+    #     """Checks if no section line is added and max line is less than 1"""
+    #     if not self.mapped('section_line_ids') and self.max_line_number < 1:
+    #         raise ValidationError(
+    #             'You must provide the lines or set the maximum number to above 0'
+    #             )
+    #     if self.weighted_score < 1:
+    #         raise ValidationError(
+    #             """Section weight must be set above 0%""")
+    
+    @api.onchange('min_line_number', 'max_line_number')
+    def onchange_min_max_limit(self):
+        if self.min_line_number > self.max_line_number:
+            self.max_line_number = 7
+            self.min_line_number = 5
+            message = {
+                'title': 'Invalid',
+                'message': 'Minimum limit must not be greater than Maximum limit'
+            }
+            return {'warning': message}
     
     @api.depends('section_line_ids')
     def compute_section_weight(self):
@@ -58,29 +96,5 @@ class PmsSection(models.Model):
             self.input_weightage = 100 / numb_of_lines if numb_of_lines > 0 else 100 # safe eva
         else:
             self.input_weightage = 100
-
-        
-    section_line_ids = fields.One2many(
-        "pms.section.line",
-        "section_id",
-        string="Section Lines"
-    )
-    # consider removing or make invisible N/B not to be used
-    weighted_score = fields.Integer(
-        string='Section Weighted', 
-        placeholder="eg. 35",
-        required=False,
-        )
-    
-    @api.constrains('job_roles')
-    def _check_lines(self):
-        """Checks if no section line is added and max line is less than 1"""
-        if not self.mapped('section_line_ids') and self.max_line_number < 1:
-            raise ValidationError(
-                'You must provide the lines or set the maximum number to above 0'
-                )
-        if self.weighted_score < 1:
-            raise ValidationError(
-                """Section weight must be set above 0%""")
 
     

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
     <odoo>
-    <menuitem id="view_hr_pms_menu" name="HR PMS" sequence="4"/>
+    <menuitem id="view_hr_pms_menu" name="HR PMS" sequence="4" web_icon="hr_pms,static/description/icon_main.png"/>
     <menuitem 
     id="view_hr_pms_config_menu" 
     name="Configuration" 
