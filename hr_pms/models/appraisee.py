@@ -192,7 +192,7 @@ class PMS_Appraisee(models.Model):
         ('partially_agreed', 'Partially Agreed'),
         ('largely_disagreed', 'Largely Disagreed'),
         ('totally_disagreed', 'Totally Disagreed'),
-        ], string="Perception on PMS", default = "none", 
+        ], string="Perception on your Appraisal", default = "none", 
         tracking=True, copy=False)
     type_of_pms = fields.Selection([
         ('gs', 'Goal Setting'),
@@ -1461,6 +1461,9 @@ class PMS_Appraisee(models.Model):
                 'submitted_date': fields.Date.today(),
                 'manager_id': self.employee_id.parent_id.id,
             })
+        
+    def back_forth_button_test(self):
+        self.state = "hyr_draft"
             
     def button_admin_supervisor_rating(self): 
         msg = """Dear {}, <br/> 
@@ -1749,8 +1752,7 @@ class PMS_Appraisee(models.Model):
         if self.employee_id.parent_id.user_id.id != self.env.uid:
             raise ValidationError("You are not responsible to do this operation")
         
-    def hyr_return_appraisal(self):
-        self.check_employer_manager()
+    def _get_appraisal_return_state(self):
         if self.state == 'gs_fa':
             self.state = 'goal_setting_draft'
             self.type_of_pms = 'gs'
@@ -1764,8 +1766,15 @@ class PMS_Appraisee(models.Model):
         elif self.state == 'hyr_draft':
             self.state = 'goal_setting_draft'
             self.type_of_pms = 'gs'
+        elif self.state == 'functional_rating':
+            self.state = 'draft'
+        elif self.state == 'reviewer_rating':
+            self.state = 'functional_rating'
+        elif self.state == 'admin_rating':
+            self.state = 'draft'
         
     def return_appraisal(self):
+        self.check_employer_manager()
         return {
               'name': 'Reason for Return',
               'view_type': 'form',

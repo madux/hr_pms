@@ -38,6 +38,11 @@ class PMSJobCategory(models.Model):
     
     pms_year_id = fields.Many2one(
         'pms.year', string="Period")
+    allow_mid_year_review = fields.Boolean(string="Allow Mid year review",
+                                           help="Allow the appraisee to start Mid year review")
+    allow_annual_review_submission = fields.Boolean(
+        string="Allow Annaul review", 
+        help="Allow the appraisee to start Annual year review")
     type_of_pms = fields.Selection([
         ('gs', 'Goal Setting'),
         ('hyr', 'Mid year review'),

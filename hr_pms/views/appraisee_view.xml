@@ -87,6 +87,11 @@
 			<field name="arch" type="xml">
 				<form string="appraisees" create="0">
                     <header>
+                        <!-- <button 
+                            name="back_forth_button_test" 
+                            string="return test" 
+                            type="object" 
+                        /> -->
                         <button 
                             name="goal_setting_button_submit" 
                             string="Submit Goal Setting to Manager" 
@@ -97,7 +102,7 @@
                         />
                         <button 
                             name="manager_submit_goal_setting_button" 
-                            string="Submit For Mid year Review" 
+                            string="Approve For Mid year Review" 
                             class="oe_highlight" 
                             type="object"
                             states="gs_fa"
@@ -176,16 +181,16 @@
                             name="return_appraisal" 
                             string="Return" 
                             type="object"
-                            attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['admin_rating', 'functional_rating', 'reviewer_rating'])]}"
+                            attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['gs_fa', 'admin_rating', 'functional_rating', 'reviewer_rating'])]}"
                             confirm="Are you sure you want to return"
                         />
-                        <button 
+                        <!-- <button 
                             name="hyr_return_appraisal" 
                             string="Return" 
                             type="object"
                             attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['gs_fa'])]}"
                             confirm="Are you sure you want to return"
-                        />
+                        /> -->
                             <!-- states="admin_rating,functional_rating" -->
                         <button 
                             name="button_set_to_draft" 

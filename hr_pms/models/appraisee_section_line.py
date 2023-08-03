@@ -110,7 +110,7 @@ class KRA_SectionLine(models.Model):
         ('poor_progress', 'Poor Progress'),
         ('good_progress', 'Good Progress'),
         ('average_progress', 'Average Progress'),
-        ], string="FA(HYR) Review", default = "", readonly=False)
+        ], string="FA(Mid Year) Review", default = "", readonly=False)
     hyr_aa_rating = fields.Selection([
         ('poor_progress', 'Poor Progress'),
         ('good_progress', 'Good Progress'),
