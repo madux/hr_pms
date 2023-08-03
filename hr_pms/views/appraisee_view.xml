@@ -994,7 +994,7 @@
         </record>
 
         <record id="ir_action_server_pms_post_normalisation_update" model="ir.actions.server">
-			<field name="name">Upload Post Normalisation</field>
+			<field name="name">Upload Post Normalisation:</field>
             <field name="type">ir.actions.server</field>
             <field name="model_id" ref="hr_pms.model_pms_appraisee"/>
             <field name="binding_model_id" ref="hr_pms.model_pms_appraisee"/>
@@ -1015,5 +1015,5 @@
     groups="hr_pms.group_pms_user_id,base.group_user,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
     <menuitem id="view_pms_aa_1_menu" name="Administrative Appraisal(s)" sequence="2" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_aa_view_id" groups="hr_pms.group_pms_user_id,base.group_user"/>
     <menuitem id="view_pms_fa_2_menu" name="Functional Appraisal(s)" sequence="3" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_fa_view_id" groups="hr_pms.group_pms_user_id,base.group_user"/>
-    <menuitem id="view_pms_fr_3_menu" name=" Appraisal(s) for Review" sequence="4" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_fr_view_id" groups="hr_pms.group_pms_user_id,base.group_user"/>
+    <menuitem id="view_pms_fr_3_menu" name="Appraisal(s) for Review" sequence="4" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_fr_view_id" groups="hr_pms.group_pms_user_id,base.group_user"/>
 </odoo>
