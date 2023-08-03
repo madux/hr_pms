@@ -1,0 +1,113 @@
+<odoo>
+  <data> 
+    <report
+        id = "report_pms_appraisal"
+        model= "pms.appraisee"
+        string="Print Report"
+        report_type = "qweb-pdf"
+        name ="hr_pms.pms_appraisal_print_template"
+        file ="hr_pms.pms_appraisal_print_template"
+        attachment_use="True"
+    />
+    <template id="pms_appraisal_print_template">
+      <t t-call="web.html_container">
+          <t t-foreach="docs" t-as="o">
+              <t t-call="hr_pms.pms_appraisal_print_template_id"/>
+          </t>
+      </t>
+    </template>
+    <template id="pms_appraisal_print_template_id">
+      <t t-call="web.external_layout">
+        <t t-foreach="docs" t-as="o">
+          <div class="page" style="padding-top: 10px;">
+            <style>
+              table {
+                border-collapse: collapse;
+                margin-bottom: 20px;
+              }
+             
+            p {
+                margin-bottom: 2px;
+              }
+              
+              th {
+                background-color: #333;
+                color: #fff;
+              }
+
+              table, th, tr, td {
+                border:1px solid #999;
+                font-family: Trebuchet MS
+              }
+
+              tr:nth-child(odd){
+                background-color: #ccc;
+              }
+
+              th, td{
+                padding: 5px;
+              }
+
+              td:nth-child(4) {
+                color: green;
+              }
+
+              .outstanding {
+                color: red;
+              }
+            </style>
+            <!-- <p style="text-align: right; font-weight: bold; font-size: 14px;"><b>From: </b> <span t-field="o.employee_id.name"/></p>
+            <p style="text-align: right; font-weight: bold; font-size: 14px;"><t t-esc="datetime.datetime.now().strftime('%B %d, %Y')"/></p>
+            <p style="text-align: right; font-weight: bold; font-size: 14px;">Memo Number: <t t-esc="o.code"/></p>
+            <p style="text-align: left; font-weight: bold; font-size: 14px;"><b>Dear, </b> <span t-field="o.set_staff.name"/></p>
+            <h4 style="font-weight: bold; text-align: center;font-size: 14px;"><u>Notification For <span t-field="o.memo_type"/> </u></h4>
+            <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 14px;">Memo Subject:  </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:16px;" t-field="o.name"/><br/> -->
+          
+            <!-- <t t-if="o.reason_back">
+                <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 18px;">Refusal Reason: </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:18px;" t-raw="o.reason_back"/>
+            </t>
+
+            <t t-if="o.comments"> 
+                <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 18px;">Comments:  </strong><br/><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:18px;" t-raw="o.comments"/><br/>
+            </t> -->
+
+            <t t-if="o.state=='goal_setting_draft'">
+              <table style="width: 100%; text-align: left;">
+                  <tr>
+                    <th>KRA</th>
+                    <th>Weightage</th>
+                    <th>Unit of Measure</th>
+                    <th>Target</th>
+                  </tr>
+                  <t t-foreach="o.goal_setting_section_line_ids" t-as="sec">
+                    <tr>
+                      <td><t t-esc="sec.name"/></td>
+                      <td><t t-esc="sec.weightage"/></td>
+                      <td><t t-esc="sec.pms_uom"/></td>
+                      <td><t t-esc="sec.target"/></td>
+                      <!-- <td>NGN<t t-esc="'{0:,}'.format(float(o.amountfig))"/></td> -->
+                    </tr>
+                  </t>
+              </table>  
+            </t> 
+            <!-- <t t-if="o.description"> 
+              <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 14px;">Description:  
+              </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:14px;" t-raw="o.description"/>
+            </t> -->
+             
+            <br/><br/>
+            <!-- <div class="row">
+              <div class="oe_right">
+                  <p style="text-align: right; font-weight: bold; font-size: 14px;">Approve by: <t t-esc="o.approver_by.name"/></p>
+                  <img t-if="o.approver_by.user_signature" t-att-src="image_data_uri(o.approver_by.user_signature)" style="max-height: 65px;max-width: 200px;" alt="Logo"/>
+              </div>
+            </div> -->
+          </div>
+        </t>
+      </t>
+
+    </template>
+
+ 
+  </data>
+</odoo>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="report_pms_appraisal" model="ir.actions.report">
+    <!-- <record id="report_pms_appraisal" model="ir.actions.report">
         <field name="name">Registration Badge</field>
         <field name="model">event.registration</field>
         <field name="report_type">qweb-pdf</field>
@@ -11,7 +11,8 @@
         <field name="paperformat_id" ref="report.paperformat_euro"/>
         <field name="binding_model_id" ref="model_pms_appraisee"/>
         <field name="binding_type">report</field>
-    </record>
+    </record> -->
+
 
 
 </odoo>
