@@ -55,53 +55,217 @@
               .outstanding {
                 color: red;
               }
+
+              .info-box {
+                background-color: #f8f9fa;
+                padding: 10px;
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: space-between;
+                gap: 20px; /* Adjust this value for spacing */
+            }
+              .info-box h3 {
+                margin-top: 0;
+               }
+
+              .section-header {
+                  background-color: #333;
+                  color: #fff;
+                  padding: 5px 10px;
+                  margin-bottom: 10px;
+                  font-weight: bold;
+              }
+
+              .section-content {
+                padding: 10px;
+                background-color: #f8f9fa;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                margin-bottom: 20px;
+              }
+
+              <!-- .column {
+                  display: flex;
+                  flex-direction: column;
+              } -->
+              .column {
+                flex: 1;
+              }
+
+              .row {
+                  display: flex;
+                  justify-content: space-between;
+              }
             </style>
-            <!-- <p style="text-align: right; font-weight: bold; font-size: 14px;"><b>From: </b> <span t-field="o.employee_id.name"/></p>
-            <p style="text-align: right; font-weight: bold; font-size: 14px;"><t t-esc="datetime.datetime.now().strftime('%B %d, %Y')"/></p>
-            <p style="text-align: right; font-weight: bold; font-size: 14px;">Memo Number: <t t-esc="o.code"/></p>
-            <p style="text-align: left; font-weight: bold; font-size: 14px;"><b>Dear, </b> <span t-field="o.set_staff.name"/></p>
-            <h4 style="font-weight: bold; text-align: center;font-size: 14px;"><u>Notification For <span t-field="o.memo_type"/> </u></h4>
-            <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 14px;">Memo Subject:  </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:16px;" t-field="o.name"/><br/> -->
-          
-            <!-- <t t-if="o.reason_back">
-                <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 18px;">Refusal Reason: </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:18px;" t-raw="o.reason_back"/>
-            </t>
 
-            <t t-if="o.comments"> 
-                <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 18px;">Comments:  </strong><br/><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:18px;" t-raw="o.comments"/><br/>
-            </t> -->
+            <div class="oe_title">
+              <h1>
+                <b><span t-field="o.name"/></b>
+              </h1>
+            </div>
 
-            <t t-if="o.state=='goal_setting_draft'">
-              <table style="width: 100%; text-align: left;">
+            <div class="container">
+              <div class="row mt32 mb32">
+                <div class="col-6">
+                    <div class="info-box">
+                        <p><b>PMS Type:</b> <span t-field="o.type_of_pms"/></p>
+                        <p><b>Deadline:</b> <span t-field="o.deadline"/></p>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="info-box">
+                        <p><b>Date From:</b> <span t-field="o.date_from"/></p>
+                        <p><b>Date End:</b> <span t-field="o.date_end"/></p>
+                        <p><b>Submitted Date:</b> <span t-field="o.submitted_date"/></p>
+                    </div>
+                </div>
+              </div>
+
+              <t t-if="o.state=='goal_setting_draft'">
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                      <th>KRA</th>
+                      <th>Weightage</th>
+                      <th>Unit of Measure</th>
+                      <th>Target</th>
+                    </tr>
+                    <t t-foreach="o.goal_setting_section_line_ids" t-as="sec">
+                      <tr>
+                        <td><t t-esc="sec.name"/></td>
+                        <td><t t-esc="sec.weightage"/></td>
+                        <td><t t-esc="sec.pms_uom"/></td>
+                        <td><t t-esc="sec.target"/></td>
+                        <!-- <td>NGN<t t-esc="'{0:,}'.format(float(o.amountfig))"/></td> -->
+                      </tr>
+                    </t>
+                </table>  
+              </t>
+              <t t-elif="o.state=='gs_fa'">
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                      <th>KRA</th>
+                      <th>Weightage</th>
+                      <th>Unit of Measure</th>
+                      <th>Target</th>
+                      <th>Acceptance</th>
+                    </tr>
+                    <t t-foreach="o.goal_setting_section_line_ids" t-as="sec">
+                      <tr>
+                        <td><t t-esc="sec.name"/></td>
+                        <td><t t-esc="sec.weightage"/></td>
+                        <td><t t-esc="sec.pms_uom"/></td>
+                        <td><t t-esc="sec.target"/></td>
+                        <td><t t-esc="sec.acceptance_status"/></td>
+                      </tr>
+                    </t>
+                </table>  
+              </t>
+              <t t-elif="o.state in ['hyr_draft', 'hyr_functional_rating']">
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                      <th>KRA</th>
+                      <th>Weightage</th>
+                      <th>Target</th>
+                      <th>Revise Weightage</th>
+                      <th>Unit of Measure</th>
+                      <th>Revise Target</th>
+                      <th>Acceptance</th>
+                      <th>Progress Status</th>
+                      <th>Comment(s)</th>
+                    </tr>
+                    <t t-foreach="o.hyr_kra_section_line_ids" t-as="sec">
+                      <tr>
+                        <td><t t-esc="sec.name"/></td>
+                        <td><t t-esc="sec.weightage"/></td>
+                        <td><t t-esc="sec.target"/></td>
+                        <td><t t-esc="sec.revise_weightage"/></td>
+                        <td><t t-esc="sec.pms_uom"/></td>
+                        <td><t t-esc="sec.revise_target"/></td>
+                        <td><t t-esc="sec.acceptance_status"/></td>
+                        <td><t t-esc="sec.hyr_fa_rating"/></td>
+                        <td><t t-esc="sec.fa_comment"/></td>
+                      </tr>
+                    </t>
+                </table>  
+              </t>
+              <t t-elif="o.state in ['draft', 'admin_rating', 'functional_rating', 'reviewer_rating', 'done', 'signed']">
+                <h1>KRA Section</h1>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                      <th>KRA</th>
+                      <th>FA(HYR)Review</th>
+                      <th>Weightage</th>
+                      <th>Self Rating</th>
+                      <th>AA Rating</th>
+                      <th>FA Rating</th>
+                      <th>Reviewer Rating</th>
+                    </tr>
+                    <t t-foreach="o.kra_section_line_ids" t-as="sec">
+                      <tr>
+                        <td><t t-esc="sec.name"/></td>
+                        <td><t t-esc="sec.hyr_fa_rating"/></td>
+                        <td><t t-esc="sec.weightage"/></td>
+                        <td><t t-esc="sec.self_rating"/></td>
+                        <td><t t-esc="sec.administrative_supervisor_rating"/></td>
+                        <td><t t-esc="sec.functional_supervisor_rating"/></td>
+                        <td><t t-esc="sec.reviewer_rating"/></td>
+                      </tr>
+                    </t>
+                </table>
+
+                <h1>FC Section</h1> 
+                <table style="width: 100%; text-align: left;">
                   <tr>
-                    <th>KRA</th>
+                    <th>Description</th>
                     <th>Weightage</th>
-                    <th>Unit of Measure</th>
-                    <th>Target</th>
+                    <th>AA Rating</th>
+                    <th>FA Rating</th>
+                    <th>Reviewer Rating</th>
                   </tr>
-                  <t t-foreach="o.goal_setting_section_line_ids" t-as="sec">
+                  <t t-foreach="o.fc_section_line_ids" t-as="sec">
                     <tr>
                       <td><t t-esc="sec.name"/></td>
                       <td><t t-esc="sec.weightage"/></td>
-                      <td><t t-esc="sec.pms_uom"/></td>
-                      <td><t t-esc="sec.target"/></td>
-                      <!-- <td>NGN<t t-esc="'{0:,}'.format(float(o.amountfig))"/></td> -->
+                      <td><t t-esc="sec.administrative_supervisor_rating"/></td>
+                      <td><t t-esc="sec.functional_supervisor_rating"/></td>
+                      <td><t t-esc="sec.reviewer_rating"/></td>
                     </tr>
                   </t>
-              </table>  
-            </t> 
-            <!-- <t t-if="o.description"> 
-              <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 14px;">Description:  
-              </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:14px;" t-raw="o.description"/>
-            </t> -->
+                </table>
+              
+                <h1>LC Section</h1> 
+                <table style="width: 100%; text-align: left;">
+                  <tr>
+                    <th>Description</th>
+                    <th>Weightage</th>
+                    <th>AA Rating</th>
+                    <th>FA Rating</th>
+                    <th>Reviewer Rating</th>
+                  </tr>
+                  <t t-foreach="o.lc_section_line_ids" t-as="sec">
+                    <tr>
+                      <td><t t-esc="sec.name"/></td>
+                      <td><t t-esc="sec.weightage"/></td>
+                      <td><t t-esc="sec.administrative_supervisor_rating"/></td>
+                      <td><t t-esc="sec.functional_supervisor_rating"/></td>
+                      <td><t t-esc="sec.reviewer_rating"/></td>
+                    </tr>
+                  </t>
+                </table>   
+              </t>  
+              <!-- <t t-if="o.description"> 
+                <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 14px;">Description:  
+                </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:14px;" t-raw="o.description"/>
+              </t> -->
              
-            <br/><br/>
-            <!-- <div class="row">
-              <div class="oe_right">
-                  <p style="text-align: right; font-weight: bold; font-size: 14px;">Approve by: <t t-esc="o.approver_by.name"/></p>
-                  <img t-if="o.approver_by.user_signature" t-att-src="image_data_uri(o.approver_by.user_signature)" style="max-height: 65px;max-width: 200px;" alt="Logo"/>
-              </div>
-            </div> -->
+              <br/><br/>
+              <!-- <div class="row">
+                <div class="oe_right">
+                    <p style="text-align: right; font-weight: bold; font-size: 14px;">Approve by: <t t-esc="o.approver_by.name"/></p>
+                    <img t-if="o.approver_by.user_signature" t-att-src="image_data_uri(o.approver_by.user_signature)" style="max-height: 65px;max-width: 200px;" alt="Logo"/>
+                </div>
+              </div> -->
+            </div>
           </div>
         </t>
       </t>
