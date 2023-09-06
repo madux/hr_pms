@@ -42,7 +42,7 @@ class GoalSettingSectionLine(models.Model):
     acceptance_status = fields.Selection([
         ('yes', 'Yes'),
         ('no', 'No'),
-        ], string="Acceptance", default = "yes", readonly=False)
+        ], string="Acceptance", default = "no", readonly=False)
     fa_comment = fields.Text(
         string='Comment(s)', 
         )
