@@ -406,15 +406,19 @@
                                 <group>
                                     <field name="fa_comment_gs" attrs="{'readonly': [('is_functional_appraiser', '=', False)]}"/>
                                 </group>
-                                <field name="is_appraisee" force_save="1" invisible="1"/> 
+                                <field name="is_appraisee" force_save="1" invisible="1"/>
+
+                                <!-- <div data-oe-type="widget" data-oe-model="pms.appraisee" data-oe-id="widget_id" name="appraisee_consent_gs">
+                                    <t t-call="hr_pms.hr_pms_appraisee_form_template_id"/>
+                                </div>  -->
                                
-                                <div style="margin-top: 20px; margin-bottom: 20px;">
+                                <!-- <div style="margin-top: 20px; margin-bottom: 20px;">
                                     <label for="appraisee_consent_gs">Do you Consent to Discussion on KRAs with FA</label>
                                     <field name="appraisee_consent_gs" attrs="{'invisible': [('state', '!=', 'gs_signoff')], 'readonly': [('is_appraisee', '!=', True)]}"/>
-                                    <!-- <field name="appraisee_consent_gs" class="oe_edit_only"
-                                            attrs="{'invisible': [('state', '!=', 'gs_signoff'), ('is_appraisee', '=', False)]}"/> -->
+                                    <field name="appraisee_consent_gs" class="oe_edit_only"
+                                            attrs="{'invisible': [('state', '!=', 'gs_signoff'), ('is_appraisee', '=', False)]}"/>
 
-                                </div>
+                                </div> -->
 
                             </page>
                             <page name="section_line_ids" string="Sections" attrs="{'invisible': [('state', 'not in', ['draft', 'hyr_draft', 'hyr_functional_rating','functional_rating', 'reviewer_rating', 'done','signed'])]}">

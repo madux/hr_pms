@@ -1797,6 +1797,7 @@ class PMS_Appraisee(models.Model):
 
     @api.depends('employee_id', 'employee_id.user_id')
     def compute_user_appraisee(self):
+        self.ensure_one()
         if self.employee_id and self.employee_id.user_id.id == self.env.user.id:
             self.is_appraisee = True 
         else:
