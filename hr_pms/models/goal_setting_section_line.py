@@ -42,13 +42,14 @@ class GoalSettingSectionLine(models.Model):
     acceptance_status = fields.Selection([
         ('yes', 'Yes'),
         ('no', 'No'),
-        ], string="Acceptance", default = "no", readonly=False)
+        ], string="Acceptance Status", default = "no", readonly=False)
     fa_comment = fields.Text(
         string='Comment(s)', 
         )
     state = fields.Selection([
         ('goal_setting_draft', 'Goal Settings'),
         ('gs_fa', 'Goal Settings: FA TO APPROVE'),
+        ('gs_signoff', 'Goal Settings: Signoff'),
         ('hyr_draft', 'Draft'),
         ('hyr_admin_rating', 'Admin Supervisor'),
         ('hyr_functional_rating', 'Functional Supervisor'),
