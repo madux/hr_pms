@@ -32,7 +32,6 @@
             'wizards/appraisal_return_view.xml',
             'static/xml/dashboard_action.xml',
             # 'views/employees_import_view.xml',
-
     ],
     'css': [],
     'js': [],

@@ -102,12 +102,21 @@
                         />
                         <button 
                             name="manager_submit_goal_setting_button" 
-                            string="Approve For Mid year Review" 
+                            string="Approve Goal Setting" 
                             class="oe_highlight" 
                             type="object"
                             states="gs_fa"
                             confirm="Are you sure you want to Submit"
                         />
+                        <button 
+                            name="signoff_goal_setting_button" 
+                            string="Proceed Appraisal to Mid-year" 
+                            class="oe_highlight" 
+                            type="object"
+                            states="gs_signoff"
+                            confirm="Note: A mail will be sent if you did not consent to discussion with FA; otherwise proceed to Mid-year Review"
+                        />
+
                         <button 
                             name="hyr_button_submit" 
                             string="Submit for review" 
@@ -232,14 +241,16 @@
                                 <!-- <field name="online_deadline_date" string="Appraisee Deadline Date" readonly="1" force_save="1"/>  -->
                             </group>
                             <group>
-                                <field name="date_from" readonly="1" force_save="1"/> 
-                                <field name="date_end" readonly="1" force_save="1"/>
+                                <field name="date_from" readonly="1" invisible= "1" force_save="1"/> 
+                                <field name="date_end" readonly="1" invisible="1" force_save="1"/>
                                 <field name="submitted_date" readonly="1" force_save="1"/>
                                 <field name="is_current_user" readonly="0" invisible="1"/>
                                 <field name="lock_fields" readonly="0" invisible="0" groups="base.group_system"/>
                                  <!-- groups="base.group_system"/> -->
                                 
                             </group>
+                        </group>
+                        <group>
                         </group>
                         <div class='alert alert-info' role="alert">
                             FIND USER MANUAL HERE ==>
@@ -253,6 +264,10 @@
                             </page>
                             <page name="employee_manager_info" string="Staff Profile">
                                 <form string="">
+                                    <div>
+                                        <p style="color: red;">Please check the following details carefully, and if you find any errors in your information, don't hesitate to contact EEDC Talent Management via 
+                                            <a href="mailto:eedctalentmanagement@enugudisco.com?subject=Regarding%20Appraisal%20Information%20Error">link</a> or email eedctalentmanagement@enugudisco.com.</p>
+                                    </div>
                                     <group>
                                     <separator class="alert alert-info" role="alert" string="Appraisee’s Personal Information (employee must have worked for minimum 4 months in the appraisal period)" colspan="4"/>
                                     <group>
@@ -308,9 +323,43 @@
                             </page>
                             <page name="section_line_ids" string="Goal Settings" attrs="{'invisible': [('state', '!=', 'goal_setting_draft'),('type_of_pms', '!=', 'gs')]}">
 							    <div attrs="{'invisible': [('type_of_pms', '!=', 'gs')]}">
-                                    <p style="color: black;font-size: 14px;">Goal Setting</p>
-                                    <p style="color: red;">* Only Employee and Functional managers are expected to fill at this stage</p>
-                                    <p style="color: red;">* FA should also discuss with AA at this stage</p>
+                                    <!-- <p style="color: black;font-size: 14px;">Goal Setting</p>
+                                    <p style="color: red;">* Minimum of 5 KRAs and Max of 7 KRAs</p>
+                                    <p style="color: red;">* Total weight should be 100</p>
+                                    <p style="color: red;">* Be careful while selecting unit of measure for KRAs</p>
+                                    <p style="color: red;">* Goal Setting should be in consultant with the supervisor</p>
+                                    <p style="color: red;">* Click on the edit button to proceed</p> -->
+                                    <style>
+                                        .instruction-list {
+                                            list-style: none;
+                                            padding: 0;
+                                            display: flex;
+                                            flex-wrap: wrap;
+                                            gap: 10px; /* Adjust the gap between instructions */
+                                        }
+                                    
+                                        .instruction-item {
+                                            color: red;
+                                            flex-basis: calc(50% - 5px); /* Fit up to two items per line with a small gap */
+                                            margin: 0;
+                                            display: flex;
+                                            align-items: center;
+                                        }
+                                    
+                                        .arrow-icon {
+                                            margin-right: 5px;
+                                        }
+                                    </style>
+                                    
+                                    <ul class="instruction-list">
+                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Minimum of 5 KRAs and Max of 7 KRAs</li>
+                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Total weight should be 100</li>
+                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Be careful while selecting the unit of measure for KRAs</li>
+                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Goal Setting should be in consultation with the supervisor</li>
+                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Click on the edit button to proceed</li>
+                                    </ul>                                    
+                                    
+                                    
                                 </div>
                                 <!-- <button 
                                     name="button_goal_setting" 
@@ -335,7 +384,7 @@
                                         <field name="target" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],
                                         'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft', 'gs_fa'])]}" />
                                         <field name="acceptance_status" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],
-                                        'required': [('state', 'in', ['gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['gs_fa'])]}" />
+                                        'required': [('state', 'in', ['gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['gs_fa', 'gs_signoff'])]}" />
                                         <field name="goal_setting_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <field name="fa_comment" required="0" invisible="1"/>
                                     </tree>
@@ -354,6 +403,25 @@
                                         </group>
                                     </form>
                                 </field>
+                                <group>
+                                    <field name="fa_comment_gs" attrs="{'readonly': [('is_functional_appraiser', '=', False)]}"/>
+                                    <field name="is_appraisee" force_save="1" invisible="1"/>
+                                </group>
+
+
+                                <!-- <div data-oe-type="widget" data-oe-model="pms.appraisee" data-oe-id="widget_id" name="appraisee_consent_gs">
+                                    <t t-call="hr_pms.hr_pms_appraisee_form_template_id"/>
+                                </div>  -->
+                               
+                                <div attrs="{'invisible': [('is_appraisee', '=', False)]}" style="margin-top: 20px; margin-bottom: 20px;">
+                                    <label for="appraisee_consent_gs">Do you Consent to Discussion on KRAs with FA</label>
+                                    <field name="appraisee_consent_gs" />
+                                    <!-- <field name="appraisee_consent_gs" class="oe_edit_only" attrs="{'invisible': [('state', '!=', 'gs_signoff'), ('is_appraisee', '=', False)]}"/> -->
+                                    <!-- <field name="appraisee_consent_gs" attrs="{'invisible': [('state', '!=', 'gs_signoff')], 'readonly': [('state', '!=', 'gs_signoff'), ('employee_id.user_id.id','!=', uid)]}" /> -->
+
+
+                                </div>
+
                             </page>
                             <page name="section_line_ids" string="Sections" attrs="{'invisible': [('state', 'not in', ['draft', 'hyr_draft', 'hyr_functional_rating','functional_rating', 'reviewer_rating', 'done','signed'])]}">
                                 <div attrs="{'invisible': [('type_of_pms', '!=', 'hyr')]}">
@@ -395,7 +463,7 @@
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)]}"/>
                                         <field name="hyr_kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <!-- attrs="{'invisible': [('is_current_user', '=', True)]}" -->
-                                        <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
+                                        <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly --> 
                                         <field name="is_functional_manager" force_save="1" invisible="1"/> 
                                         <field name="is_administrative_supervisor" force_save="1" invisible="1"/> 
                                         <field name="is_reviewer" force_save="1" invisible="1"/>
