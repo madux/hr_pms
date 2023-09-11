@@ -233,7 +233,6 @@ class ImportRecords(models.TransientModel):
             fullname = vals.get('fullname')
             user, password = False, False
             login = email if email and email.endswith('@enugudisco.com') else vals.get('staff_number') 
-
             if login:
                 _logger.info('LOGGING FOUND')
                 # empdate = datetime.strftime(vals.get('employment_date'), '%d-%m-Y')

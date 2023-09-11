@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <odoo>
+        <record id="import_setting_form_view" model="ir.ui.view">
+            <field name="name">hr.import_config</field>
+            <field name="model">hr.import_config</field>
+            <field name="arch" type="xml">
+                <form string="Import Setting">
+                    <header>
+                    Settings
+                    </header>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="email_to_exclude"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>   
+        <record id="action_import_config" model="ir.actions.act_window">
+            <field name="name">Import Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.import_config</field>
+            <field name="view_mode">tree,form</field>
+            <field name="target">current</field>
+        </record>
+        <menuitem id="menu_import_config_records" name="Import Settings" groups="hr.group_hr_manager" sequence="17" parent="hr_pms.view_hr_pms_config_menu" action="action_import_config"/>
+</odoo>
