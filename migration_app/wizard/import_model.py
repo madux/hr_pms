@@ -233,9 +233,9 @@ class ImportRecords(models.TransientModel):
             fullname = vals.get('fullname')
             user, password = False, False
             email_configs = self.env['hr.import_config'].search([])
-            email_blacklist = [rec.email_to_exclude for rec in email_configs] # e.g ['injection@email.com','esss@gmail.com']
-            login = email if email and email.endswith('@enugudisco.com') or \
-                email not in [email_blacklist] else vals.get('staff_number') 
+            email_blacklist = [rec.email_to_exclude.strip() for rec in email_configs] # e.g ['injection@email.com','esss@gmail.com']
+            login = email if email and email.endswith('@enugudisco.com') and \
+                email not in [email_blacklist] else vals.get('staff_number')
             if login:
                 _logger.info('LOGGING FOUND')
                 # empdate = datetime.strftime(vals.get('employment_date'), '%d-%m-Y')
@@ -258,7 +258,14 @@ class ImportRecords(models.TransientModel):
 
                 if user:
                     _logger.info("User already exists...")
-                    password = False
+                    if user.partner_id:
+                        _logger.info("User is connected to an employee record...using staffno")
+                        user_vals['login'] = vals.get('staff_number')
+                        user = User.create(user_vals)
+                        _logger.info("Creating User record...")
+                    else:
+                        password = False
+                        user_vals['password'] = False
                 else:
                     user = User.create(user_vals)
                     _logger.info("Creating User record...")
@@ -287,12 +294,12 @@ class ImportRecords(models.TransientModel):
                                 datesplit = row[14].split('-') # eg. 09, jul, 22
                                 d, m, y = datesplit[0], datesplit[1], datesplit[2]
                                 appt_date = f"{d}-{m}-20{y}"
-                                appt_date = datetime.strptime(appt_date, '%d-%b-%Y') 
+                                appt_date = datetime.strptime(appt_date.strip(), '%d-%b-%Y') 
                             elif '-' in row[14]:
                                 datesplit = row[14].split('/') # eg. 09, jul, 22
                                 d, m, y = datesplit[0], datesplit[1], datesplit[2]
                                 appt_date = f"{d}-{m}-20{y}"
-                                appt_date = datetime.strptime(appt_date, '%d-%b-%Y') 
+                                appt_date = datetime.strptime(appt_date.strip(), '%d-%b-%Y') 
                             else:
                                 appt_date = datetime(*xlrd.xldate_as_tuple(float(row[14]), 0)) #eg 4554545
 
@@ -349,12 +356,12 @@ class ImportRecords(models.TransientModel):
                             datesplit = row[14].split('-') # eg. 09, jul, 22
                             d, m, y = datesplit[0], datesplit[1], datesplit[2]
                             appt_date = f"{d}-{m}-20{y}"
-                            appt_date = datetime.strptime(appt_date, '%d-%b-%Y') 
+                            appt_date = datetime.strptime(appt_date.strip(), '%d-%b-%Y') 
                         elif '-' in row[14]:
                             datesplit = row[14].split('/') # eg. 09, jul, 22
                             d, m, y = datesplit[0], datesplit[1], datesplit[2]
                             appt_date = f"{d}-{m}-20{y}"
-                            appt_date = datetime.strptime(appt_date, '%d-%b-%Y') 
+                            appt_date = datetime.strptime(appt_date.strip(), '%d-%b-%Y') 
                         else:
                             appt_date = datetime(*xlrd.xldate_as_tuple(float(row[14]), 0)) #eg 4554545
                 dt = appt_date or emp_date
