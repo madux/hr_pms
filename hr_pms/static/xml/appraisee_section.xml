@@ -1,9 +1,0 @@
-<odoo>
-    <template id="hr_pms_appraisee_form_template_id" inherit_id="hr_pms.view_hr_pms_appraisee_form" name="Goal Setting Consent Form View">
-        <xpath expr="//div[@name='goal_setting_section_line_ids']" position="after">
-            <div t-if="is_appraisee">
-                <field name="appraisee_consent_gs"/>
-            </div>
-        </xpath>
-    </template>    
-</odoo>

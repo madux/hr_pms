@@ -32,15 +32,11 @@
             'wizards/appraisal_return_view.xml',
             'static/xml/dashboard_action.xml',
             # 'views/employees_import_view.xml',
-            'static/xml/appraisee_section.xml',
-            # 'static/src/js/appraisee_section.js',
-
     ],
     'css': [],
     'js': [],
     'qweb': [
         'static/xml/dashboard.xml',
-        # 'static/xml/appraisee_section.xml'
     ],
     "active": False,
     'application': True,

@@ -220,12 +220,11 @@ class PMS_Appraisee(models.Model):
         string="Goal Settings",
         copy=False
     )
-    appraisee_consent_gs = fields.Boolean(
+    appraisee_consent_gs = fields.Selection(
+        selection=[('yes', 'Yes, FA discussed with me'), ('no', 'No, FA did not discuss with me')],
         string="Do you Consent to Discussion on KRAs with FA?",
-        required=True,
         readonly=True,
         states={'gs_signoff': [('readonly', False)]},
-        defalt=False
         )
     
     hyr_kra_section_line_ids = fields.One2many(
@@ -1343,17 +1342,30 @@ class PMS_Appraisee(models.Model):
     def signoff_goal_setting_button(self):
         if not self.appraisee_consent_gs:
             raise UserError('Please consent to discussion with FA before submitting')
-        self.lock_fields = False
-        self.validate_deadline()
-        self.check_employee_right()
-        self.generate_hyr_kra_lines()
-        self.write({
-                'name': f'MID Year Review for {self.employee_id.name}', 
-                'state': 'hyr_draft',
-                'submitted_date': fields.Date.today(),
-                'type_of_pms': 'hyr',
-            })
         
+        if self.appraisee_consent_gs == 'no':
+            subject = 'Non Agreed Goal setting'
+            msg = """Dear HR, <br/> 
+                    I wish to state that FA did not discuss with me on the changes in goal setting.\
+                    <br/>Thanks. <br/>\
+                    Yours Faithfully<br/>{}<br/>{}""".format(
+                    self.employee_id.name, self.employee_id.department_id.name
+                )
+            email_to = 'eedctalentmanagement@enugudisco.com'
+            email_cc = self.employee_id.work_email
+            self.mail_sending(subject, msg, email_to, email_cc)
+        else: 
+            self.lock_fields = False
+            self.validate_deadline()
+            self.check_employee_right()
+            self.generate_hyr_kra_lines()
+            self.write({
+                    'name': f'MID Year Review for {self.employee_id.name}', 
+                    'state': 'hyr_draft',
+                    'submitted_date': fields.Date.today(),
+                    'type_of_pms': 'hyr',
+                })
+            
     def generate_hyr_kra_lines(self):
         """Generates HYR Section lines"""
         self.hyr_kra_section_line_ids = False #.unlink()
@@ -1795,13 +1807,14 @@ class PMS_Appraisee(models.Model):
         else:
             self.is_functional_appraiser = False 
 
-    @api.depends('employee_id', 'employee_id.user_id')
+    # @api.depends('employee_id', 'employee_id.user_id')
     def compute_user_appraisee(self):
-        self.ensure_one()
-        if self.employee_id and self.employee_id.user_id.id == self.env.user.id:
-            self.is_appraisee = True 
-        else:
-            self.is_appraisee = False 
+        for rec in self:
+            if rec.employee_id and rec.employee_id.user_id.id == self.env.user.id:
+                rec.is_appraisee = True 
+            else:
+                rec.is_appraisee = False 
+            
 
     def check_employer_manager(self):
         if self.employee_id.parent_id.user_id.id != self.env.uid:
