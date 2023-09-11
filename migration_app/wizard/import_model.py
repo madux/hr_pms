@@ -232,7 +232,10 @@ class ImportRecords(models.TransientModel):
             email = vals.get('email') or vals.get('private_email')
             fullname = vals.get('fullname')
             user, password = False, False
-            login = email if email and email.endswith('@enugudisco.com') else vals.get('staff_number') 
+            email_configs = self.env['hr.import_config'].search([])
+            email_blacklist = [rec.email_to_exclude for rec in email_configs] # e.g ['injection@email.com','esss@gmail.com']
+            login = email if email and email.endswith('@enugudisco.com') or \
+                email not in [email_blacklist] else vals.get('staff_number') 
             if login:
                 _logger.info('LOGGING FOUND')
                 # empdate = datetime.strftime(vals.get('employment_date'), '%d-%m-Y')
@@ -252,6 +255,7 @@ class ImportRecords(models.TransientModel):
                 _logger.info(f"Creating employee Rep User..with password {password} and {user_vals.get('password')}.")
                 User = self.env['res.users'].sudo()
                 user = User.search([('login', '=', login)],limit=1)
+
                 if user:
                     _logger.info("User already exists...")
                     password = False
