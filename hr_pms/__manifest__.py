@@ -35,6 +35,7 @@
             'report/pms_appraisal_templates.xml',
             # 'report/pms_appraisal_reports.xml',
 
+
     ],
     'css': [],
     'js': [],

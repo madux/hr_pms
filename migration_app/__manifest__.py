@@ -1,6 +1,5 @@
 ##############################################################################
-#    Copyright (C) 2021 MAACH SOFTWARE. All Rights Reserved
-#    BItlect Extensions to Sms module
+#    Copyright (C) 2022 MAACH SOFTWARE. All Rights Reserved
 
 
 {
@@ -14,6 +13,7 @@
     "data": [
         'security/ir.model.access.csv',
         'wizard/import_employee_view.xml',
+        'views/config_view.xml',
         
     ],
     "sequence": 3,

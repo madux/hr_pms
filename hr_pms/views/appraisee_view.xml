@@ -29,7 +29,7 @@
                     <group  expand='0' string='Group by...'>
                         <filter name="department_id" string='Department' domain="[]" context="{'group_by' : 'department_id'}"/>
                         <filter name="employee_id" string='Employee' domain="[]" context="{'group_by' : 'employee_id'}"/>
-                        <filter name="group_pms_year_id" string='Period' domain="[]" context="{'group_by' : 'pms_year_id'}"/>
+                        <!-- <filter name="group_pms_year_id" string='Period' domain="[]" context="{'group_by' : 'pms_year_id'}"/> -->
                         <filter name="group_type_of_pms" string='Type of PMS' domain="[]" context="{'group_by' : 'type_of_pms'}"/>
                         <filter name="manager_id" string='Manager' domain="[]" context="{'group_by' : 'manager_id'}"/>
                         <filter name="administrative_supervisor_id" string='Administrative Supervisor' domain="[]" context="{'group_by' : 'administrative_supervisor_id'}"/>
@@ -45,6 +45,41 @@
 				</search>
 			</field>
 		</record>
+
+        <record id="view_pms_appraisee_calendar" model="ir.ui.view">
+            <field name="name">pms.appraisee.calendar</field>
+            <field name="model">pms.appraisee</field>
+            <field name="arch" type="xml">
+                <calendar string="Appraisee" date_start="date_from" color="state" hide_time="true" event_limit="5" quick_add="False">
+                    <field name="employee_id" avatar_field="image_128"/>
+                    <field name="department_id"/>
+                    <field name="reviewer_id"/>
+                    <field name="manager_id"/>
+                    <field name="state" filters="1" invisible="1"/>
+                </calendar>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_pms_appraisee_graph">
+            <field name="name">pms.appraisee.graph</field>
+            <field name="model">pms.appraisee</field>
+            <field name="arch" type="xml">
+                <graph string="PMS" sample="1">
+                    <field name="department_id" type="measure"/>
+                     <field name="employee_id" type="measure"/>
+                    <field name="overall_score"/>
+                </graph>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_sale_order_pivot">
+            <field name="name">pms.appraisee.pivot</field>
+            <field name="model">pms.appraisee</field>
+            <field name="arch" type="xml">
+                <pivot string="PMS" sample="1">
+                    <field name="employee_id" type="row"/>
+                    <field name="overall_score" type="measure"/>
+                </pivot>
+            </field>
+        </record>
         
 		<record id="view_hr_pms_appraisee_form" model="ir.ui.view">
 			<field name="name">PMS appraisee form</field>
@@ -52,6 +87,11 @@
 			<field name="arch" type="xml">
 				<form string="appraisees" create="0">
                     <header>
+                        <!-- <button 
+                            name="back_forth_button_test" 
+                            string="return test" 
+                            type="object" 
+                        /> -->
                         <button 
                             name="goal_setting_button_submit" 
                             string="Submit Goal Setting to Manager" 
@@ -62,12 +102,21 @@
                         />
                         <button 
                             name="manager_submit_goal_setting_button" 
-                            string="Submit For Mid year Review" 
+                            string="Approve Goal Setting" 
                             class="oe_highlight" 
                             type="object"
                             states="gs_fa"
                             confirm="Are you sure you want to Submit"
                         />
+                        <button 
+                            name="signoff_goal_setting_button" 
+                            string="Proceed Appraisal to Mid-year" 
+                            class="oe_highlight" 
+                            type="object"
+                            states="gs_signoff"
+                            confirm="Note: A mail will be sent if you did not consent to discussion with FA; otherwise proceed to Mid-year Review"
+                        />
+
                         <button 
                             name="hyr_button_submit" 
                             string="Submit for review" 
@@ -141,16 +190,16 @@
                             name="return_appraisal" 
                             string="Return" 
                             type="object"
-                            attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['admin_rating', 'functional_rating', 'reviewer_rating'])]}"
+                            attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['gs_fa', 'admin_rating', 'functional_rating', 'reviewer_rating'])]}"
                             confirm="Are you sure you want to return"
                         />
-                        <button 
+                        <!-- <button 
                             name="hyr_return_appraisal" 
                             string="Return" 
                             type="object"
                             attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['gs_fa'])]}"
                             confirm="Are you sure you want to return"
-                        />
+                        /> -->
                             <!-- states="admin_rating,functional_rating" -->
                         <button 
                             name="button_set_to_draft" 
@@ -186,20 +235,22 @@
                         <group>
                             <group>
                                 <field name="type_of_pms" invisible="0" readonly="1" force_save="1"/> 
-                                <field name="pms_year_id" invisible="1" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="pms_year_id" invisible="0" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="deadline" readonly="1" force_save="1"/> 
                                 <field name="dummy_state" invisible="1" force_save="1"/> 
                                 <!-- <field name="online_deadline_date" string="Appraisee Deadline Date" readonly="1" force_save="1"/>  -->
                             </group>
                             <group>
-                                <field name="date_from" readonly="1" force_save="1"/> 
-                                <field name="date_end" readonly="1" force_save="1"/>
+                                <field name="date_from" readonly="1" invisible= "1" force_save="1"/> 
+                                <field name="date_end" readonly="1" invisible="1" force_save="1"/>
                                 <field name="submitted_date" readonly="1" force_save="1"/>
                                 <field name="is_current_user" readonly="0" invisible="1"/>
                                 <field name="lock_fields" readonly="0" invisible="0" groups="base.group_system"/>
                                  <!-- groups="base.group_system"/> -->
                                 
                             </group>
+                        </group>
+                        <group>
                         </group>
                         <div class='alert alert-info' role="alert">
                             FIND USER MANUAL HERE ==>
@@ -213,8 +264,12 @@
                             </page>
                             <page name="employee_manager_info" string="Staff Profile">
                                 <form string="">
+                                    <div>
+                                        <p style="color: red;">Please check the following details carefully, and if you find any errors in your information, don't hesitate to contact EEDC Talent Management via 
+                                            <a href="mailto:eedctalentmanagement@enugudisco.com?subject=Regarding%20Appraisal%20Information%20Error">link</a> or email eedctalentmanagement@enugudisco.com.</p>
+                                    </div>
                                     <group>
-                                    <separator class="alert alert-info" role="alert" string="Appraisee’s Personal Information (employee must have worked for minimum 6 months in the appraisal period)" colspan="4"/>
+                                    <separator class="alert alert-info" role="alert" string="Appraisee’s Personal Information (employee must have worked for minimum 4 months in the appraisal period)" colspan="4"/>
                                     <group>
                                         <field name="employee_id" attrs="{'readonly': [('lock_fields', '=', False)]}" readonly="0" options="{'no_create': True,'no_open': True}"/> 
                                         <field name="job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
@@ -227,7 +282,7 @@
                                         <field name="job_title" readonly="1" force_save="1" string="Designation"/>
                                         <field name="work_unit_id" readonly="1" string="Unit/SC/Workshop/Substation" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                     </group>
-                                        <separator class="alert alert-info" role="alert" string="Current Functional Appraiser’s (should have supervised appraisee for minimum 3 months) Personal Information" colspan="4"/>
+                                        <separator class="alert alert-info" role="alert" string="Current Functional Appraiser’s (should have supervised appraisee for minimum 4 months) Personal Information" colspan="4"/>
                                         <group>
                                             <field name="manager_id" readonly="1" string="Manager" options="{'no_create': True,'no_open': True}"/> 
                                             <field name="manager_job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
@@ -239,7 +294,7 @@
                                             <field name="manager_job_title" readonly="1" force_save="1" string="Designation"/>
                                             <field name="manager_work_unit" readonly="1" string="Unit/SC/Workshop/Substation" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                         </group>
-                                        <separator class="alert alert-info" role="alert" string="Current Administrative Appraiser’s (should have supervised appraisee for minimum 3 months) Personal Information" colspan="4"/>
+                                        <separator class="alert alert-info" role="alert" string="Current Administrative Appraiser’s (should have supervised appraisee for minimum 4 months) Personal Information" colspan="4"/>
                                         <group>
                                             <field name="administrative_supervisor_id" readonly="1" string="Name" options="{'no_create': True,'no_open': True}"/> 
                                             <field name="supervisor_job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
@@ -268,32 +323,68 @@
                             </page>
                             <page name="section_line_ids" string="Goal Settings" attrs="{'invisible': [('state', '!=', 'goal_setting_draft'),('type_of_pms', '!=', 'gs')]}">
 							    <div attrs="{'invisible': [('type_of_pms', '!=', 'gs')]}">
-                                    <p style="color: black;font-size: 14px;">Goal Setting</p>
-                                    <p style="color: red;">* Only Employee and Functional managers are expected to fill at this stage</p>
+                                    <!-- <p style="color: black;font-size: 14px;">Goal Setting</p>
+                                    <p style="color: red;">* Minimum of 5 KRAs and Max of 7 KRAs</p>
+                                    <p style="color: red;">* Total weight should be 100</p>
+                                    <p style="color: red;">* Be careful while selecting unit of measure for KRAs</p>
+                                    <p style="color: red;">* Goal Setting should be in consultant with the supervisor</p>
+                                    <p style="color: red;">* Click on the edit button to proceed</p> -->
+                                    <style>
+                                        .instruction-list {
+                                            list-style: none;
+                                            padding: 0;
+                                            display: flex;
+                                            flex-wrap: wrap;
+                                            gap: 10px; /* Adjust the gap between instructions */
+                                        }
+                                    
+                                        .instruction-item {
+                                            color: red;
+                                            flex-basis: calc(50% - 5px); /* Fit up to two items per line with a small gap */
+                                            margin: 0;
+                                            display: flex;
+                                            align-items: center;
+                                        }
+                                    
+                                        .arrow-icon {
+                                            margin-right: 5px;
+                                        }
+                                    </style>
+                                    
+                                    <ul class="instruction-list">
+                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Minimum of 5 KRAs and Max of 7 KRAs</li>
+                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Total weight should be 100</li>
+                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Be careful while selecting the unit of measure for KRAs</li>
+                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Goal Setting should be in consultation with the supervisor</li>
+                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Click on the edit button to proceed</li>
+                                    </ul>                                    
+                                    
+                                    
                                 </div>
-                                <button 
+                                <!-- <button 
                                     name="button_goal_setting" 
                                     string="Upload goals using excel" 
                                     class="oe_highlight btn-sm" 
                                     type="object"
                                     states="goal_setting_draft" 
                                     groups="hr_pms.group_pms_user_id"
-                                /> 
+                                />  -->
                                 <field name="goal_setting_section_line_ids" options="{'no_quick_create':True,'no_open': True}" 
                                     attrs="{
                                         'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])],
                                         'invisible': [('type_of_pms', '!=', 'gs')]
                                         }">
                                     <tree string="Goal Setting" delete="true" editable="bottom" options="{'no_create':False, 'no_open': False}">
-                                        <field name="name" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])]}"/> 
+                                        <field name="name" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])]}"/> 
                                         <field name="state" invisible="1" force_save="1"/> 
-                                        <field name="weightage" required="1" sum="total" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])],
+                                        <field name="can_edit" invisible="1" force_save="1"/> 
+                                        <field name="weightage" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],
                                         'required': [('state', 'in', ['goal_setting_draft', 'gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft', 'gs_fa'])]}" />
-                                        <field name="pms_uom" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])]}" />
-                                        <field name="target" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])],
-                                        'required': [('state', 'in', ['goal_setting_draft', 'gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft', 'gs_fa'])]}" />
-                                        <field name="acceptance_status" required="1" attrs="{'readonly': [('state', 'not in', ['gs_fa'])],
-                                        'required': [('state', 'in', ['gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['gs_fa'])]}" />
+                                        <field name="pms_uom" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])]}" />
+                                        <field name="target" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],
+                                        'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft', 'gs_fa'])]}" />
+                                        <field name="acceptance_status" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],
+                                        'required': [('state', 'in', ['gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['gs_fa', 'gs_signoff'])]}" />
                                         <field name="goal_setting_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <field name="fa_comment" required="0" invisible="1"/>
                                     </tree>
@@ -312,6 +403,25 @@
                                         </group>
                                     </form>
                                 </field>
+                                <group>
+                                    <field name="fa_comment_gs" attrs="{'readonly': [('is_functional_appraiser', '=', False)]}"/>
+                                    <field name="is_appraisee" force_save="1" invisible="1"/>
+                                </group>
+
+
+                                <!-- <div data-oe-type="widget" data-oe-model="pms.appraisee" data-oe-id="widget_id" name="appraisee_consent_gs">
+                                    <t t-call="hr_pms.hr_pms_appraisee_form_template_id"/>
+                                </div>  -->
+                               
+                                <div attrs="{'invisible': [('is_appraisee', '=', False)]}" style="margin-top: 20px; margin-bottom: 20px;">
+                                    <label for="appraisee_consent_gs">Do you Consent to Discussion on KRAs with FA</label>
+                                    <field name="appraisee_consent_gs" />
+                                    <!-- <field name="appraisee_consent_gs" class="oe_edit_only" attrs="{'invisible': [('state', '!=', 'gs_signoff'), ('is_appraisee', '=', False)]}"/> -->
+                                    <!-- <field name="appraisee_consent_gs" attrs="{'invisible': [('state', '!=', 'gs_signoff')], 'readonly': [('state', '!=', 'gs_signoff'), ('employee_id.user_id.id','!=', uid)]}" /> -->
+
+
+                                </div>
+
                             </page>
                             <page name="section_line_ids" string="Sections" attrs="{'invisible': [('state', 'not in', ['draft', 'hyr_draft', 'hyr_functional_rating','functional_rating', 'reviewer_rating', 'done','signed'])]}">
                                 <div attrs="{'invisible': [('type_of_pms', '!=', 'hyr')]}">
@@ -337,7 +447,7 @@
                                         <field name="weightage" sum="total" readonly ="1"/> 
                                         <!-- attrs="{'readonly': ['|', ('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/> -->
                                         <field name="target" readonly ="1"/>
-                                        <field name="revise_weightage" readonly="1" sum="total" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
+                                        <field name="revise_weightage" readonly="0" sum="total" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
                                         <field name="pms_uom" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
@@ -349,10 +459,11 @@
                                         'required': [('state', 'in', ['hyr_draft','hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
                                         <field name="hyr_fa_rating" required="0" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)],'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
-                                        <field name="fa_comment" widget="text" force_save="1" attrs="{'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)]}"/>
+                                        <field name="fa_comment" widget="text" force_save="1" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
+                                        'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)]}"/>
                                         <field name="hyr_kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <!-- attrs="{'invisible': [('is_current_user', '=', True)]}" -->
-                                        <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
+                                        <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly --> 
                                         <field name="is_functional_manager" force_save="1" invisible="1"/> 
                                         <field name="is_administrative_supervisor" force_save="1" invisible="1"/> 
                                         <field name="is_reviewer" force_save="1" invisible="1"/>
@@ -379,10 +490,10 @@
                                     <field name="appraisee_comment" widget="text" force_save="1" placeholder="Start typing" attrs="{
                                         'invisible': [('state', 'not in', ['hyr_draft', 'hyr_admin_rating', 'hyr_functional_rating'])],
                                         'readonly': [('state', 'not in', ['hyr_draft'])]}"/><br/>
-                                    <separator string="Supervisor Comments" colspan="4"/><br/>
+                                    <!-- <separator string="Supervisor Comments" colspan="4"/><br/>
                                     <field name="supervisor_comment" force_save="1" widget="text" placeholder="Start typing" attrs="{
                                         'invisible': [('state', 'not in', ['hyr_draft','hyr_admin_rating','hyr_functional_rating'])],
-                                        'readonly': [('state', 'not in', ['hyr_admin_rating'])]}"/><br/>
+                                        'readonly': [('state', 'not in', ['hyr_admin_rating'])]}"/><br/> -->
                                     <separator string="Manager Comments" colspan="4" /><br/>
                                     <field name="manager_comment" widget="text" force_save="1" placeholder="Start typing" attrs="{
                                         'invisible': [('state', 'not in', ['hyr_draft','hyr_admin_rating','hyr_functional_rating'])],
@@ -1024,7 +1135,7 @@
                                                     </span>
                                                 </div>
                                                 <div class="float-right" t-if="record.state.raw_value == 'draft'" name="draft_state">
-                                                    <span class="fa fa-circle-o text-muted" role="img" aria-label="Draft" title="Draft" name="draft_state">
+                                                    <span class="fa fa-circle-o text-muted" role="img" aria-label="Draft" title="Ready For Annual Review" name="draft_state">
                                                     </span>
                                                 </div>
                                                 <div class="float-right" t-if="record.state.raw_value == 'functional_rating'" name="functional_rating_state">
@@ -1082,7 +1193,7 @@
         <record id="action_pms_appraisal_view_id" model="ir.actions.act_window">
 			<field name="name">Appraisals</field>
 			<field name="res_model">pms.appraisee</field>
-			<field name="view_mode">tree,kanban,form</field>
+			<field name="view_mode">tree,kanban,form,calendar,graph,pivot</field>
             <field name="domain">[]</field>
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
              <field name="context">{'search_default_group_pms_year_id': 1,'search_default_group_type_of_pms': 1}</field>
@@ -1096,8 +1207,8 @@
         <record id="action_pms_fa_view_id" model="ir.actions.act_window">
 			<field name="name">Functional Appraisal</field>
 			<field name="res_model">pms.appraisee</field>
-			<field name="view_mode">tree,form</field>
-            <field name="domain">[('state','in',['goal_setting_draft','hyr_functional_rating','functional_rating']),('manager_id.user_id','=',uid)]</field>
+			<field name="view_mode">tree,form,calendar</field>
+            <field name="domain">[('state','in',['gs_fa', 'hyr_functional_rating','functional_rating']),('manager_id.user_id','=',uid)]</field>
             <!-- <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field> -->
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
@@ -1113,7 +1224,7 @@
         <record id="action_pms_aa_view_id" model="ir.actions.act_window">
 			<field name="name">Administrative Appraisal</field>
 			<field name="res_model">pms.appraisee</field>
-			<field name="view_mode">tree,form</field>
+			<field name="view_mode">tree,form,calendar</field>
             <field name="domain">[('state','=','admin_rating'),('administrative_supervisor_id.user_id.id','=',uid)]</field>
             <!-- <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field> -->
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
@@ -1128,7 +1239,7 @@
         <record id="action_pms_fr_view_id" model="ir.actions.act_window">
 			<field name="name">Reviewer</field>
 			<field name="res_model">pms.appraisee</field>
-			<field name="view_mode">tree,form</field>
+			<field name="view_mode">tree,form,calendar</field>
             <field name="domain">[('state','=','reviewer_rating'),('reviewer_id.user_id','=', uid)]</field>
             <!-- <field name="context">{'search_default_pms_year_id': 1, 'search_default_state': 1}</field> -->
              <field name="search_view_id" ref="hr_pms.view_pms_appraisee_filter" />
@@ -1191,8 +1302,6 @@
 			])]"/>
             <field name="code">action=model.post_normalisation_upload_action()</field>
         </record>
-
-
 
     <menuitem id="view_pms_appraisee_menu" name="Appraisal" sequence="1" parent="hr_pms.view_hr_pms_menu" action="hr_pms.action_pms_appraisee_view_id"/>
     <menuitem id="view_pms_my_appraisal_menu" name="My Appraisal(s)" sequence="1" parent="hr_pms.view_pms_appraisee_menu" action="hr_pms.action_pms_appraisee_view_id"
