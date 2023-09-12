@@ -1,0 +1,311 @@
+<odoo>
+  <data> 
+    <report
+        id = "report_pms_appraisal"
+        model= "pms.appraisee"
+        string="Print Report"
+        report_type = "qweb-pdf"
+        name ="hr_pms.pms_appraisal_print_template"
+        file ="hr_pms.pms_appraisal_print_template"
+        attachment_use="True"
+    />
+    <template id="pms_appraisal_print_template">
+      <t t-call="web.html_container">
+          <t t-foreach="docs" t-as="o">
+              <t t-call="hr_pms.pms_appraisal_print_template_id"/>
+          </t>
+      </t>
+    </template>
+    <template id="pms_appraisal_print_template_id">
+      <t t-call="web.external_layout">
+        <t t-foreach="docs" t-as="o">
+          <div class="page" style="padding-top: 10px;">
+            <style>
+              table {
+                border-collapse: collapse;
+                margin-bottom: 20px;
+              }
+             
+            p {
+                margin-bottom: 2px;
+              }
+              
+              th {
+                background-color: #333;
+                color: #fff;
+              }
+
+              table, th, tr, td {
+                border:1px solid #999;
+                font-family: Trebuchet MS
+              }
+
+              tr:nth-child(odd){
+                background-color: #ccc;
+              }
+
+              th, td{
+                padding: 5px;
+              }
+
+              td:nth-child(4) {
+                color: green;
+              }
+
+              .outstanding {
+                color: red;
+              }
+
+              .section-header {
+                  background-color: #333;
+                  color: #fff;
+                  padding: 5px 10px;
+                  margin-bottom: 10px;
+                  font-weight: bold;
+              }
+
+              .section-content {
+                padding: 10px;
+                background-color: #f8f9fa;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                margin-bottom: 20px;
+              }
+
+              <!-- .column {
+                  display: flex;
+                  flex-direction: column;
+              } -->
+              .column {
+                flex: 1;
+              }
+
+              .row {
+                  display: flex;
+                  justify-content: space-between;
+              }
+            </style>
+
+            <div class="container">
+              <div class="oe_title">
+                <h1>
+                  <b><span t-field="o.name"/></b>
+                </h1>
+                <br/>
+              </div>
+              <div>
+                <h2>
+                  <b>Status:</b> <span t-field="o.state"/>
+                </h2>
+                <br/>
+              </div>
+              <div class="row mt32 mb32">
+                <div class="col-6">
+                  <p><b>PMS Type:</b> <span t-field="o.type_of_pms"/></p>
+                  <p><b>Deadline:</b> <span t-field="o.deadline"/></p>
+                </div>
+                <div class="col-6">
+                  <p><b>Date From:</b> <span t-field="o.date_from"/></p>
+                  <p><b>Date End:</b> <span t-field="o.date_end"/></p>
+                  <p><b>Submitted Date:</b> <span t-field="o.submitted_date"/></p>
+                </div>
+              </div>
+
+              <t t-if="o.state=='goal_setting_draft'">
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                      <th>KRA</th>
+                      <th>Weightage</th>
+                      <th>Unit of Measure</th>
+                      <th>Target</th>
+                    </tr>
+                    <t t-foreach="o.goal_setting_section_line_ids" t-as="sec">
+                      <tr>
+                        <td><t t-esc="sec.name"/></td>
+                        <td><t t-esc="sec.weightage"/></td>
+                        <td><t t-esc="sec.pms_uom"/></td>
+                        <td><t t-esc="sec.target"/></td>
+                        <!-- <td>NGN<t t-esc="'{0:,}'.format(float(o.amountfig))"/></td> -->
+                      </tr>
+                    </t>
+                </table>  
+              </t>
+              <t t-elif="o.state=='gs_fa'">
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                      <th>KRA</th>
+                      <th>Weightage</th>
+                      <th>Unit of Measure</th>
+                      <th>Target</th>
+                      <th>Acceptance</th>
+                    </tr>
+                    <t t-foreach="o.goal_setting_section_line_ids" t-as="sec">
+                      <tr>
+                        <td><t t-esc="sec.name"/></td>
+                        <td><t t-esc="sec.weightage"/></td>
+                        <td><t t-esc="sec.pms_uom"/></td>
+                        <td><t t-esc="sec.target"/></td>
+                        <td><t t-esc="sec.acceptance_status"/></td>
+                      </tr>
+                    </t>
+                </table>  
+              </t>
+              <t t-elif="o.state in ['hyr_draft', 'hyr_functional_rating']">
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                      <th>KRA</th>
+                      <th>Weightage</th>
+                      <th>Target</th>
+                      <th>Revise Weightage</th>
+                      <th>Unit of Measure</th>
+                      <th>Revise Target</th>
+                      <th>Acceptance</th>
+                      <th>Progress Status</th>
+                      <th>Comment(s)</th>
+                    </tr>
+                    <t t-foreach="o.hyr_kra_section_line_ids" t-as="sec">
+                      <tr>
+                        <td><t t-esc="sec.name"/></td>
+                        <td><t t-esc="sec.weightage"/></td>
+                        <td><t t-esc="sec.target"/></td>
+                        <td><t t-esc="sec.revise_weightage"/></td>
+                        <td><t t-esc="sec.pms_uom"/></td>
+                        <td><t t-esc="sec.revise_target"/></td>
+                        <td><t t-esc="sec.acceptance_status"/></td>
+                        <td><t t-esc="sec.hyr_fa_rating"/></td>
+                        <td><t t-esc="sec.fa_comment"/></td>
+                      </tr>
+                    </t>
+                </table>  
+              </t>
+              <t t-elif="o.state in ['draft', 'admin_rating', 'functional_rating', 'reviewer_rating', 'done', 'signed']">
+                <h1>KRA Section</h1>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                      <th>KRA</th>
+                      <th>FA(HYR)Review</th>
+                      <th>Weightage</th>
+                      <th>Self Rating</th>
+                      <th>AA Rating</th>
+                      <th>FA Rating</th>
+                      <th>Reviewer Rating</th>
+                    </tr>
+                    <t t-foreach="o.kra_section_line_ids" t-as="sec">
+                      <tr>
+                        <td><t t-esc="sec.name"/></td>
+                        <td><t t-esc="sec.hyr_fa_rating"/></td>
+                        <td><t t-esc="sec.weightage"/></td>
+                        <td><t t-esc="sec.self_rating"/></td>
+                        <td><t t-esc="sec.administrative_supervisor_rating"/></td>
+                        <td><t t-esc="sec.functional_supervisor_rating"/></td>
+                        <td><t t-esc="sec.reviewer_rating"/></td>
+                      </tr>
+                    </t>
+                </table>
+
+                <h1>FC Section</h1> 
+                <table style="width: 100%; text-align: left;">
+                  <tr>
+                    <th>Description</th>
+                    <th>Weightage</th>
+                    <th>AA Rating</th>
+                    <th>FA Rating</th>
+                    <th>Reviewer Rating</th>
+                  </tr>
+                  <t t-foreach="o.fc_section_line_ids" t-as="sec">
+                    <tr>
+                      <td><t t-esc="sec.name"/></td>
+                      <td><t t-esc="sec.weightage"/></td>
+                      <td><t t-esc="sec.administrative_supervisor_rating"/></td>
+                      <td><t t-esc="sec.functional_supervisor_rating"/></td>
+                      <td><t t-esc="sec.reviewer_rating"/></td>
+                    </tr>
+                  </t>
+                </table>
+              
+                <h1>LC Section</h1> 
+                <table style="width: 100%; text-align: left;">
+                  <tr>
+                    <th>Description</th>
+                    <th>Weightage</th>
+                    <th>AA Rating</th>
+                    <th>FA Rating</th>
+                    <th>Reviewer Rating</th>
+                  </tr>
+                  <t t-foreach="o.lc_section_line_ids" t-as="sec">
+                    <tr>
+                      <td><t t-esc="sec.name"/></td>
+                      <td><t t-esc="sec.weightage"/></td>
+                      <td><t t-esc="sec.administrative_supervisor_rating"/></td>
+                      <td><t t-esc="sec.functional_supervisor_rating"/></td>
+                      <td><t t-esc="sec.reviewer_rating"/></td>
+                    </tr>
+                  </t>
+                </table>
+                
+                <h1>Overall Current Assessment</h1>
+                <table style="width: 100%; text-align: left;">
+                  <tr>
+                    <th>Assessment By</th>
+                    <th>Rating</th>
+                  </tr>
+                  <t t-foreach="o.current_assessment_section_line_ids" t-as="sec">
+                    <tr>
+                      <td><t t-esc="sec.name"/></td>
+                      <td><t t-esc="sec.assessment_type"/></td>
+                    </tr>
+                  </t>
+                </table> 
+
+                <h1>Potential Assessment</h1>
+                <table style="width: 100%; text-align: left;">
+                  <tr>
+                    <th>Assessment By</th>
+                    <th>Rating</th>
+                  </tr>
+                  <t t-foreach="o.potential_assessment_section_line_ids" t-as="sec">
+                    <tr>
+                      <td><t t-esc="sec.name"/></td>
+                      <td><t t-esc="sec.assessment_type"/></td>
+                    </tr>
+                  </t>
+                </table>
+                
+                <div>
+                  <t t-if="o.appraisee_comment"> 
+                    <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 14px;">Appraisee Comment:  
+                    </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:14px;" t-esc="o.appraisee_comment"/>
+                  </t>
+                  <t t-if="o.supervisor_comment"> 
+                    <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 14px;">AA Comment:  
+                    </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:14px;" t-esc="o.supervisor_comment"/>
+                  </t>
+                  <t t-if="o.manager_comment"> 
+                    <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 14px;">FA Comment:  
+                    </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:14px;" t-esc="o.manager_comment"/>
+                  </t>
+                  <t t-if="o.reviewer_comment"> 
+                    <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 14px;">Reviewer Comment:  
+                    </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:14px;" t-esc="o.reviewer_comment"/>
+                  </t>
+                </div>
+                <br/><br/>
+                <div>
+                  <t t-if="o.reason_back"> 
+                    <strong style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size: 14px;">Return Reasons:  
+                    </strong><span style="text-align: justify; font-family: 'Times New Roman', Times, serif; font-size:14px;" t-esc="o.reason_back"/>
+                  </t>
+                </div>
+                
+              </t>  
+              
+            </div>
+          </div>
+        </t>
+      </t>
+
+    </template>
+
+ 
+  </data>
+</odoo>

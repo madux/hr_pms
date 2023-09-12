@@ -32,6 +32,10 @@
             'wizards/appraisal_return_view.xml',
             'static/xml/dashboard_action.xml',
             # 'views/employees_import_view.xml',
+            'report/pms_appraisal_templates.xml',
+            # 'report/pms_appraisal_reports.xml',
+
+
     ],
     'css': [],
     'js': [],
