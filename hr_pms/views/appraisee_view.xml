@@ -382,7 +382,7 @@
                                         <button name="unlink"
                                             type="object"
                                             class="fa fa-trash-o"
-                                            attrs="{'invisible': ['|',('state', '!=', 'goal_setting_draft'),('create_uid', '!=', 'uid')]}"
+                                            attrs="{'invisible': [('state', '!=', 'goal_setting_draft')]}"
                                             aria-label="Delete row 1"/>
                                     </tree>
                                     <form string="">
