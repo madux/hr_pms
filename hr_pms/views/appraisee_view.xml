@@ -110,7 +110,7 @@
                         />
                         <button 
                             name="signoff_goal_setting_button" 
-                            string="Proceed Appraisal to Mid-year" 
+                            string="Proceed Appraisal" 
                             class="oe_highlight" 
                             type="object"
                             states="gs_signoff"
