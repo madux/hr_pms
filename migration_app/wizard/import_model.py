@@ -102,6 +102,13 @@ class ImportRecords(models.TransientModel):
             sheet_index = int(self.index) if self.index else 0
             sheet = workbook.sheet_by_index(sheet_index)
             data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
+            # data = []
+
+                    # Read rows one by one and append only non-empty rows to data
+            # for row in range(sheet.ncols):
+            #     row_values = [sheet.cell_value(row, c) for c in range(sheet.ncols)]
+            #     if any(val != '' for val in row_values):
+            #         data.append(row_values)
             data.pop(0)
             file_data = data
         else:
