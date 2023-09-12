@@ -374,7 +374,7 @@
                                         'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])],
                                         'invisible': [('type_of_pms', '!=', 'gs')]
                                         }">
-                                    <tree string="Goal Setting" delete="true" editable="bottom" options="{'no_create':False, 'no_open': False}">
+                                    <tree string="Goal Setting" delete="false" editable="bottom" options="{'no_create':False, 'no_open': False}">
                                         <field name="name" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])]}"/> 
                                         <field name="state" invisible="1" force_save="1"/> 
                                         <field name="can_edit" invisible="1" force_save="1"/> 
@@ -387,6 +387,12 @@
                                         'required': [('state', 'in', ['gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['gs_fa', 'gs_signoff'])]}" />
                                         <field name="goal_setting_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <field name="fa_comment" required="0" invisible="1"/>
+                                        <field name="create_uid" invisible="1"/>
+                                        <button name="unlink"
+                                            type="object"
+                                            class="fa fa-trash-o"
+                                            attrs="{'invisible': ['|',('state', '!=', 'goal_setting_draft'),('create_uid', '!=', 'uid')]}"
+                                            aria-label="Delete row 1"/>
                                     </tree>
                                     <form string="">
                                         <group>
