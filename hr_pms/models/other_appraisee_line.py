@@ -91,10 +91,10 @@ class currentAssessmentSectionLine(models.Model):
         )
     assessment_type = fields.Selection([
         ('none', ''),
-        ('Ordinary', 'Ordinary (P1)'),
-        ('Diligent', 'Diligent (P2)'),
-        ('Fantastic', 'Fantastic (P3)'),
-        ('Superb', 'Superb (P4)'),
+        ('Ordinary', 'Ordinary (P4)'),
+        ('Diligent', 'Diligent (P3)'),
+        ('Fantastic', 'Fantastic (P2)'),
+        ('Superb', 'Superb (P1)'),
         ], string="Choose", default = "none", readonly=False)
     
     @api.onchange('assessment_type')

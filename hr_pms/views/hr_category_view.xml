@@ -71,6 +71,7 @@
                                 <field name="online_deadline_date" readonly="0" force_save="1"/>
                                 <field name="allow_mid_year_review" readonly="0" force_save="1"/>
                                 <field name="allow_annual_review_submission" readonly="0" force_save="1"/>
+                                <field name="is_done" readonly="0" force_save="1"/>
 
                             </group>
                             <separator string="Category Section Weight" colspan="4"/>

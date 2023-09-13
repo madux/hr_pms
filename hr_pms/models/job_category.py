@@ -13,6 +13,12 @@ class PMSJobCategory(models.Model):
         string="Name", 
         required=True)
     
+    is_done = fields.Boolean(
+        string="Is Done", 
+        help="""Used to keep track of completed PMS template. 
+        If set, computation of employee appraiser will not take effect""",
+        default=False)
+    
     category = fields.Many2one('hr.level.category', string="Category")
     sequence = fields.Char(
         string="Sequence")

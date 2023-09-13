@@ -75,31 +75,36 @@ class PMS_Appraisee(models.Model):
         )
     employee_number = fields.Char( 
         string="Staff ID",
-        related="employee_id.employee_number",
+        # related="employee_id.employee_number",
+        compute="compute_employee_details",
         store=True,
         size=6,
         copy=False
         )
     job_title = fields.Char( 
         string="Job title",
-        related="employee_id.job_title",
+        # related="employee_id.job_title",
+        compute="compute_employee_details",
         store=True
         )
     work_unit_id = fields.Many2one(
         'hr.work.unit',
         string="Job title",
-        related="employee_id.work_unit_id",
+        # related="employee_id.work_unit_id",
+        compute="compute_employee_details",
         store=True
         )
     job_id = fields.Many2one(
         'hr.job',
         string="Function", 
-        related="employee_id.job_id"
+        # related="employee_id.job_id"
+        compute="compute_employee_details",
         )
     ps_district_id = fields.Many2one(
         'hr.district',
         string="District", 
-        related="employee_id.ps_district_id",
+        # related="employee_id.ps_district_id",
+        compute="compute_employee_details",
         store=True
         )
     department_id = fields.Many2one(
@@ -107,24 +112,148 @@ class PMS_Appraisee(models.Model):
         string="Department ID",
         copy=True,
         store=True,
-        related="employee_id.department_id",
+        # related="employee_id.department_id",
+        compute="compute_employee_details",
         )
+    
+    def compute_reviewer_details(self, employee_id):
+        self.reviewer_department = employee_id.reviewer_id.department_id.id
+        self.reviewer_district = employee_id.reviewer_id.ps_district_id.id
+        self.reviewer_job_id= employee_id.reviewer_id.job_id.id
+        self.reviewer_work_unit = employee_id.reviewer_id.work_unit_id.id
+        self.reviewer_job_title = employee_id.reviewer_id.job_title
+        self.reviewer_employee_number = employee_id.reviewer_id.employee_number
+        self.reviewer_id = employee_id.reviewer_id.id
+
+    def compute_manager_details(self, employee_id):
+        self.manager_department = employee_id.parent_id.department_id.id
+        self.manager_district = employee_id.parent_id.ps_district_id.id
+        self.manager_job_id= employee_id.parent_id.job_id.id
+        self.manager_work_unit = employee_id.parent_id.work_unit_id.id
+        self.manager_job_title = employee_id.parent_id.job_title
+        self.manager_employee_number = employee_id.parent_id.employee_number
+        self.manager_id = employee_id.parent_id.id
+
+    def compute_supervisor_details(self, employee_id):
+        self.supervisor_department = employee_id.administrative_supervisor_id.department_id.id
+        self.supervisor_district = employee_id.administrative_supervisor_id.ps_district_id.id
+        self.supervisor_job_id= employee_id.administrative_supervisor_id.job_id.id
+        self.supervisor_work_unit = employee_id.administrative_supervisor_id.work_unit_id.id
+        self.supervisor_job_title = employee_id.administrative_supervisor_id.job_title
+        self.supervisor_employee_number = employee_id.administrative_supervisor_id.employee_number
+        self.administrative_supervisor_id = employee_id.administrative_supervisor_id.id
+    
+    @api.depends('employee_id')
+    def compute_employee_details(self):
+        """docs: used to compute the employees appraiser's details"""
+        for rec in self:
+            # Employee artifacts
+            employee_id = rec.employee_id.id
+            dept = rec.department_id
+            job_id = rec.job_id.id
+            district = rec.ps_district_id.id
+            employee_number = rec.employee_number
+            employee_jobtitle = rec.job_title
+            employee_work_unit = rec.work_unit_id.id 
+
+            ## For supervisor's artifacts
+            asmr_supervisor = rec.administrative_supervisor_id.id
+            asmr_dept = rec.supervisor_department.id
+            asmr_job_id = rec.supervisor_job_id.id
+            asmr_district = rec.supervisor_district.id
+            asmr_employee_number = rec.supervisor_employee_number
+            asmr_employee_jobtitle = rec.supervisor_job_title
+            asmr_employee_work_unit = rec.supervisor_work_unit.id
+ 
+            # Manager's artifacts
+            mr_manager_id = rec.manager_id.id
+            mr_dept = rec.manager_department.id
+            mr_job_id = rec.manager_job_id.id
+            mr_district = rec.manager_district.id
+            mr_employee_number = rec.manager_employee_number
+            mr_employee_jobtitle = rec.manager_job_title
+            mr_employee_work_unit = rec.manager_work_unit.id
+
+            # Reviewer artifacts
+            r_review = rec.reviewer_id.id
+            r_dept = rec.reviewer_department.id
+            r_job_id = rec.reviewer_job_id.id
+            r_district = rec.reviewer_district.id
+            r_employee_number = rec.reviewer_employee_number
+            r_employee_jobtitle = rec.reviewer_job_title
+            r_employee_work_unit = rec.reviewer_work_unit.id
+
+            if not rec.pms_department_id.sudo().hr_category_id.is_done:
+                if rec.employee_id: 
+                    rec.department_id = rec.employee_id.department_id.id
+                    rec.ps_district_id = rec.employee_id.ps_district_id.id
+                    rec.job_id = rec.employee_id.job_id.id
+                    rec.work_unit_id = rec.employee_id.work_unit_id.id
+                    rec.job_title = rec.employee_id.job_title
+                    rec.employee_number = rec.employee_id.employee_number
+                    rec.compute_reviewer_details(rec.employee_id)
+                    rec.compute_manager_details(rec.employee_id)
+                    rec.compute_supervisor_details(rec.employee_id)
+                else:
+                    rec.department_id = False 
+                    rec.ps_district_id = False 
+                    rec.job_id = False 
+                    rec.work_unit_id = False 
+                    rec.job_title = False 
+                    rec.employee_number = False 
+            else:
+                rec.employee_id = employee_id
+                rec.department_id = dept 
+                rec.ps_district_id = district 
+                rec.job_id = job_id 
+                rec.work_unit_id = employee_work_unit 
+                rec.job_title = employee_jobtitle 
+                rec.employee_number = employee_number 
+
+                rec.administrative_supervisor_id = asmr_supervisor
+                rec.supervisor_department = asmr_dept
+                rec.supervisor_job_id = asmr_job_id
+                rec.supervisor_district = asmr_district
+                rec.supervisor_employee_number = asmr_employee_number
+                rec.supervisor_job_title = asmr_employee_jobtitle
+                rec.supervisor_work_unit = asmr_employee_work_unit
+
+                rec.manager_id = mr_manager_id
+                rec.manager_department = mr_dept
+                rec.manager_job_id = mr_job_id
+                rec.manager_district = mr_district
+                rec.manager_employee_number = mr_employee_number
+                rec.manager_job_title = mr_employee_jobtitle
+                rec.manager_work_unit = mr_employee_work_unit
+
+                rec.reviewer_id = r_review
+                rec.reviewer_department = r_dept
+                rec.reviewer_job_id = r_job_id
+                rec.reviewer_district = r_district
+                rec.reviewer_employee_number = r_employee_number
+                rec.reviewer_job_title = r_employee_jobtitle
+                rec.reviewer_work_unit = r_employee_work_unit
+
     reviewer_id = fields.Many2one(
         'hr.employee', 
         string="Reviewer",
-        related="employee_id.reviewer_id",
+        # related="employee_id.reviewer_id",
+        compute="compute_employee_details",
         store=True
         )
+    
     administrative_supervisor_id = fields.Many2one(
         'hr.employee', 
         string="Administrative Supervisor",
-        related="employee_id.administrative_supervisor_id",
+        # related="employee_id.administrative_supervisor_id",
+        compute="compute_employee_details",
         store=True
         )
     manager_id = fields.Many2one(
         'hr.employee', 
         string="Functional Manager",
-        related="employee_id.parent_id",
+        compute="compute_employee_details",
+        # related="employee_id.parent_id",
         store=True
         )
     approver_ids = fields.Many2many(
@@ -482,105 +611,123 @@ class PMS_Appraisee(models.Model):
     reviewer_work_unit = fields.Many2one(
         'hr.work.unit',
         string="Reviewer Unit", 
-        related="employee_id.reviewer_id.work_unit_id",
+        # related="employee_id.reviewer_id.work_unit_id",
+        compute='compute_employee_details',
         store=True
         )
     reviewer_job_title = fields.Char(
         string="Reviewer Designation", 
-        related="employee_id.reviewer_id.job_title",
+        # related="employee_id.reviewer_id.job_title",
+        compute='compute_employee_details',
         store=True
         )
     reviewer_job_id = fields.Many2one(
         'hr.job',
         string="Reviewer Function",
-        related="employee_id.reviewer_id.job_id",
+        # related="employee_id.reviewer_id.job_id",
+        compute='compute_employee_details',
         store=True
         )
     reviewer_district = fields.Many2one(
         'hr.district',
         string="Reviewer District", 
-        related="employee_id.reviewer_id.ps_district_id",
+        # related="employee_id.reviewer_id.ps_district_id",
+        compute='compute_employee_details',
         store=True
         )
     reviewer_department = fields.Many2one(
         'hr.department',
         string="Reviewer department", 
-        related="employee_id.reviewer_id.department_id",
+        # related="employee_id.reviewer_id.department_id",
+        compute='compute_employee_details',
         store=True
         )
     reviewer_employee_number = fields.Char(
         string="Reviewer Employee Number", 
-        related="employee_id.reviewer_id.employee_number",
+        # related="employee_id.reviewer_id.employee_number",
+        compute='compute_employee_details',
         store=True
         )
     
     manager_work_unit = fields.Many2one(
         'hr.work.unit',
         string="Manager Unit", 
-        related="employee_id.parent_id.work_unit_id",
+        # related="employee_id.parent_id.work_unit_id",
+        compute='compute_employee_details',
         store=True
         )
     manager_job_title = fields.Char(
         string="Manager Designation", 
-        related="employee_id.parent_id.job_title",
+        # related="employee_id.parent_id.job_title",
+        compute='compute_employee_details',
         store=True
         )
     manager_job_id = fields.Many2one(
         'hr.job',
         string="Manager Function", 
-        related="employee_id.parent_id.job_id",
+        # related="employee_id.parent_id.job_id",
+        compute='compute_employee_details',
         store=True
         )
     manager_district = fields.Many2one(
         'hr.district',
         string="Manager District", 
-        related="employee_id.parent_id.ps_district_id",
+        # related="employee_id.parent_id.ps_district_id",
+        compute='compute_employee_details',
         store=True
         )
     
     manager_department = fields.Many2one(
         'hr.department',
         string="Manager department", 
-        related="employee_id.parent_id.department_id",
+        # related="employee_id.parent_id.department_id",
+        compute='compute_employee_details',
         store=True
         )
     manager_employee_number = fields.Char(
         string="Manager Employee Number", 
-        related="employee_id.parent_id.employee_number",
+        # related="employee_id.parent_id.employee_number",
+        compute='compute_employee_details',
         store=True
         )
     supervisor_work_unit = fields.Many2one(
         'hr.work.unit',
         string="Supervisor Unit", 
-        related="employee_id.administrative_supervisor_id.work_unit_id",
+        # related="employee_id.administrative_supervisor_id.work_unit_id",
+        compute='compute_employee_details',
         store=True
         )
     supervisor_job_title = fields.Char(
         string="Supervisor Designation", 
-        related="employee_id.administrative_supervisor_id.job_title",
+        # related="employee_id.administrative_supervisor_id.job_title",
+        compute='compute_employee_details',
         store=True
         )
     supervisor_job_id = fields.Many2one(
         'hr.job',
         string="Supervisor Function", 
-        related="employee_id.administrative_supervisor_id.job_id",
+        # related="employee_id.administrative_supervisor_id.job_id",
+        compute='compute_employee_details',
         store=True
         )
     supervisor_department = fields.Many2one(
         'hr.department',
         string="Supervisor Dept", 
-        related="employee_id.administrative_supervisor_id.department_id",
+        # related="employee_id.administrative_supervisor_id.department_id",
+        compute='compute_employee_details',
         store=True
         )
     supervisor_district = fields.Many2one(
         'hr.district',
         string="Supervisor District", 
-        related="employee_id.administrative_supervisor_id.ps_district_id",
+        # related="employee_id.administrative_supervisor_id.ps_district_id",
+        compute='compute_employee_details',
         store=True
         )
     supervisor_employee_number = fields.Char(
         string="Supervisor Employee Number", 
-        related="employee_id.administrative_supervisor_id.employee_number",
+        # related="employee_id.administrative_supervisor_id.employee_number",
+        compute='compute_employee_details',
         store=True
         )
     is_functional_appraiser = fields.Boolean(string='Is functional appraiser', compute="compute_functional_appraiser")
