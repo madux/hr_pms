@@ -119,9 +119,8 @@
                             <!-- states="admin_rating,functional_rating" -->
                         <button name="button_set_to_draft" string="Set to draft" class="oe_highlight" type="object" states="withdraw" confirm="Are you sure you want to continue?" groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_user_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id"/>
                         <button name="action_send_reminder" string="Send Mail Reminder" type="object" states="draft,admin_rating,functional_rating,reviewer_rating,done"/>
-                        <!--<field name="state" widget="statusbar" clickable="False" invisible="0" readonly="1" force_save="1" statusbar_visible="draft,reviewer_rating,done"/>-->
+                        <field name="state" widget="statusbar" clickable="False" invisible="0" readonly="1" force_save="1" statusbar_visible="draft,reviewer_rating,done"/>
 							<!-- statusbar_visible="draft,admin_rating,functional_rating,reviewer_rating,done" -->
-
                     </header>
                     <sheet>
                         <div class="oe_title">
@@ -138,8 +137,7 @@
                                 <field name="type_of_pms" invisible="0" readonly="0" force_save="1"/> 
                                 <field name="pms_year_id" invisible="0" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="deadline" readonly="1" force_save="1"/> 
-                                <field name="dummy_state" invisible="1" force_save="1"/> 
-                                <field name="state" readonly="0"/>
+                                <field name="dummy_state" invisible="1" force_save="1"/>
                                 <!-- <field name="online_deadline_date" string="Appraisee Deadline Date" readonly="1" force_save="1"/>  -->
                             </group>
                             <group>
@@ -149,7 +147,6 @@
                                 <field name="is_current_user" readonly="0" invisible="1"/> 
                                 <field name="lock_fields" readonly="0" invisible="0" groups="base.group_system"/>
                                  <!-- groups="base.group_system"/> -->
-                                
                             </group>
                         </group>
                         <group>
