@@ -92,107 +92,23 @@
                             string="return test" 
                             type="object" 
                         /> -->
-                        <button 
-                            name="goal_setting_button_submit" 
-                            string="Submit Goal Setting to Manager" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="goal_setting_draft"
-                            confirm="Are you sure you want to Submit"
-                        />
-                        <button 
-                            name="manager_submit_goal_setting_button" 
-                            string="Approve Goal Setting" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="gs_fa"
-                            confirm="Are you sure you want to Submit"
-                        />
-                        <button 
-                            name="signoff_goal_setting_button" 
-                            string="Proceed Appraisal" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="gs_signoff"
-                            confirm="Note: A mail will be sent if you did not consent to discussion with FA; otherwise proceed to Mid-year Review"
-                        />
+                        <button name="goal_setting_button_submit" string="Submit Goal Setting to Manager" class="oe_highlight" type="object" states="goal_setting_draft" confirm="Are you sure you want to Submit"/>
+                        <button name="manager_submit_goal_setting_button" string="Approve Goal Setting" class="oe_highlight" type="object" states="gs_fa" confirm="Are you sure you want to Submit"/>
+                        <button name="signoff_goal_setting_button" string="Proceed Appraisal" class="oe_highlight" type="object" states="gs_signoff" confirm="Note: A mail will be sent if you did not consent to discussion with FA; otherwise proceed to Mid-year Review"/>
 
-                        <button 
-                            name="hyr_button_submit" 
-                            string="Submit for review" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="hyr_draft" 
-                            confirm="Are you sure you want to Submit"
-                        />
-                        <button 
-                            name="hyr_button_admin_supervisor_rating" 
-                            string="Submit Review" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="hyr_admin_rating" 
-                            confirm="Are you sure you want to Submit rating"
-                        />
-                        <button 
-                            name="hyr_button_functional_manager_rating" 
-                            string="Submit Review" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="hyr_functional_rating" 
-                            confirm="Are you sure you want to Submit rating"
-                        />
+                        <button name="hyr_button_submit" string="Submit for review" class="oe_highlight" type="object" states="hyr_draft" confirm="Are you sure you want to Submit"/>
+                        <button name="hyr_button_admin_supervisor_rating" string="Submit Review" class="oe_highlight" type="object" states="hyr_admin_rating" confirm="Are you sure you want to Submit rating"/>
+                        <button name="hyr_button_functional_manager_rating" string="Submit Review" class="oe_highlight" type="object" states="hyr_functional_rating" confirm="Are you sure you want to Submit rating"/>
                         <!-- FULL YEAR REVIEW STARTS HEREV  -->
-                        <button 
-                            name="button_submit" 
-                            string="Submit" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="draft" 
-                            confirm="Are you sure you want to Submit"
-                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id"
-                        />
+                        <button name="button_submit" string="Submit" class="oe_highlight" type="object" states="draft" confirm="Are you sure you want to Submit" groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id"/>
 
-                        <button 
-                            name="button_admin_supervisor_rating" 
-                            string="Submit rating" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="admin_rating" 
-                            confirm="Are you sure you want to Submit rating"
-                        />
+                        <button name="button_admin_supervisor_rating" string="Submit rating" class="oe_highlight" type="object" states="admin_rating" confirm="Are you sure you want to Submit rating"/>
                             <!-- groups="hr_pms.group_pms_user_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id" -->
-                        <button 
-                            name="button_functional_manager_rating" 
-                            string="Submit rating" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="functional_rating" 
-                            confirm="Are you sure you want to Submit rating"
-                        />
+                        <button name="button_functional_manager_rating" string="Submit rating" class="oe_highlight" type="object" states="functional_rating" confirm="Are you sure you want to Submit rating"/>
                         <!-- groups="hr_pms.group_pms_user_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id" -->
-                        <button 
-                            name="button_reviewer_manager_rating" 
-                            string="Submit Review" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="reviewer_rating" 
-                            confirm="Are you sure you want to Submit rating"
-                        /> 
-                        <button 
-                            name="button_withdraw" 
-                            string="Withdraw" 
-                            type="object"
-                            attrs="{'invisible': ['|',('is_current_user', '!=', True), ('state', 'not in', ['admin_rating','functional_rating'])]}"
-                            confirm="Are you sure you want to Withdraw"
-                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr.group_hr_manager"
-                        />
-                        <button 
-                            name="return_appraisal" 
-                            string="Return" 
-                            type="object"
-                            attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['gs_fa', 'admin_rating', 'functional_rating', 'reviewer_rating'])]}"
-                            confirm="Are you sure you want to return"
-                        />
+                        <button name="button_reviewer_manager_rating" string="Submit Review" class="oe_highlight" type="object" states="reviewer_rating" confirm="Are you sure you want to Submit rating"/> 
+                        <button name="button_withdraw" string="Withdraw" type="object" attrs="{'invisible': ['|',('is_current_user', '!=', True), ('state', 'not in', ['admin_rating','functional_rating'])]}" confirm="Are you sure you want to Withdraw" groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id,hr.group_hr_manager"/>
+                        <button name="return_appraisal" string="Return" type="object" attrs="{'invisible': ['|',('is_current_user', '=', True), ('state', 'not in', ['gs_fa', 'admin_rating', 'functional_rating', 'reviewer_rating'])]}" confirm="Are you sure you want to return"/>
                         <!-- <button 
                             name="hyr_return_appraisal" 
                             string="Return" 
@@ -201,24 +117,9 @@
                             confirm="Are you sure you want to return"
                         /> -->
                             <!-- states="admin_rating,functional_rating" -->
-                        <button 
-                            name="button_set_to_draft" 
-                            string="Set to draft" 
-                            class="oe_highlight" 
-                            type="object"
-                            states="withdraw" 
-                            confirm="Are you sure you want to continue?"
-                            groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_user_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id"
-                        />
-                        <button 
-                            name="action_send_reminder" 
-                            string="Send Mail Reminder" 
-                            type="object"
-                            states="draft,admin_rating,functional_rating,reviewer_rating,done" 
-                        />
-                        <field name="state" widget="statusbar" clickable="False" invisible="0" readonly="1" force_save="1"
-							statusbar_visible="draft,reviewer_rating,done"
-							/>
+                        <button name="button_set_to_draft" string="Set to draft" class="oe_highlight" type="object" states="withdraw" confirm="Are you sure you want to continue?" groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_user_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id"/>
+                        <button name="action_send_reminder" string="Send Mail Reminder" type="object" states="draft,admin_rating,functional_rating,reviewer_rating,done"/>
+                        <!--<field name="state" widget="statusbar" clickable="False" invisible="0" readonly="1" force_save="1" statusbar_visible="draft,reviewer_rating,done"/>-->
 							<!-- statusbar_visible="draft,admin_rating,functional_rating,reviewer_rating,done" -->
 
                     </header>
@@ -228,23 +129,24 @@
                                 <field name="name" default_focus="1" required="1" attrs="{'readonly': [('lock_fields', '=', False)]}" placeholder="KRAs &amp; Achivements"/>
                             </h1>
                         </div>
-                        <div class='alert alert-info' role="alert">
-                            FIND USER MANUAL HERE ==>
-                            Download:  <a href='/hr_pms/static/TRAINING_FOR_HR_PMS.pdf' target="_blank"> <strong>USER MANUAL</strong> </a> <br/>
+                        <div class="alert alert-info" role="alert">
+                            FIND USER MANUAL HERE ==&gt;
+                            Download:  <a href="/hr_pms/static/TRAINING_FOR_HR_PMS.pdf" target="_blank"> <strong>USER MANUAL</strong> </a> <br/>
                         </div>
                         <group>
                             <group>
-                                <field name="type_of_pms" invisible="0" readonly="1" force_save="1"/> 
+                                <field name="type_of_pms" invisible="0" readonly="0" force_save="1"/> 
                                 <field name="pms_year_id" invisible="0" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="deadline" readonly="1" force_save="1"/> 
                                 <field name="dummy_state" invisible="1" force_save="1"/> 
+                                <field name="state" readonly="0"/>
                                 <!-- <field name="online_deadline_date" string="Appraisee Deadline Date" readonly="1" force_save="1"/>  -->
                             </group>
                             <group>
-                                <field name="date_from" readonly="1" invisible= "1" force_save="1"/> 
+                                <field name="date_from" readonly="1" invisible="1" force_save="1"/> 
                                 <field name="date_end" readonly="1" invisible="1" force_save="1"/>
                                 <field name="submitted_date" readonly="1" force_save="1"/>
-                                <field name="is_current_user" readonly="0" invisible="1"/>
+                                <field name="is_current_user" readonly="0" invisible="1"/> 
                                 <field name="lock_fields" readonly="0" invisible="0" groups="base.group_system"/>
                                  <!-- groups="base.group_system"/> -->
                                 
@@ -252,9 +154,9 @@
                         </group>
                         <group>
                         </group>
-                        <div class='alert alert-info' role="alert">
-                            FIND USER MANUAL HERE ==>
-                            Click to Download:  <a href='/hr_pms/static/TRAINING_FOR_HR_PMS.pdf' target="_blank"> <strong>USER MANUAL</strong> </a> <br/>
+                        <div class="alert alert-info" role="alert">
+                            FIND USER MANUAL HERE ==&gt;
+                            Click to Download:  <a href="/hr_pms/static/TRAINING_FOR_HR_PMS.pdf" target="_blank"> <strong>USER MANUAL</strong> </a> <br/>
                         </div>
                         <notebook>
                             <page name="instruction_page" string="Instructions" invisible="0">
@@ -275,7 +177,7 @@
                                         <field name="job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
                                         <field name="department_id" readonly="1" string="Department" force_save="1" options="{'no_create': True,'no_open': True}"/>
                                         <field name="ps_district_id" readonly="1" string="District" force_save="1" options="{'no_create': True,'no_open': True}"/> 
-                                        <field name="pms_department_id" required="1" invisible="1" options="{'no_create': True,'no_open': True}"/> 
+                                        <field name="pms_department_id" required="1" invisible="0" options="{'no_create': True,'no_open': True}"/> 
                                     </group>
                                     <group>
                                         <field name="employee_number" readonly="1" force_save="1" string="Staff ID"/>
@@ -360,37 +262,25 @@
                                     states="goal_setting_draft" 
                                     groups="hr_pms.group_pms_user_id"
                                 />  -->
-                                <field name="goal_setting_section_line_ids" options="{'no_quick_create':True,'no_open': True}" 
-                                    attrs="{
-                                        'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])],
-                                        'invisible': [('type_of_pms', '!=', 'gs')]
-                                        }">
+                                <field name="goal_setting_section_line_ids" options="{'no_quick_create':True,'no_open': True}" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])],'invisible': [('type_of_pms', '!=', 'gs')]}">
                                     <tree string="Goal Setting" delete="false" editable="bottom" options="{'no_create':False, 'no_open': False}">
                                         <field name="name" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])]}"/> 
                                         <field name="state" invisible="1" force_save="1"/> 
                                         <field name="can_edit" invisible="1" force_save="1"/> 
-                                        <field name="weightage" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],
-                                        'required': [('state', 'in', ['goal_setting_draft', 'gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft', 'gs_fa'])]}" />
-                                        <field name="pms_uom" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])]}" />
-                                        <field name="target" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],
-                                        'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft', 'gs_fa'])]}" />
-                                        <field name="acceptance_status" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],
-                                        'required': [('state', 'in', ['gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['gs_fa', 'gs_signoff'])]}" />
+                                        <field name="weightage" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],'required': [('state', 'in', ['goal_setting_draft', 'gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft', 'gs_fa'])]}"/>
+                                        <field name="pms_uom" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])]}"/>
+                                        <field name="target" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft', 'gs_fa'])]}"/>
+                                        <field name="acceptance_status" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])],'required': [('state', 'in', ['gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['gs_fa', 'gs_signoff'])]}"/>
                                         <field name="goal_setting_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <field name="fa_comment" required="0" invisible="1"/>
                                         <field name="create_uid" invisible="1"/>
-                                        <button name="unlink"
-                                            type="object"
-                                            class="fa fa-trash-o"
-                                            attrs="{'invisible': [('state', '!=', 'goal_setting_draft')]}"
-                                            aria-label="Delete row 1"/>
+                                        <button name="unlink" type="object" class="fa fa-trash-o" attrs="{'invisible': [('state', '!=', 'goal_setting_draft')]}" aria-label="Delete row 1"/>
                                     </tree>
                                     <form string="">
                                         <group>
                                             <group>
                                                 <field name="name" required="1" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])]}"/> 
-                                                <field name="weightage" required="1" sum="total" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])],
-                                                'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}" />
+                                                <field name="weightage" required="1" sum="total" attrs="{'readonly': [('state', 'not in', ['goal_setting_draft'])],'required': [('state', 'in', ['goal_setting_draft'])], 'column_invisible':[('parent.state', 'not in', ['goal_setting_draft'])]}"/>
                                                 
                                             </group>
                                             <group>
@@ -412,7 +302,7 @@
                                
                                 <div attrs="{'invisible': [('is_appraisee', '=', False)]}" style="margin-top: 20px; margin-bottom: 20px;">
                                     <label for="appraisee_consent_gs">Do you Consent to Discussion on KRAs with FA</label>
-                                    <field name="appraisee_consent_gs" />
+                                    <field name="appraisee_consent_gs"/>
                                     <!-- <field name="appraisee_consent_gs" class="oe_edit_only" attrs="{'invisible': [('state', '!=', 'gs_signoff'), ('is_appraisee', '=', False)]}"/> -->
                                     <!-- <field name="appraisee_consent_gs" attrs="{'invisible': [('state', '!=', 'gs_signoff')], 'readonly': [('state', '!=', 'gs_signoff'), ('employee_id.user_id.id','!=', uid)]}" /> -->
 
@@ -427,12 +317,7 @@
                                     <p style="color: red;">* Instructions: At this stage, kindly add the target weightage. No score rating is done at this point </p>
                                     <p style="color: red;">* Only Administrative or Functional managers are expected to fill at this stage</p>
                                 </div> 
-                                <field name="hyr_kra_section_line_ids" options="{'no_quick_create':True,'no_open': True}" 
-                                    attrs="{
-                                        'readonly': [('state', 'in', ['draft', 'admin_rating', 'functional_rating', 'reviewer_rating'])],
-                                        'invisible': [('type_of_pms', '!=', 'hyr')]
-                                        }"
-                                    context="{'default_enable_line_edit': 'yes', 'default_state': state}">
+                                <field name="hyr_kra_section_line_ids" options="{'no_quick_create':True,'no_open': True}" attrs="{'readonly': [('state', 'in', ['draft', 'admin_rating', 'functional_rating', 'reviewer_rating'])],'invisible': [('type_of_pms', '!=', 'hyr')]}" context="{'default_enable_line_edit': 'yes', 'default_state': state}">
                                     <tree string="Mid Year review KRA Sections" delete="true" editable="bottom" options="{'no_create':False, 'no_open': False}">
                                         <field name="name" required="1" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no'])]}"/> 
                                         <field name="state" invisible="1" force_save="1"/>
@@ -441,23 +326,17 @@
                                         <field name="manager_can_edit" invisible="1" readonly="0" force_save="1"/> 
                                         <!-- <field name="appraisee_weightage" invisible="1" attrs="{'readonly': [('state', 'not in', ['hyr_draft'])],
                                         'required': [('state', 'in', ['hyr_draft'])]}" sum="total"/> -->
-                                        <field name="weightage" sum="total" readonly ="1"/> 
+                                        <field name="weightage" sum="total" readonly="1"/> 
                                         <!-- attrs="{'readonly': ['|', ('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/> -->
-                                        <field name="target" readonly ="1"/>
-                                        <field name="revise_weightage" readonly="0" sum="total" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
-                                        'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
-                                        <field name="pms_uom" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],
-                                        'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
-                                        <field name="revise_target" required="1" sum="total" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],
-                                        'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}" />
+                                        <field name="target" readonly="1"/>
+                                        <field name="revise_weightage" readonly="0" sum="total" attrs="{'readonly': [('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
+                                        <field name="pms_uom" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
+                                        <field name="revise_target" required="1" sum="total" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
                                         <!-- <field name="acceptance_status" attrs="{'readonly': [('is_current_user', '=', True),('enable_line_edit', 'in', ['', 'no']),('state', 'not in', ['hyr_functional_rating'])],
                                         'required': [('state', 'in', ['hyr_draft','hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/> -->
-                                        <field name="acceptance_status" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],
-                                        'required': [('state', 'in', ['hyr_draft','hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
-                                        <field name="hyr_fa_rating" required="0" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
-                                        'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)],'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
-                                        <field name="fa_comment" widget="text" force_save="1" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],
-                                        'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)]}"/>
+                                        <field name="acceptance_status" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_functional_rating'])],'required': [('state', 'in', ['hyr_draft','hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
+                                        <field name="hyr_fa_rating" required="0" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)],'column_invisible':[('parent.state', 'not in', ['hyr_draft','hyr_functional_rating'])]}"/>
+                                        <field name="fa_comment" widget="text" force_save="1" attrs="{'readonly': ['|',('manager_can_edit', '=', 'no'),('state', 'not in', ['hyr_draft','hyr_functional_rating'])],'required': [('state', 'in', ['hyr_functional_rating'])], 'invisible': [('is_current_user', '=', True)]}"/>
                                         <field name="hyr_kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <!-- attrs="{'invisible': [('is_current_user', '=', True)]}" -->
                                         <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly --> 
@@ -470,10 +349,8 @@
                                             <group>
                                                 <field name="name" required="1" attrs="{'readonly': [('state', 'not in', ['hyr_draft'])]}"/> 
                                                 <!-- self rating only for KRAs -->
-                                                <field name="weightage" required="1" attrs="{'readonly': [('state', 'not in', ['hyr_functional_rating'])],
-                                                'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'in', ['hyr_draft', 'hyr_admin_rating'])]}" />
-                                                <field name="acceptance_status" attrs="{'readonly': [('state', 'not in', ['hyr_functional_rating'])],
-                                                'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_functional_rating'])]}"/>
+                                                <field name="weightage" required="1" attrs="{'readonly': [('state', 'not in', ['hyr_functional_rating'])],'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'in', ['hyr_draft', 'hyr_admin_rating'])]}"/>
+                                                <field name="acceptance_status" attrs="{'readonly': [('state', 'not in', ['hyr_functional_rating'])],'required': [('state', 'in', ['hyr_functional_rating'])], 'column_invisible':[('parent.state', 'not in', ['hyr_functional_rating'])]}"/>
                                             </group>
                                             <group>
                                                 <field name="state" invisible="1" force_save="1"/>
@@ -484,30 +361,22 @@
                                 </field>
                                 <div attrs="{'invisible': [('type_of_pms', '!=', 'hyr')]}">
                                     <separator string="Appraisee Comments" colspan="4"/><br/>
-                                    <field name="appraisee_comment" widget="text" force_save="1" placeholder="Start typing" attrs="{
-                                        'invisible': [('state', 'not in', ['hyr_draft', 'hyr_admin_rating', 'hyr_functional_rating'])],
-                                        'readonly': [('state', 'not in', ['hyr_draft'])]}"/><br/>
+                                    <field name="appraisee_comment" widget="text" force_save="1" placeholder="Start typing" attrs="{'invisible': [('state', 'not in', ['hyr_draft', 'hyr_admin_rating', 'hyr_functional_rating'])],'readonly': [('state', 'not in', ['hyr_draft'])]}"/><br/>
                                     <!-- <separator string="Supervisor Comments" colspan="4"/><br/>
                                     <field name="supervisor_comment" force_save="1" widget="text" placeholder="Start typing" attrs="{
                                         'invisible': [('state', 'not in', ['hyr_draft','hyr_admin_rating','hyr_functional_rating'])],
                                         'readonly': [('state', 'not in', ['hyr_admin_rating'])]}"/><br/> -->
-                                    <separator string="Manager Comments" colspan="4" /><br/>
-                                    <field name="manager_comment" widget="text" force_save="1" placeholder="Start typing" attrs="{
-                                        'invisible': [('state', 'not in', ['hyr_draft','hyr_admin_rating','hyr_functional_rating'])],
-                                        'readonly': [('state', 'not in', ['hyr_functional_rating'])]}"/><br/>
+                                    <separator string="Manager Comments" colspan="4"/><br/>
+                                    <field name="manager_comment" widget="text" force_save="1" placeholder="Start typing" attrs="{'invisible': [('state', 'not in', ['hyr_draft','hyr_admin_rating','hyr_functional_rating'])],'readonly': [('state', 'not in', ['hyr_functional_rating'])]}"/><br/>
                                 </div><br/>
                                 
-                                <div class="row" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}"> 
+                                <div class="row" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}"> 
                                     <p style="color: black;font-size: 14px;">SECTION (A) - KRA / Achievement(s)</p>
                                     <p style="color: red;" attrs="{'invisible': [('instruction_html', '!=', False)]}">* Minimum of 5 lines and Maximun of 7 Lines to be added on this section </p>
                                     <p style="color: red;">* Instructions: Rating scale is 1 (Lowest rate) to 4 scale, where 4 is the HIGHEST rating </p>
                                     <p style="color: red;">* KRA Lines should be Minimum of 5 lines and Maximum of 7 Lines </p>
                                 </div><br/>
-                                <field name="kra_section_line_ids" 
-                                    required="1" options="{'no_quick_create':True,'no_open': True}" 
-                                    attrs="{'readonly': [('state', 'not in', ['draft', 'admin_rating', 'functional_rating', 'reviewer_rating'])],
-                                    'invisible': ['|',('is_current_user', '=', True),('type_of_pms', '!=', 'fyr')]}"
-                                    context="{'default_section_avg_scale': dummy_kra_section_scale}">
+                                <field name="kra_section_line_ids" required="1" options="{'no_quick_create':True,'no_open': True}" attrs="{'readonly': [('state', 'not in', ['draft', 'admin_rating', 'functional_rating', 'reviewer_rating'])], 'invisible': ['|','|', ('is_current_user', '=', True),('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}" context="{'default_section_avg_scale': dummy_kra_section_scale}">
                                     <tree string="KRA Sections" delete="true" editable="bottom" options="{'no_create':True, 'no_open': False}">
                                         <field name="name" required="1" readonly="1"/>
                                         <field name="hyr_aa_rating" required="0" readonly="1" invisible="1"/>
@@ -515,20 +384,16 @@
                                         <field name="appraisee_weightage" invisible="1" attrs="{'readonly': [('state', 'not in', ['draft'])],'required': [('state', 'in', ['draft'])]}" sum="total"/>
                                         <field name="weightage" readonly="1" sum="total" attrs="{'required': [('state', 'in', ['functional_rating'])]}"/>
                                         <!-- 'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating'])] -->
-                                        <field name="self_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'draft')],
-                                        'required': [('state', '=', 'draft')]}"/>
+                                        <field name="self_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'draft')],'required': [('state', '=', 'draft')]}"/>
                                         <field name="kra_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <!-- Used to determine who is currently logged in. if the user is not a functional, system should be readonly -->
                                         <field name="state" invisible="1" force_save="1"/> 
                                         <field name="is_functional_manager" force_save="1" invisible="1"/> 
                                         <field name="is_administrative_supervisor" force_save="1" invisible="1"/> 
                                         <field name="is_reviewer" force_save="1" invisible="1"/> 
-                                        <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],
-                                        'required': [('state', '=', 'admin_rating')], 'column_invisible':[('parent.state', 'in', ['draft'])]}"/> 
-                                        <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],
-                                        'required': [('state', '=', 'functional_rating')], 'column_invisible':[('parent.state', 'in', ['draft','admin_rating'])]}"/> 
-                                        <field name="reviewer_rating" force_save="1" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],
-                                        'required': [('state', '=', 'reviewer_rating')],'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating','functional_rating'])]}"/> 
+                                        <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],'required': [('state', '=', 'admin_rating')], 'column_invisible':[('parent.state', 'in', ['draft'])]}"/> 
+                                        <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],'required': [('state', '=', 'functional_rating')], 'column_invisible':[('parent.state', 'in', ['draft','admin_rating'])]}"/> 
+                                        <field name="reviewer_rating" force_save="1" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],'required': [('state', '=', 'reviewer_rating')],'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating','functional_rating'])]}"/> 
                                         <field name="is_required" force_save="1" invisible="1"/> 
                                         <field name="section_avg_scale" force_save="1" readonly="0" invisible="1"/> 
                                         <field name="weighted_score" force_save="1" invisible="1"/> 
@@ -540,8 +405,7 @@
                                                 <field name="name" readonly="1"/>
                                                 <field name="state" invisible="1"/>
                                                 <field name="kra_section_id" string="Section" invisible="1" options="{'no_create':True, 'no_open':False}"/> 
-                                                <field name="weightage" required="1" sum="total" attrs="{'readonly': [('state', 'not in', ['functional_rating'])],
-                                                 'required': [('state', 'in', ['functional_rating'])], 'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating'])]}" />
+                                                <field name="weightage" required="1" sum="total" attrs="{'readonly': [('state', 'not in', ['functional_rating'])],'required': [('state', 'in', ['functional_rating'])], 'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating'])]}"/>
                                             </group>
                                             <group>
                                                 <field name="administrative_supervisor_rating" string="Administrative Supervisor Rating(AR)" readonly="1"/> 
@@ -553,10 +417,9 @@
                                         </group>
                                     </form>
                                 </field>
-                                <separator string="Functional Competency Sections" colspan="4" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}"/>
-							    <p style="color: red;" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}">* Instructions: Rating scale is 1 (Lowest rate) to 5(Highest) scale</p>
-                                <field name="fc_section_line_ids" 
-                                    required="1" options="{'no_quick_create':True}" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')],'readonly': [('state', 'not in', ['draft', 'admin_rating','functional_rating','reviewer_rating'])]}">
+                                <separator string="Functional Competency Sections" colspan="4" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}"/>
+							    <p style="color: red;" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}">* Instructions: Rating scale is 1 (Lowest rate) to 5(Highest) scale</p>
+                                <field name="fc_section_line_ids" required="1" options="{'no_quick_create':True}" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])],'readonly': [('state', 'not in', ['draft', 'admin_rating','functional_rating','reviewer_rating'])]}">
                                     <tree string="Functional Sections" delete="false" create="false" editable="bottom">
                                         <field name="name" required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
                                         <field name="state" invisible="1"/> 
@@ -569,12 +432,9 @@
                                         <field name="is_functional_manager" force_save="1" invisible="1"/> 
                                         <field name="is_administrative_supervisor" force_save="1" invisible="1"/> 
                                         <field name="is_reviewer" force_save="1" invisible="1"/> 
-                                        <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],
-                                        'required': [('state', '=', 'admin_rating')]}"/> 
-                                        <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],
-                                        'required': [('state', '=', 'functional_rating')]}"/> 
-                                        <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],
-                                        'required': [('state', '=', 'reviewer_rating')]}"/> 
+                                        <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],'required': [('state', '=', 'admin_rating')]}"/> 
+                                        <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],'required': [('state', '=', 'functional_rating')]}"/> 
+                                        <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],'required': [('state', '=', 'reviewer_rating')]}"/> 
                                         <field name="is_required" force_save="1" invisible="1"/> 
                                         <field name="section_avg_scale" force_save="1" readonly="1" invisible="0"/> 
                                         <field name="weighted_score" force_save="1"/> 
@@ -589,10 +449,9 @@
                                         </group>
                                     </form>
                                 </field>
-                                <separator string="Leadership Competency Sections" colspan="4" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}"/>
-							    <p style="color: red;" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}">* Instructions: Rating scale is 1 (Lowest rate) to 5(Highest) scale</p>
-                                <field name="lc_section_line_ids" 
-                                    required="1" options="{'no_quick_create':True}" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')],'readonly': [('state', 'not in', ['draft', 'admin_rating','functional_rating','reviewer_rating'])]}">
+                                <separator string="Leadership Competency Sections" colspan="4" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}"/>
+							    <p style="color: red;" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}">* Instructions: Rating scale is 1 (Lowest rate) to 5(Highest) scale</p>
+                                <field name="lc_section_line_ids" required="1" options="{'no_quick_create':True}" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])],'readonly': [('state', 'not in', ['draft', 'admin_rating','functional_rating','reviewer_rating'])]}">
                                     <tree string="Leadership Competency" delete="false" create="false" editable="bottom">
                                         <field name="name" required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
                                         <field name="state" invisible="1"/> 
@@ -605,12 +464,9 @@
                                         <field name="is_functional_manager" force_save="1" invisible="1"/> 
                                         <field name="is_administrative_supervisor" force_save="1" invisible="1"/> 
                                         <field name="is_reviewer" force_save="1" invisible="1"/> 
-                                        <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],
-                                        'required': [('state', '=', 'admin_rating')]}"/> 
-                                        <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],
-                                        'required': [('state', '=', 'functional_rating')]}"/> 
-                                        <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],
-                                        'required': [('state', '=', 'reviewer_rating')]}"/> 
+                                        <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],'required': [('state', '=', 'admin_rating')]}"/> 
+                                        <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],'required': [('state', '=', 'functional_rating')]}"/> 
+                                        <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],'required': [('state', '=', 'reviewer_rating')]}"/> 
                                         <field name="is_required" force_save="1" invisible="1"/> 
                                         <field name="section_avg_scale" force_save="1" readonly="1" invisible="0"/> 
                                         <field name="weighted_score" force_save="1"/> 
@@ -631,10 +487,9 @@
                                         </group>
                                     </form>
                                 </field>
-                                <separator string="Training Need Identification (to be filled by the CURRENT APPRAISER)" colspan="4" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}"/>
-							    <p style="color: red;" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}">* At least 1 should be related to functional competency and 1 should be related to general topic or leadership competency </p>
-                                <field name="training_section_line_ids" 
-                                    required="0" options="{'no_open':True}" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')],'readonly': [('state', 'not in', ['admin_rating', 'functional_rating'])]}">
+                                <separator string="Training Need Identification (to be filled by the CURRENT APPRAISER)" colspan="4" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}"/>
+							    <p style="color: red;" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}">* At least 1 should be related to functional competency and 1 should be related to general topic or leadership competency </p>
+                                <field name="training_section_line_ids" required="0" options="{'no_open':True}" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])],'readonly': [('state', 'not in', ['admin_rating', 'functional_rating'])]}">
                                     <tree string="Training Need Identification" delete="true" create="true" editable="bottom">
                                         <field name="name" required="1" invisible="0" readonly="0"/>
                                         <field name="comments" readonly="0"/>
@@ -655,9 +510,9 @@
                                         </group>
                                     </form>
                                 </field>
-                                <separator string="Overall Current Assessment" colspan="4" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}"/>
-							    <p style="color: red;" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}">* Instruction: Use the following scale for your rating</p>
-                                <div class="row" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}">
+                                <separator string="Overall Current Assessment" colspan="4" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}"/>
+							    <p style="color: red;" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}">* Instruction: Use the following scale for your rating</p>
+                                <div class="row" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}">
                                     <table class="table table-bordered table-sm">
                                         <thead>
                                             <tr>
@@ -697,14 +552,12 @@
                                         </tbody>
                                     </table><br/>
                                 </div>
-                                <field name="current_assessment_section_line_ids" 
-                                    required="0" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')],'readonly': [('state', 'in', ['draft'])]}"
-                                    context="{'default_state': state}">
+                                <field name="current_assessment_section_line_ids" required="0" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])],'readonly': [('state', 'in', ['draft'])]}" context="{'default_state': state}">
                                     <tree string="Current Assessment" delete="false" create="false" editable="bottom">
                                         <field name="name" string="Assessment By" required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
                                         <field name="state" invisible="1"/> 
                                         <field name="current_assessment_section_id" invisible="1"/> 
-                                        <field name="assessment_type" required="1" />
+                                        <field name="assessment_type" required="1"/>
                                         <field name="administrative_supervisor_rating" invisible="1"/> 
                                         <!-- attrs="{'readonly': [('state', '!=', 'admin_rating')],
                                         'invisible': [('state', '!=', 'admin_rating')]}"/>  -->
@@ -737,19 +590,16 @@
                                                 <field name="assessment_type" required="1"/> 
                                             </group>
                                             <group> 
-                                                <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],
-                                                'invisible': [('state', '!=', 'admin_rating')]}"/> 
-                                                <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],
-                                                'invisible': [('state', '!=', 'functional_rating')]}"/> 
-                                                <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],
-                                                'invisible': [('state', '!=', 'reviewer_rating')]}"/> 
+                                                <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],'invisible': [('state', '!=', 'admin_rating')]}"/> 
+                                                <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],'invisible': [('state', '!=', 'functional_rating')]}"/> 
+                                                <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],'invisible': [('state', '!=', 'reviewer_rating')]}"/> 
                                             </group>
                                         </group>
                                     </form>
                                 </field>
-                                <separator string="Potential Assessment" colspan="4" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}"/>
-							    <p style="color: red;" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}">* Instruction It's majorly about the 'future', not the past performance: Use the following scale for your rating </p>
-                                <div class="row" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}">
+                                <separator string="Potential Assessment" colspan="4" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}"/>
+							    <p style="color: red;" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}">* Instruction It's majorly about the 'future', not the past performance: Use the following scale for your rating </p>
+                                <div class="row" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}">
                                     <table class="table table-bordered table-sm">
                                         <thead>
                                             <tr>
@@ -787,9 +637,7 @@
                                         </tbody>
                                     </table><br/>
                                 </div>
-                                <field name="potential_assessment_section_line_ids" 
-                                    required="0" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')],'readonly': [('state', 'in', ['draft'])]}"
-                                    context="{'default_state': state}">
+                                <field name="potential_assessment_section_line_ids" required="0" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])],'readonly': [('state', 'in', ['draft'])]}" context="{'default_state': state}">
                                     <tree string="Potential Assessment" delete="false" create="false" editable="bottom">
                                         <field name="name" string="Assessment By" required="1" readonly="1" options="{'no_create':True, 'no_open': False}"/>
                                         <field name="state" invisible="1"/> 
@@ -831,20 +679,16 @@
                                             </group>
                                             <group>
                                             
-                                            <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],
-                                            'invisible': [('state', '!=', 'admin_rating')]}"/> 
-                                            <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],
-                                            'invisible': [('state', '!=', 'functional_rating')]}"/> 
-                                            <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],
-                                            'invisible': [('state', '!=', 'reviewer_rating')]}"/> 
+                                            <field name="administrative_supervisor_rating" attrs="{'readonly': [('state', '!=', 'admin_rating')],'invisible': [('state', '!=', 'admin_rating')]}"/> 
+                                            <field name="functional_supervisor_rating" attrs="{'readonly': [('state', '!=', 'functional_rating')],'invisible': [('state', '!=', 'functional_rating')]}"/> 
+                                            <field name="reviewer_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'reviewer_rating')],'invisible': [('state', '!=', 'reviewer_rating')]}"/> 
                                             </group>
                                         </group>
                                     </form>
                                 </field>
-                                <separator string="Quality checks" colspan="4" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}"/>
+                                <separator string="Quality checks" colspan="4" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}"/>
 							    <p style="color: red;" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}">* Instruction Quality checks &amp; due diligence to be done by the HR Team </p>
-                                <field name="qualitycheck_section_line_ids" 
-                                    required="0" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')],'readonly': [('state', 'not in', ['done', 'signed'])]}">
+                                <field name="qualitycheck_section_line_ids" required="0" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])],'readonly': [('state', 'not in', ['done', 'signed'])]}">
                                     <tree string="Quality checks" delete="true" create="true" editable="bottom">
                                          
                                         <field name="qualitycheck_section_id" invisible="1"/> 
@@ -871,8 +715,7 @@
                                 </field>
                             </page>
 
-                            <page name="scoreInfo" string="Score Details" attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}"
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer">
+                            <page name="scoreInfo" string="Score Details" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']), ('state', 'not in',['draft', 'admin_rating','functional_rating', 'reviewer_rating', 'wating_approval','done', 'signed'])]}" groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_pms.group_pms_reviewer">
                                 <form string="">
                                     <group>
                                         <separator string="Score Informations" colspan="4"/>
@@ -929,13 +772,12 @@
                                     </group>
                                 </form>
                             </page>
-                            <page name="manager_section" string="Manager's Comment" attrs="{'invisible': ['|',('type_of_pms', '!=', 'fyr'),('state', 'not in', ['functional_rating'])]}"
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id,hr_pms.group_pms_officer_id">
+                            <page name="manager_section" string="Manager's Comment" attrs="{'invisible': ['|',('type_of_pms', 'not in', [False, 'fyr']),('state', 'not in', ['functional_rating'])]}" groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_manager_id,hr_pms.group_pms_officer_id">
                                 <separator string="Manager's Comment" colspan="4"/>
                                 <form string="">
                                     <group>
                                         <group>
-                                            <field name="manager_comment" placeholder="Start typing..."  attrs="{'readonly': [('state', 'not in', ['functional_rating', 'reviewer_rating', 'done'])]}"/> 
+                                            <field name="manager_comment" placeholder="Start typing..." attrs="{'readonly': [('state', 'not in', ['functional_rating', 'reviewer_rating', 'done'])]}"/> 
                                         </group>
                                         <group>
                                             <field name="manager_attachement_ids" domain="[('id', '=', None)]" attrs="{'readonly': [('state', 'not in', ['functional_rating', 'reviewer_rating', 'done'])]}">
@@ -961,9 +803,7 @@
                                     </group>
                                 </form>
                             </page>
-                            <page name="supervisor_section" string="Admin Appraiser's Comment" attrs="{'invisible': ['|', ('type_of_pms', '!=', 'fyr'),('state', 'not in', ['admin_rating'])]}"
-                            groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
-                            >
+                            <page name="supervisor_section" string="Admin Appraiser's Comment" attrs="{'invisible': ['|', ('type_of_pms', 'not in', [False, 'fyr']),('state', 'not in', ['admin_rating'])]}" groups="hr_pms.group_pms_supervisor,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id">
                                 <separator string="Admin Appraiser's Comment" colspan="4"/>
                                 <form string="">
                                     <group>
@@ -993,7 +833,7 @@
                                     </group>
                                 </form>
                             </page>
-                            <page name="reviewer_comment" string="Reviewer's Comment" invisible="0" attrs="{'invisible': ['|', ('type_of_pms', '!=', 'fyr'),('state', 'not in', ['reviewer_rating'])]}">
+                            <page name="reviewer_comment" string="Reviewer's Comment" invisible="0" attrs="{'invisible': ['|', ('type_of_pms', 'not in', [False, 'fyr']),('state', 'not in', ['reviewer_rating'])]}">
                                 <separator string="Reviewer's Section" colspan="4"/>
                                 <form string="">
                                     <group>
@@ -1035,15 +875,14 @@
                                 <separator string="Reviewer Comments" colspan="4"/>
                                 <field name="reviewer_comment" string="Comment"/> 
                             </page>
-                            <page name="reason_back" string="Return Comment(s)"
-                            attrs="{'invisible': [('type_of_pms', '!=', 'fyr')]}">
+                            <page name="reason_back" string="Return Comment(s)" attrs="{'invisible': [('type_of_pms', 'not in', [False, 'fyr'])]}">
                                 <form string="">
                                     <group>
                                         <group>
-                                            <field name="reason_back" placeholder="Start typing..." readonly ="1"/> 
+                                            <field name="reason_back" placeholder="Start typing..." readonly="1"/> 
                                         </group>
                                         <group>
-                                            <field name="is_functional_appraiser" invisible ="1"/> 
+                                            <field name="is_functional_appraiser" invisible="1"/> 
                                         </group>
                                     </group>
                                 </form>
