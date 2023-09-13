@@ -664,10 +664,10 @@
                                     <table class="table table-bordered table-sm">
                                         <thead>
                                             <tr>
-                                                <th style="color: #000000; background-color: #FF0000;">ORDINARY</th>
-                                                <th style="color: #000000; background-color: #89CFF0;">DILIGENT</th>
-                                                <th style="color: #000000; background-color: #9FE2BF;">FANTASTIC</th>
-                                                <th style="color: #000000; background-color: #00A36C;">SUPERB</th>
+                                                <th style="color: #000000; background-color: #FF0000;">ORDINARY (P4)</th>
+                                                <th style="color: #000000; background-color: #89CFF0;">DILIGENT (P3)</th>
+                                                <th style="color: #000000; background-color: #9FE2BF;">FANTASTIC (P2)</th>
+                                                <th style="color: #000000; background-color: #00A36C;">SUPERB (P1)</th>
                                             </tr>
                                         </thead>
                                         <tbody>

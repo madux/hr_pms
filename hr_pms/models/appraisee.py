@@ -791,7 +791,7 @@ class PMS_Appraisee(models.Model):
             if self.mapped('current_assessment_section_line_ids').filtered(
                 lambda line: line.name == "Administrative Appraiser" and line.assessment_type == False):
                 raise ValidationError(
-                    "Ops! Please ensure all administrative supervisor's rating at current assessment section is at least Ordinary"
+                    "Ops! Please ensure all administrative supervisor's rating at current assessment section is at least Ordinary (P4)"
                 )
             if self.mapped('potential_assessment_section_line_ids').filtered(
                 lambda line: line.name == "Administrative Appraiser" and line.assessment_type == False):
