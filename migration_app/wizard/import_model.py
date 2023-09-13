@@ -271,16 +271,16 @@ class ImportRecords(models.TransientModel):
 				'login' : login,
 				'password': password,
                 }
-                _logger.info(f"Creating employee Rep User..with password {password} and {user_vals.get('password')}.")
+                _logger.info(f"Creating employee Rep User..with password {fullname} and {user_vals.get('password')}.")
                 User = self.env['res.users'].sudo()
-                user = User.search([('login', '=', login)],limit=1)
+                user = User.search([('login', '=', login), ('active', '=', True)],limit=1)
 
                 if user:
                     _logger.info("User already exists...")
                     if user.partner_id:
                         _logger.info("User is connected to an employee record...checking staffno")
                         login = vals.get('staff_number')
-                        user = User.search([('login', '=', login)],limit=1) # Checks if staffno exist
+                        user = User.search([('login', '=', login),('active', '=', True)],limit=1) # Checks if staffno exist
                         if not user:
                             user_vals['login'] = login
                             user = User.create(user_vals)
@@ -293,7 +293,7 @@ class ImportRecords(models.TransientModel):
                         user_vals['password'] = False
                 else:
                     user = User.create(user_vals)
-                    _logger.info("Creating User record...")
+                    _logger.info("Creating User record if not existing...")
                 _logger.info('Adding user to group ...')
                 user.sudo().write({'groups_id':group_list})
                 return user, user_vals.get('password')
