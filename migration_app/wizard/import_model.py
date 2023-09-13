@@ -302,7 +302,7 @@ class ImportRecords(models.TransientModel):
         if self.import_type == "employee":
             for data_batch in data_gen:
                 for row in data_batch:
-                    # _logger.info(f"Row data: {row}")
+                    _logger.info(f"Row data: {row}")
                     # try:
                     if find_existing_employee(row[1]):
                         unsuccess_records.append(f'Employee with {str(row[1])} Already exists')
