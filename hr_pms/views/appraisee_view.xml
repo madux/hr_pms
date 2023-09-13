@@ -110,7 +110,7 @@
                         />
                         <button 
                             name="signoff_goal_setting_button" 
-                            string="Proceed Appraisal to Mid-year" 
+                            string="Proceed Appraisal" 
                             class="oe_highlight" 
                             type="object"
                             states="gs_signoff"
@@ -323,41 +323,32 @@
                             </page>
                             <page name="section_line_ids" string="Goal Settings" attrs="{'invisible': [('state', '!=', 'goal_setting_draft'),('type_of_pms', '!=', 'gs')]}">
 							    <div attrs="{'invisible': [('type_of_pms', '!=', 'gs')]}">
-                                    <!-- <p style="color: black;font-size: 14px;">Goal Setting</p>
-                                    <p style="color: red;">* Minimum of 5 KRAs and Max of 7 KRAs</p>
-                                    <p style="color: red;">* Total weight should be 100</p>
-                                    <p style="color: red;">* Be careful while selecting unit of measure for KRAs</p>
-                                    <p style="color: red;">* Goal Setting should be in consultant with the supervisor</p>
-                                    <p style="color: red;">* Click on the edit button to proceed</p> -->
+                                    
                                     <style>
-                                        .instruction-list {
-                                            list-style: none;
+                                        ol.instruction-body {
+                                            list-style: upper-roman;
                                             padding: 0;
                                             display: flex;
                                             flex-wrap: wrap;
                                             gap: 10px; /* Adjust the gap between instructions */
                                         }
                                     
-                                        .instruction-item {
+                                        li.instruction-item {
                                             color: red;
-                                            flex-basis: calc(50% - 5px); /* Fit up to two items per line with a small gap */
-                                            margin: 0;
-                                            display: flex;
-                                            align-items: center;
+                                            vertical-align: middle;
+                                            margin-left: 20px; 
                                         }
+                                        
                                     
-                                        .arrow-icon {
-                                            margin-right: 5px;
-                                        }
                                     </style>
                                     
-                                    <ul class="instruction-list">
-                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Minimum of 5 KRAs and Max of 7 KRAs</li>
-                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Total weight should be 100</li>
-                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Be careful while selecting the unit of measure for KRAs</li>
-                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Goal Setting should be in consultation with the supervisor</li>
-                                        <li class="instruction-item"><span class="arrow-icon">➤</span> Click on the edit button to proceed</li>
-                                    </ul>                                    
+                                    <ol class="instruction-body">
+                                        <li class="instruction-item"> Minimum of 5 KRAs and Max of 7 KRAs</li>
+                                        <li class="instruction-item"> Total weight should be 100</li>
+                                        <li class="instruction-item"> Be careful while selecting the unit of measure for KRAs</li>
+                                        <li class="instruction-item"> Goal Setting should be in consultation with the supervisor</li>
+                                        <li class="instruction-item"> Click on the edit button to proceed</li>
+                                    </ol>                                    
                                     
                                     
                                 </div>
@@ -374,7 +365,7 @@
                                         'readonly': [('state', 'not in', ['goal_setting_draft', 'gs_fa'])],
                                         'invisible': [('type_of_pms', '!=', 'gs')]
                                         }">
-                                    <tree string="Goal Setting" delete="true" editable="bottom" options="{'no_create':False, 'no_open': False}">
+                                    <tree string="Goal Setting" delete="false" editable="bottom" options="{'no_create':False, 'no_open': False}">
                                         <field name="name" required="1" attrs="{'readonly': [('can_edit', '=', False), ('state', 'in', ['gs_fa'])]}"/> 
                                         <field name="state" invisible="1" force_save="1"/> 
                                         <field name="can_edit" invisible="1" force_save="1"/> 
@@ -387,6 +378,12 @@
                                         'required': [('state', 'in', ['gs_fa'])], 'column_invisible':[('parent.state', 'not in', ['gs_fa', 'gs_signoff'])]}" />
                                         <field name="goal_setting_section_id" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                         <field name="fa_comment" required="0" invisible="1"/>
+                                        <field name="create_uid" invisible="1"/>
+                                        <button name="unlink"
+                                            type="object"
+                                            class="fa fa-trash-o"
+                                            attrs="{'invisible': [('state', '!=', 'goal_setting_draft')]}"
+                                            aria-label="Delete row 1"/>
                                     </tree>
                                     <form string="">
                                         <group>
