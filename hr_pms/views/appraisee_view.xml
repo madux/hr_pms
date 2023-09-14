@@ -134,7 +134,7 @@
                         </div>
                         <group>
                             <group>
-                                <field name="type_of_pms" invisible="0" readonly="0" force_save="1"/> 
+                                <field name="type_of_pms" invisible="0" readonly="1" force_save="1"/> 
                                 <field name="pms_year_id" invisible="0" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
                                 <field name="deadline" readonly="1" force_save="1"/> 
                                 <field name="dummy_state" invisible="1" force_save="1"/>
@@ -174,7 +174,7 @@
                                         <field name="job_id" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}" string="Function"/> 
                                         <field name="department_id" readonly="1" string="Department" force_save="1" options="{'no_create': True,'no_open': True}"/>
                                         <field name="ps_district_id" readonly="1" string="District" force_save="1" options="{'no_create': True,'no_open': True}"/> 
-                                        <field name="pms_department_id" required="1" invisible="0" options="{'no_create': True,'no_open': True}"/> 
+                                        <field name="pms_department_id" required="1" invisible="1" options="{'no_create': True,'no_open': True}"/> 
                                     </group>
                                     <group>
                                         <field name="employee_number" readonly="1" force_save="1" string="Staff ID"/>
