@@ -46,7 +46,8 @@ class HRLevelcategory(models.Model):
             self.job_role_ids = False 
             if employees:
                 for rec in employees:
-                    self.job_role_ids = [(4, rec.job_id.id)]
+                    if rec.job_id:
+                        self.job_role_ids = [(4, rec.job_id.id)]
 
     @api.constrains('category')
     def check_category(self):
