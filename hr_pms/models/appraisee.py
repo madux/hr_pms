@@ -444,13 +444,6 @@ class PMS_Appraisee(models.Model):
         ('h', 'Withdrawn'),
         ], string="Dummy Status", readonly=True,compute="_compute_new_state", store=True,copy=False)
     
-    @api.constrains('appraisee_consent_gs')
-    def _check_appraisee_consent_gs(self):
-        if self.state != 'gs_signoff':
-            raise ValidationError('You cannot set this field in this stage')
-        if self.env.user.id != self.employee_id.user_id.id:
-            raise ValidationError('This is only for appraisee')
-    
     @api.onchange('type_of_pms')
     def onchange_type_of_pms(self):
         """This is to enable status move directly to
@@ -1179,7 +1172,7 @@ class PMS_Appraisee(models.Model):
         rec_ids = self.env.context.get('active_ids', [])
         for record in rec_ids:
             rec = self.env['pms.appraisee'].browse([record])
-            if rec.state != 'draft':
+            if rec.state != 'goal_setting_draft':
                 raise UserError('You cannot duplicate this record !!!')
             else:
                 rec.copy()
