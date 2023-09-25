@@ -460,7 +460,7 @@ class mirrorCompetencyConfig(models.Model):
                     raise ValidationError(f"Employee by name {emp.name} under the appraisee {rec.employee_id.name}- at line {count}")
 
     def action_publish(self):
-        self.validate_reviewers_role()
+        # self.validate_reviewers_role()
         self.generate_rating()
         self.state = "publish"
 
