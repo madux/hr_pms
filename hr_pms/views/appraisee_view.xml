@@ -99,7 +99,7 @@
                         <button name="hyr_button_submit" string="Submit for review" class="oe_highlight" type="object" states="hyr_draft" confirm="Are you sure you want to Submit"/>
                         <button name="hyr_button_admin_supervisor_rating" string="Submit Review" class="oe_highlight" type="object" states="hyr_admin_rating" confirm="Are you sure you want to Submit rating"/>
                         <button name="hyr_button_functional_manager_rating" string="Submit Review" class="oe_highlight" type="object" states="hyr_functional_rating" confirm="Are you sure you want to Submit rating"/>
-                        <!-- FULL YEAR REVIEW STARTS HEREV  -->
+                        <!-- FULL YEAR REVIEW STARTS HERE  -->
                         <button name="button_submit" string="Submit" class="oe_highlight" type="object" states="draft" confirm="Are you sure you want to Submit" groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_supervisor,hr_pms.group_pms_user_id,hr_pms.group_pms_manager_id"/>
 
                         <button name="button_admin_supervisor_rating" string="Submit rating" class="oe_highlight" type="object" states="admin_rating" confirm="Are you sure you want to Submit rating"/>
@@ -378,7 +378,7 @@
                                         <field name="name" required="1" readonly="1"/>
                                         <field name="hyr_aa_rating" required="0" readonly="1" invisible="1"/>
                                         <field name="hyr_fa_rating" required="0" readonly="1"/>
-                                        <field name="appraisee_weightage" invisible="1" attrs="{'readonly': [('state', 'not in', ['draft'])],'required': [('state', 'in', ['draft'])]}" sum="total"/>
+                                        <field name="appraisee_weightage" invisible="0" attrs="{'readonly': [('state', 'not in', ['draft'])],'required': [('state', 'in', ['draft'])]}" sum="total"/>
                                         <field name="weightage" readonly="1" sum="total" attrs="{'required': [('state', 'in', ['functional_rating'])]}"/>
                                         <!-- 'column_invisible':[('parent.state', 'in', ['draft', 'admin_rating'])] -->
                                         <field name="self_rating" force_save="1" invisible="0" attrs="{'readonly': [('state', '!=', 'draft')],'required': [('state', '=', 'draft')]}"/>

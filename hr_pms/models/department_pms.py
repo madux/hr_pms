@@ -224,7 +224,6 @@ class PMSDepartment(models.Model):
                 raise ValidationError(
                     f"""Please ensure section line is added {rec.department_id.name}"""
                 )
-            
             job_position_ids = rec.hr_category_id.mapped('job_role_ids').filtered(
                 lambda se: se.department_id.id == rec.department_id.id)
             appraises = []

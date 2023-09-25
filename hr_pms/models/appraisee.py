@@ -445,8 +445,8 @@ class PMS_Appraisee(models.Model):
         ], string="Dummy Status", readonly=True,compute="_compute_new_state", store=True,copy=False)
     
     @api.constrains('appraisee_consent_gs')
-    def _check_appraisee_consent_gs(self):
-        if self.state != 'gs_signoff':
+    def check_appraisee_consent_gs(self):
+        if self.state == 'gs_signoff' and not self.appraisee_consent_gs: 
             raise ValidationError('You cannot set this field in this stage')
         if self.env.user.id != self.employee_id.user_id.id:
             raise ValidationError('This is only for appraisee')
@@ -1961,7 +1961,6 @@ class PMS_Appraisee(models.Model):
                 rec.is_appraisee = True 
             else:
                 rec.is_appraisee = False 
-            
 
     def check_employer_manager(self):
         if self.employee_id.parent_id.user_id.id != self.env.uid:
