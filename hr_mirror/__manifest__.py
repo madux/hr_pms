@@ -18,6 +18,7 @@
             'views/linking_reviewer.xml',
             'views/aggregation_view.xml',
             'views/hr_employee_view.xml',
+            'views/hr_employee_competency_view.xml',
     ],
     'css': [],
     'js': [],

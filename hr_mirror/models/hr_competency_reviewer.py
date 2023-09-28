@@ -3,6 +3,33 @@ from datetime import datetime, date
 from odoo.exceptions import ValidationError
 
 
+class CategoryRole(models.Model):
+    _name = "category.role"
+    _description = "Roles"
+
+    name = fields.Char(
+        string="Name"
+        )
+
+class HrCompetencyRole(models.Model):
+    _name = "hr.competency.role"
+    _description = "Place to link employees to the category role"
+
+    category_role_id = fields.Many2one(
+        "category.role"
+        )
+    
+    competency_reviewer_id = fields.Many2one(
+        "hr.competency.reviewer"
+        )
+    employee_ids = fields.Many2many(
+        'hr.employee', 
+        'hr_competency_role_rel',
+        'hr_competency_role_id',
+        'hr_competency_role_employee_id',
+        string="Employees", 
+        )
+    
 class CompetencyReview(models.Model):
     _name = "hr.competency.reviewer"
     _description = "Competency Reviewers"
@@ -22,6 +49,12 @@ class CompetencyReview(models.Model):
         string="Department", 
         required=False,
         store=True
+        )
+    
+    category_role_ids = fields.One2many(
+        'hr.competency.role', 
+        'competency_reviewer_id',
+        string="Category Role", 
         )
     
     employee_ids = fields.Many2many(

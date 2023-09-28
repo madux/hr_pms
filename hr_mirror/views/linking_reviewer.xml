@@ -33,22 +33,15 @@
                                 <field name="active" invisible="0" readonly="0" force_save="1"/> 
                             </group>
                         </group>
-                        <notebook> 
-                            <page name="employee_ids" string="Employees to link">
-                                <field name="employee_ids" readonly="0" string="Employees">
-                                    <tree string="">
-                                        <field name="name" readonly="0" force_save="1" string="Employee name"/>
-                                        <field name="employee_number" readonly="0" force_save="1" string="Staff No."/>
-                                        <field name="job_id"/>
-                                        <field name="rating_role"/>
-                                        <field name="work_email"/>
-                                        <field name="work_phone" readonly="0"/>
-                                        <field name="department_id"/>
-                                        <field name="job_title"/>
-                                        <field name="work_unit_id"/>
+                        <notebook>
+                            <page name="category_role_ids" string="Roles &amp; Employees to link">
+                                <field name="category_role_ids" readonly="0" string="Employees">
+                                    <tree string="" editable="bottom">
+                                        <field name="category_role_id" readonly="0" force_save="1" string="Category"/>
+                                        <field name="employee_ids" widget="many2many_tags"/>
                                     </tree>
                                 </field>
-                            </page>
+                            </page> 
                         </notebook>
                     </sheet>
                 </form>

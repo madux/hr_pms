@@ -12,10 +12,30 @@ class hrCompetencySectionLine(models.Model):
         required=True)
 
     rate = fields.Float(
-        string="Self Rate")
+        string="Employee Rate",
+        default=0
+        )
+
+    self_rating_term = fields.Selection([
+        ('1', 'Rarely Demonstrated'),
+        ('2', 'Sometimes Demonstrated'),
+        ('3', 'Often Demonstrated'),
+        ('4', 'Mostly Demonstrated'),
+        ('5', 'Always Demonstrated'),
+        ], string="Self Rating", default=""
+        )
+    appraiser_rating_term = fields.Selection([
+        ('1', 'Rarely Demonstrated'),
+        ('2', 'Sometimes Demonstrated'),
+        ('3', 'Often Demonstrated'),
+        ('4', 'Mostly Demonstrated'),
+        ('5', 'Always Demonstrated'),
+        ], string="Appraiser Rating", default=""
+        ) 
 
     appraiser_rate = fields.Float(
-        string="Appraiser Rate")
+        string="Appraiser Rate",
+        default=0)
 
     percentage_rate = fields.Float(
         string="Percentage Score",
@@ -36,22 +56,36 @@ class hrCompetencySectionLine(models.Model):
         compute="determine_appraisee_user"
         )
     
-    @api.onchange('appraiser_rate', 'rate')
-    def check_ratings(self):
-        # status = self.hr_competency_section_line_id.hr_competency_id.state
-        if self.rate > 0 and self.rate not in range(1, 6):
-            self.rate = 0
-            return {'warning': {
-                'title': _("Warning"),
-                'message': _("Self rating must be within the range of 1, 2, 3, 4, 5")
-            }}  
+    @api.onchange('self_rating_term')
+    def onchange_self_rating_term(self):
+        if self.self_rating_term:
+            self.rate = float(self.self_rating_term)
+        else:
+            self.rate = 0.00
         
-        if self.appraiser_rate > 0 and self.appraiser_rate not in range(1, 6):
-            self.appraiser_rate = 0
-            return {'warning': {
-                'title': _("Warning"),
-                'message': _("Appraiser rating must be within the range of 1, 2, 3, 4, 5")
-            }}
+    @api.onchange('appraiser_rating_term')
+    def onchange_appraiser_rating_term(self):
+        if self.appraiser_rating_term:
+            self.appraiser_rate = float(self.appraiser_rating_term)
+        else:
+            self.appraiser_rate = 0.00
+    
+    # @api.onchange('appraiser_rate', 'rate')
+    # def check_ratings(self):
+    #     # status = self.hr_competency_section_line_id.hr_competency_id.state
+    #     if self.rate > 0 and self.rate not in range(1, 6):
+    #         self.rate = 0
+    #         return {'warning': {
+    #             'title': _("Warning"),
+    #             'message': _("Self rating must be within the range of 1, 2, 3, 4, 5")
+    #         }}  
+        
+    #     if self.appraiser_rate > 0 and self.appraiser_rate not in range(1, 6):
+    #         self.appraiser_rate = 0
+    #         return {'warning': {
+    #             'title': _("Warning"),
+    #             'message': _("Appraiser rating must be within the range of 1, 2, 3, 4, 5")
+    #         }}
     
     @api.depends("appraiser_rate")
     def compute_percentage_score(self):
@@ -92,7 +126,11 @@ class hrCompetencySectionLine(models.Model):
     hr_competency_id = fields.Many2one(
         "hr.competency",
         string="Competency", 
-        required=True) 
+        required=False)
+    
+    hr_employee_competency_id = fields.Many2one(
+        "hr.employee.competency",
+        string="Employee Competency") 
 
     average_total = fields.Float(
         string="Average total", 
@@ -134,6 +172,11 @@ class mirrorCompetency(models.Model):
     _description = "HR competency"
     _rec_name = "name"
 
+    hr_competency_id = fields.Many2one(
+        'hr.employee.competency',
+        string="Employee competency"
+        )
+
     name = fields.Char(
         string="Name", 
         readonly=True
@@ -159,6 +202,10 @@ class mirrorCompetency(models.Model):
         ], 
         string="Role", 
     )
+    category_role_id = fields.Many2one(
+        "category.role"
+        )
+    
     department_id = fields.Many2one(
         'hr.department',
         string="Department"
@@ -166,6 +213,10 @@ class mirrorCompetency(models.Model):
     date_of_submission = fields.Datetime(
         string="Date of submission",
         )
+    completion_date = fields.Datetime(
+        string="Completion Date",
+        )
+    
     publish_date = fields.Datetime(
         string="Date of Publication",
         )
@@ -299,7 +350,7 @@ class mirrorCompetency(models.Model):
             if self.employee_id.user_id.id != self.env.uid:
                 raise ValidationError("You are not responsible to submit this record")
             self_rating_below_zero = lines.filtered(
-                lambda ln: ln.rate <= 0
+                lambda ln: ln.rate <= 0 or not ln.self_rating_term
             )
             if self_rating_below_zero:
                 raise ValidationError("Please ensure all the line attributes self rating is above 0")
@@ -307,10 +358,10 @@ class mirrorCompetency(models.Model):
             if self.rated_by.user_id.id != self.env.uid:
                 raise ValidationError("You are not responsible to submit this record")
             self_rating_below_zero = lines.filtered(
-                lambda ln: ln.appraiser_rate <= 0
+                lambda ln: ln.appraiser_rate <= 0 or not ln.appraiser_rating_term
             )
             if self_rating_below_zero:
-                raise ValidationError("Please ensure all the line attributes appraiser's rating is above 0")
+                raise ValidationError("Please ensure all the line attributes appraiser's rating are rated")
               
     # def validation_before_submission(self):
     #     if self.state == "draft":
@@ -329,7 +380,7 @@ class mirrorCompetency(models.Model):
     #                 raise ValidationError("Please ensure all the line attributes self rating is above 0")
               
     def action_submit(self):
-        self.validation_before_submission()
+        # self.validation_before_submission()
         self.write({
             'state': 'in_review'
         })
@@ -366,7 +417,8 @@ class mirrorCompetency(models.Model):
         self.validation_before_submission()
         self.generate_aggregate()
         self.write({
-            'state': 'completed'
+            'state': 'completed',
+            'completion_date': fields.Date.today()
         })
 
     def action_sign(self):
@@ -428,44 +480,65 @@ class mirrorCompetencyConfig(models.Model):
         default="draft"
     )
 
-    def generate_rating(self):
+    # def generate_rating(self):
+    #     """Loops through each reviewers linked employee records 
+    #     and generates appraisee ratings for them
+    #     """
+    #     hr_competency = self.env['hr.competency'].sudo()
+    #     for rev in self.competency_reviewer_ids:
+    #         for app in rev.employee_ids:
+    #             hr_competency.create({
+    #                 'employee_id': rev.employee_id.id,
+    #                 'name': f"({self.name}) {app.id}",
+    #                 'rated_by': app.id,
+    #                 'rating_role': rev.employee_id.rating_role,
+    #                 'publish_date': fields.Date.today(),
+    #                 'hr_competency_config_id': self.id,
+    #                 'period_id': self.period_id.id,
+    #                 'competency_ids': [(0, 0, {
+    #                     'name': comp.name, 
+    #                     'competency_attribute_line_ids': [(0, 0, {
+    #                         'name': att.name,
+    #                     }) for att in comp.lc_attribute_ids]
+    #                 }) for comp in self.competency_ids],
+    #             })
+
+    def generate_employee_competency(self):
         """Loops through each reviewers linked employee records 
         and generates appraisee ratings for them
         """
-        hr_competency = self.env['hr.competency'].sudo()
-        for rev in self.competency_reviewer_ids:
-            for app in rev.employee_ids:
-                hr_competency.create({
-                    'employee_id': rev.employee_id.id,
-                    'name': f"({self.name}) {app.id}",
-                    'rated_by': app.id,
-                    'rating_role': rev.employee_id.rating_role,
-                    'publish_date': fields.Date.today(),
-                    'hr_competency_config_id': self.id,
-                    'period_id': self.period_id.id,
-                    'competency_ids': [(0, 0, {
-                        'name': comp.name, 
-                        'competency_attribute_line_ids': [(0, 0, {
-                            'name': att.name,
-                        }) for att in comp.lc_attribute_ids]
-                    }) for comp in self.competency_ids],
-                })
+        hr_employee_competency = self.env['hr.employee.competency'].sudo()
+        for appr in self.competency_reviewer_ids:
+            hr_employee_competency.create({
+                'employee_id': appr.employee_id.id,
+                'name': f"{self.name} - {appr.employee_id.name}",
+                'rater_ids': appr.category_role_ids.ids,
+                'publish_date': fields.Date.today(),
+                'hr_competency_config_id': self.id,
+                'period_id': self.period_id.id,
+                'competency_ids': [(0, 0, {
+                    'name': comp.name, 
+                    'competency_attribute_line_ids': [(0, 0, {
+                        'name': att.name,
+                    }) for att in comp.lc_attribute_ids]
+                }) for comp in self.competency_ids],
+            })
 
-    def validate_reviewers_role(self):
-        count = 1
-        for rec in self.competency_reviewer_ids:
-            count =+ 1
-            for emp in rec.employee_ids:
-                if not emp.rating_role:
-                    raise ValidationError(f"Employee by name {emp.name} under the appraisee {rec.employee_id.name}- at line {count}")
+    # def validate_reviewers_role(self):
+    #     count = 1
+    #     for rec in self.competency_reviewer_ids:
+    #         count =+ 1
+    #         for emp in rec.employee_ids:
+    #             if not emp.rating_role:
+    #                 raise ValidationError(f"Employee by name {emp.name} under the appraisee {rec.employee_id.name}- at line {count}")
 
     def action_publish(self):
         # self.validate_reviewers_role()
-        self.generate_rating()
+        self.generate_employee_competency()
         self.state = "publish"
 
     def action_unpublish(self):
-        appraisee_ids = self.env['hr.competency'].search([
+        appraisee_ids = self.env['hr.employee.competency'].search([
             ('hr_competency_config_id', '=', self.id)])
         if appraisee_ids:
             for rec in appraisee_ids:

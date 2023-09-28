@@ -55,9 +55,14 @@ class EmployeeAgregation(models.Model):
     @api.depends('hr_competency_ids')
     def employee_hr_competency(self):
         '''Gets all the Employee competencies average scores'''
-        for tec in self:
-            competency_line_average_score = 0
-            for rec in tec.hr_competency_ids:
-                # competency_line_average_score = sum([r.average_total for r in rec.competency_ids])
-                competency_line_average_score = sum(rec.competency_ids.mapped('average_total'))
-            tec.total = competency_line_average_score / len(tec.hr_competency_ids.ids)
+        if self.hr_competency_ids:
+            self.total = 0 
+        else:
+            self.total = 0 
+
+        # for tec in self:
+        #     competency_line_average_score = 0
+        #     for rec in tec.hr_competency_ids:
+        #         # competency_line_average_score = sum([r.average_total for r in rec.competency_ids])
+        #         competency_line_average_score = sum(rec.competency_ids.mapped('average_total'))
+        #     tec.total = competency_line_average_score / len(tec.hr_competency_ids.ids)

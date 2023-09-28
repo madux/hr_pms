@@ -2,13 +2,13 @@
 <odoo>
     <data>
         <record id="pms_hr_employee_public_mirror_view_form" model="ir.ui.view">
-            <field name="name">hr.employee.public.form</field>
-            <field name="model">hr.employee.public</field>
-            <field name="inherit_id" ref="hr.hr_employee_public_view_form" />
+            <field name="name">hr.employee.form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form" />
             <field name="arch" type="xml">
                 
                 <field name="parent_id" position="after">
-                    <field name="rating_role" string="360 role"/>
+                    <field name="rating_role" string="360 role" invisible="1"/>
                 </field>
                  
             </field>
