@@ -158,7 +158,7 @@ class hrCompetencySectionLine(models.Model):
             lenght_attribute_line = rec.competency_attribute_line_ids.ids
             if rec.competency_attribute_line_ids:
                 total_rate = sum([rc.appraiser_rate for rc in rec.mapped('competency_attribute_line_ids')])
-                rec.average_total = total_rate
+                rec.average_total = total_rate 
 
                 percentage_average_total = sum([rc.percentage_rate for rc in rec.mapped('competency_attribute_line_ids')])
                 rec.percentage_average_total = percentage_average_total / len(lenght_attribute_line)
@@ -504,7 +504,7 @@ class mirrorCompetencyConfig(models.Model):
     #             })
 
     def generate_employee_competency(self):
-        """Loops through each reviewers linked employee records 
+        """Loops through each raters linked employee records 
         and generates appraisee ratings for them
         """
         hr_employee_competency = self.env['hr.employee.competency'].sudo()
@@ -523,6 +523,35 @@ class mirrorCompetencyConfig(models.Model):
                     }) for att in comp.lc_attribute_ids]
                 }) for comp in self.competency_ids],
             })
+            subject = '360-Degree Feedback: Self-Assessment'
+            # msg = f"""Dear {appr.employee_id.name}, <br/><br/> 
+            # I wish to notify you that a feedback form <br/>\
+            # has been generated for you.<br/>\
+            # <br/>Kindly login to rate yourself <br/>\
+            # Yours Sincerely<br/>HR Department"""
+
+            msg = f"""Dear {appr.employee_id.name}, <br/><br/> 
+                I hope this message finds you well. As part of our ongoing\
+                commitment to fostering professional growth and development,\
+                we are initiating the 360-degree feedback process titled "{self.name}"\
+                has been generated for you.<br/>\
+                <br/>We kindly request you to take a moment and to complete your self-assessment by following the steps below: <br/>\
+                <br/><ol>\
+                <li>Visit the following link to access the system http://hrpms.myeedc.com:8069/web</li></li>\
+                <br/><li>Log in using your credentials sent earlier</li>\
+                <br/><li>Click 360 Feedback in the menu</li>\
+                <br/><li>Click the "{self.name} - {appr.employee_id.name}" record and wait for it to open</li>\
+                <br/><li>Click and edit and select each of the leadership categories to rate yourself</li>\
+                </ol>\
+                <br/>If you encounter any technical issues or have questions about the self-assessment process,\
+                please don't hesitate to reach out to the HR team for assistance.\
+                <br/> Thank you for your participation.\
+                <br/><br/>Yours Sincerely<br/>HR Department<br/>EEDC Corporate Headquarters<br/>eedctalentmanagement@enugudisco.com"""
+
+            email_cc = ''
+
+            email_to = appr.employee_id.work_email
+            self._send_mail(subject, msg, email_to, email_cc)
 
     # def validate_reviewers_role(self):
     #     count = 1
@@ -547,6 +576,20 @@ class mirrorCompetencyConfig(models.Model):
 
     def action_cancel_publish(self):
         self.state = "draft"
+
+    def _send_mail(self, subject, msg, email_to, email_cc):
+        email_from = self.env.user.email
+        mail_data = {
+                'email_from': email_from,
+                'subject': subject,
+                'email_to': email_to,
+                'reply_to': email_from,
+                'email_cc': email_cc,
+                'body_html': msg,
+                'state': 'sent'
+            }
+        mail_id = self.env['mail.mail'].sudo().create(mail_data)
+        self.env['mail.mail'].sudo().send(mail_id)
 
 
 class hrCompetencySection(models.Model):

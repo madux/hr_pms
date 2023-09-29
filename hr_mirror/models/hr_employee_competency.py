@@ -145,6 +145,30 @@ class EmployeeCompetency(models.Model):
                         }) for att in comp.competency_attribute_line_ids]
                     }) for comp in self.competency_ids],
                 })
+                subject = f'Request for Your Feedback: 360-Degree Assessment for {self.name}'
+
+            msg = f"""Dear {emp.name}, <br/><br/> 
+                I hope this message finds you well. As part of our ongoing\
+                commitment to fostering professional growth and development,\
+                you have been selected to provide valuable feedback on the performance of {self.name} as part of our 360-degree feedback process.\
+                <br/>Your input is highly valued and will contribute to our efforts to enhance leadership competencies within our organization.\ 
+                <br/>To provide your feedback on {self.name}, please follow these steps: <br/>\
+                <br/><ol>\
+                <li>Visit the following link to access the system http://hrpms.myeedc.com:8069/web</li>\
+                <br/><li>Log in using your credentials sent earlier</li>\
+                <br/><li>Click 360 Feedback in the menu</li>\
+                <br/><li>Click the "{self.name} - {self.employee_id.name}" record and wait for it to open</li>\
+                <br/><li>Click edit and select and give your feedback on each of the leadership categories</li>\
+                </ol>\
+                <br/>If you encounter any technical issues or have questions about the self-assessment process,\
+                please don't hesitate to reach out to the HR team for assistance.\
+                <br/> Thank you for your participation.\
+                <br/><br/>Yours Sincerely<br/>HR Department<br/>EEDC Corporate Headquarters<br/>eedctalentmanagement@enugudisco.com"""
+
+            email_cc = self.employee_id.work_email
+
+            email_to = emp.work_email
+            self._send_mail(subject, msg, email_to, email_cc)
     
     def action_submit(self):
         self.validation_before_submission()
@@ -162,5 +186,19 @@ class EmployeeCompetency(models.Model):
         self.write({
             'state': 'draft'
         })
+
+    def _send_mail(self, subject, msg, email_to, email_cc):
+        email_from = 'eedctalentmanagement@enugudisco.com'
+        mail_data = {
+                'email_from': email_from,
+                'subject': subject,
+                'email_to': email_to,
+                'reply_to': email_from,
+                'email_cc': email_cc,
+                'body_html': msg,
+                'state': 'sent'
+            }
+        mail_id = self.env['mail.mail'].sudo().create(mail_data)
+        self.env['mail.mail'].sudo().send(mail_id)
 
  
