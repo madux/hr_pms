@@ -509,7 +509,7 @@ class mirrorCompetencyConfig(models.Model):
         """
         hr_employee_competency = self.env['hr.employee.competency'].sudo()
         for appr in self.competency_reviewer_ids:
-            hr_employee_competency.create({
+            new_hr_emp_competency = hr_employee_competency.create({
                 'employee_id': appr.employee_id.id,
                 'name': f"{self.name} - {appr.employee_id.name}",
                 'rater_ids': appr.category_role_ids.ids,
@@ -523,35 +523,7 @@ class mirrorCompetencyConfig(models.Model):
                     }) for att in comp.lc_attribute_ids]
                 }) for comp in self.competency_ids],
             })
-            subject = '360-Degree Feedback: Self-Assessment'
-            # msg = f"""Dear {appr.employee_id.name}, <br/><br/> 
-            # I wish to notify you that a feedback form <br/>\
-            # has been generated for you.<br/>\
-            # <br/>Kindly login to rate yourself <br/>\
-            # Yours Sincerely<br/>HR Department"""
-
-            msg = f"""Dear {appr.employee_id.name}, <br/><br/> 
-                I hope this message finds you well. As part of our ongoing\
-                commitment to fostering professional growth and development,\
-                we are initiating the 360-degree feedback process titled "{self.name}"\
-                has been generated for you.<br/>\
-                <br/>We kindly request you to take a moment and to complete your self-assessment by following the steps below: <br/>\
-                <br/><ol>\
-                <li>Visit the following link to access the system http://hrpms.myeedc.com:8069/web</li></li>\
-                <br/><li>Log in using your credentials sent earlier</li>\
-                <br/><li>Click 360 Feedback in the menu</li>\
-                <br/><li>Click the "{self.name} - {appr.employee_id.name}" record and wait for it to open</li>\
-                <br/><li>Click and edit and select each of the leadership categories to rate yourself</li>\
-                </ol>\
-                <br/>If you encounter any technical issues or have questions about the self-assessment process,\
-                please don't hesitate to reach out to the HR team for assistance.\
-                <br/> Thank you for your participation.\
-                <br/><br/>Yours Sincerely<br/>HR Department<br/>EEDC Corporate Headquarters<br/>eedctalentmanagement@enugudisco.com"""
-
-            email_cc = ''
-
-            email_to = appr.employee_id.work_email
-            self._send_mail(subject, msg, email_to, email_cc)
+            self._send_mail_to(new_hr_emp_competency)
 
     # def validate_reviewers_role(self):
     #     count = 1
@@ -577,19 +549,22 @@ class mirrorCompetencyConfig(models.Model):
     def action_cancel_publish(self):
         self.state = "draft"
 
-    def _send_mail(self, subject, msg, email_to, email_cc):
-        email_from = self.env.user.email
-        mail_data = {
-                'email_from': email_from,
-                'subject': subject,
-                'email_to': email_to,
-                'reply_to': email_from,
-                'email_cc': email_cc,
-                'body_html': msg,
-                'state': 'sent'
-            }
-        mail_id = self.env['mail.mail'].sudo().create(mail_data)
-        self.env['mail.mail'].sudo().send(mail_id)
+    def _send_mail_to(self, record):
+        # template_id = self.env.ref(
+        # 'hr_mirror.mail_template_mirror_notification', raise_if_not_found=False)
+        ir_model_data = self.env['ir.model.data']
+        template_id = ir_model_data.get_object_reference('hr_mirror', 'mail_template_mirror_notification')[1]   
+        if template_id:
+                ctx = dict({
+                    'default_model': 'hr.employee.competency',
+                    # 'default_res_id': record.id,
+                    'default_use_template': bool(template_id),
+                    'default_template_id': template_id,
+                    'default_composition_mode': 'comment',
+                })
+                template_rec = self.env['mail.template'].browse(template_id)
+                # raise ValidationError(f'Template = {template_rec.email_from} appr = {record.employee_id.name}')
+                template_rec.with_context(ctx).send_mail(record.id, False)
 
 
 class hrCompetencySection(models.Model):
