@@ -550,21 +550,17 @@ class mirrorCompetencyConfig(models.Model):
         self.state = "draft"
 
     def _send_mail_to(self, record):
-        # template_id = self.env.ref(
-        # 'hr_mirror.mail_template_mirror_notification', raise_if_not_found=False)
-        ir_model_data = self.env['ir.model.data']
-        template_id = ir_model_data.get_object_reference('hr_mirror', 'mail_template_mirror_notification')[1]   
+        template_id = self.env.ref(
+        'hr_mirror.mail_template_mirror_notification', raise_if_not_found=False)
         if template_id:
                 ctx = dict({
                     'default_model': 'hr.employee.competency',
-                    # 'default_res_id': record.id,
-                    'default_use_template': bool(template_id),
-                    'default_template_id': template_id,
+                    'default_res_id': record.id,
+                    'default_use_template': bool(template_id.id),
+                    'default_template_id': template_id.id,
                     'default_composition_mode': 'comment',
                 })
-                template_rec = self.env['mail.template'].browse(template_id)
-                # raise ValidationError(f'Template = {template_rec.email_from} appr = {record.employee_id.name}')
-                template_rec.with_context(ctx).send_mail(record.id, False)
+                template_id.with_context(ctx).send_mail(record.id, False)
 
 
 class hrCompetencySection(models.Model):
