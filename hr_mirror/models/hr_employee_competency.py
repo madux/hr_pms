@@ -126,7 +126,7 @@ class EmployeeCompetency(models.Model):
         hr_competency = self.env['hr.competency'].sudo()
         for rater in self.rater_ids:
             for emp in rater.employee_ids:
-                hr_competency.create({
+                new_hr_competency = hr_competency.create({
                     'employee_id': self.employee_id.id,
                     'name': f"({self.name}) - {self.employee_id.name}",
                     'rated_by': emp.id,
@@ -145,6 +145,7 @@ class EmployeeCompetency(models.Model):
                         }) for att in comp.competency_attribute_line_ids]
                     }) for comp in self.competency_ids],
                 })
+                self._send_mail_to(new_hr_competency)
     
     def action_submit(self):
         self.validation_before_submission()
@@ -163,4 +164,16 @@ class EmployeeCompetency(models.Model):
             'state': 'draft'
         })
 
+    def _send_mail_to(self, record):
+        template_id = self.env.ref(
+        'hr_mirror.mail_template_mirror_raters_notification', raise_if_not_found=False)
+        if template_id:
+                ctx = dict({
+                    'default_model': 'hr.competency',
+                    'default_res_id': record.id,
+                    'default_use_template': bool(template_id.id),
+                    'default_template_id': template_id.id,
+                    'default_composition_mode': 'comment',
+                })
+                template_id.with_context(ctx).send_mail(record.id, False)
  

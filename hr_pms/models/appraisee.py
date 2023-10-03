@@ -1179,7 +1179,7 @@ class PMS_Appraisee(models.Model):
         rec_ids = self.env.context.get('active_ids', [])
         for record in rec_ids:
             rec = self.env['pms.appraisee'].browse([record])
-            if rec.state != 'draft':
+            if rec.state != 'goal_setting_draft':
                 raise UserError('You cannot duplicate this record !!!')
             else:
                 rec.copy()

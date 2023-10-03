@@ -158,7 +158,7 @@ class hrCompetencySectionLine(models.Model):
             lenght_attribute_line = rec.competency_attribute_line_ids.ids
             if rec.competency_attribute_line_ids:
                 total_rate = sum([rc.appraiser_rate for rc in rec.mapped('competency_attribute_line_ids')])
-                rec.average_total = total_rate
+                rec.average_total = total_rate 
 
                 percentage_average_total = sum([rc.percentage_rate for rc in rec.mapped('competency_attribute_line_ids')])
                 rec.percentage_average_total = percentage_average_total / len(lenght_attribute_line)
@@ -504,12 +504,12 @@ class mirrorCompetencyConfig(models.Model):
     #             })
 
     def generate_employee_competency(self):
-        """Loops through each reviewers linked employee records 
+        """Loops through each raters linked employee records 
         and generates appraisee ratings for them
         """
         hr_employee_competency = self.env['hr.employee.competency'].sudo()
         for appr in self.competency_reviewer_ids:
-            hr_employee_competency.create({
+            new_hr_emp_competency = hr_employee_competency.create({
                 'employee_id': appr.employee_id.id,
                 'name': f"{self.name} - {appr.employee_id.name}",
                 'rater_ids': appr.category_role_ids.ids,
@@ -523,6 +523,7 @@ class mirrorCompetencyConfig(models.Model):
                     }) for att in comp.lc_attribute_ids]
                 }) for comp in self.competency_ids],
             })
+            self._send_mail_to(new_hr_emp_competency)
 
     # def validate_reviewers_role(self):
     #     count = 1
@@ -547,6 +548,19 @@ class mirrorCompetencyConfig(models.Model):
 
     def action_cancel_publish(self):
         self.state = "draft"
+
+    def _send_mail_to(self, record):
+        template_id = self.env.ref(
+        'hr_mirror.mail_template_mirror_notification', raise_if_not_found=False)
+        if template_id:
+                ctx = dict({
+                    'default_model': 'hr.employee.competency',
+                    'default_res_id': record.id,
+                    'default_use_template': bool(template_id.id),
+                    'default_template_id': template_id.id,
+                    'default_composition_mode': 'comment',
+                })
+                template_id.with_context(ctx).send_mail(record.id, False)
 
 
 class hrCompetencySection(models.Model):

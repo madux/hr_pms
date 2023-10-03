@@ -19,6 +19,7 @@
             'views/aggregation_view.xml',
             'views/hr_employee_view.xml',
             'views/hr_employee_competency_view.xml',
+            'data/hr_mirror_mail_data.xml'
     ],
     'css': [],
     'js': [],
