@@ -289,6 +289,7 @@ class mirrorCompetency(models.Model):
         help='Average of the total sum of competency sverage score; EG. 100 + 30 + 10 / 3',
         compute="compute_competency_overall_total"
         )
+    rater_comment = fields.Text(string='Comment')
     
     @api.depends('competency_ids')
     def compute_competency_overall_total(self):

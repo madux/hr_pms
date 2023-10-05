@@ -103,6 +103,11 @@
                                         <field name="name"/>
                                     </tree>
                                 </field>
+                                <field name="is_ratee" invisible="1" readonly="1" force_save="1"/>
+                                <field name="is_rater" invisible="1" readonly="1" force_save="1"/>
+                                <group>
+                                    <field name="ratee_comment" placeholder="Add your comment here" attrs="{'readonly': [('is_ratee', '=', False)]}"/> 
+                                </group>
                             </page> 
                             <page name="rater_ids" string="Appraiser(s)">
                                 <field name="rater_ids" string="" readonly="1" options="{'no_create': True,'no_open': True}">

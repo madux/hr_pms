@@ -122,7 +122,7 @@
 
                                                         <field name="percentage_rate" readonly="1"/>
                                                     </tree> 
-                                                </field> 
+                                                </field>
                                             </page>
                                         </notebook>
                                     </form>
@@ -132,6 +132,9 @@
                                         <field name="percentage_average_total" readonly="1" force_save="1"/>
                                     </tree>
                                 </field>
+                                <group>
+                                    <field name="rater_comment"  placeholder="Add your comment here" attrs="{'readonly': [('is_reviewer', '=', False)]}"/>
+                                </group> 
                             </page>
                         </notebook>
                     </sheet>
