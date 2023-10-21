@@ -30,7 +30,7 @@ class hrCompetencySectionLine(models.Model):
         ('3', 'Often Demonstrated'),
         ('4', 'Mostly Demonstrated'),
         ('5', 'Always Demonstrated'),
-        ], string="Appraiser Rating", default=""
+        ], string="Rater Rating", default=""
         ) 
 
     appraiser_rate = fields.Float(
@@ -148,6 +148,36 @@ class hrCompetencySectionLine(models.Model):
         string="Attributes",
         copy=False
     )
+    self_rate_level = fields.Selection([
+        ('all_rated', 'All Rated'),
+        ('partially_rated', 'Partially Rated'),
+        ('no_rating', 'No Rating')
+    ], string="Competency Rating", compute='_compute_self_rate_level', store=True)
+    rater_level = fields.Selection([
+        ('all_rated', 'All Rated'),
+        ('partially_rated', 'Partially Rated'),
+        ('no_rating', 'No Rating')
+    ], string="Competency Rating", compute='_compute_rater_level', store=True)
+
+    @api.depends('competency_attribute_line_ids.self_rating_term')
+    def _compute_self_rate_level(self):
+        for record in self:
+            if all(line.self_rating_term for line in record.competency_attribute_line_ids):
+                record.self_rate_level = 'all_rated'
+            elif any(line.self_rating_term for line in record.competency_attribute_line_ids):
+                record.self_rate_level = 'partially_rated'
+            else:
+                record.self_rate_level = 'no_rating'
+
+    @api.depends('competency_attribute_line_ids.appraiser_rating_term')
+    def _compute_rater_level(self):
+        for record in self:
+            if all(line.appraiser_rating_term for line in record.competency_attribute_line_ids):
+                record.rater_level = 'all_rated'
+            elif any(line.appraiser_rating_term for line in record.competency_attribute_line_ids):
+                record.rater_level = 'partially_rated'
+            else:
+                record.rater_level = 'no_rating' 
 
     @api.depends('competency_attribute_line_ids')
     def compute_average_total(self):
@@ -298,7 +328,7 @@ class mirrorCompetency(models.Model):
                 overall_total = sum(rec.competency_ids.mapped('percentage_average_total'))
                 rec.competency_overall_total = overall_total / len(rec.competency_ids.ids)
             else:
-                rec.competency_overall_total = False  
+                rec.competency_overall_total = False 
 
     def determine_reviewer_user(self):
         for rec in self:

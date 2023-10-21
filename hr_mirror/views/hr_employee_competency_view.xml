@@ -92,14 +92,15 @@
                                                         <field name="name" readonly="1" force_save="1" string="Description"/>
                                                         <field name="is_reviewer" invisible="1" readonly="1" force_save="1" string="Is reviewer"/>
                                                         <field name="is_appraisee" invisible="1" readonly="1" force_save="1" string="Is appraisee"/>
-                                                        <field name="rate" string="Self Rating" readonly="0" force_save="1" invisible="0"/>
+                                                        <field name="rate" string="Self Rating" readonly="0" force_save="1" invisible="1"/>
                                                         <field name="self_rating_term" string="Self Rating" readonly="0" force_save="1" required="1"/>
                                                     </tree> 
                                                 </field> 
                                             </page>
                                         </notebook>
                                     </form>
-                                    <tree string="Competency" delete="false" create="false">
+                                    <tree string="Competency" delete="false" create="false" decoration-success="self_rate_level=='all_rated'">
+                                        <field name="self_rate_level" invisible="1" readonly="1" force_save="1"/>
                                         <field name="name"/>
                                     </tree>
                                 </field>

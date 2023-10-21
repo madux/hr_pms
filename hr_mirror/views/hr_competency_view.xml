@@ -115,18 +115,19 @@
                                                         <field name="rate" string="Self Rating" readonly="0" force_save="1" invisible="1"/>
                                                         <field name="appraiser_rate" string="Appraiser Rating" readonly="0" force_save="1" invisible="1"/>
 
-                                                        <field name="self_rating_term" string="Self Rating" readonly="0" force_save="1" required="1"
+                                                        <field name="self_rating_term" string="Self Rating" invisible="1" readonly="0" force_save="1" required="1"
                                                         attrs="{'readonly': [('is_appraisee', '=', False)]}"/>
                                                         <field name="appraiser_rating_term" string="Appraiser Rating" readonly="0" force_save="1" required="1"
                                                         attrs="{'readonly': [('is_reviewer', '=', False)]}"/>
 
-                                                        <field name="percentage_rate" readonly="1"/>
+                                                        <field name="percentage_rate" readonly="1" invisible="1"/>
                                                     </tree> 
                                                 </field>
                                             </page>
                                         </notebook>
                                     </form>
-                                    <tree string="Competency" delete="false" create="false">
+                                    <tree string="Competency" delete="false" create="false" decoration-success="rater_level=='all_rated'">
+                                        <field name="rater_level" invisible="1" readonly="1" force_save="1" />
                                         <field name="name"/>
                                         <field name="average_total" string="Avg. Total"/>
                                         <field name="percentage_average_total" readonly="1" force_save="1"/>
