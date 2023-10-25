@@ -100,6 +100,15 @@ class EmployeeCompetency(models.Model):
         ('refused', 'Refused'),
         ], string="State", default="draft"
         )
+    ratee_comment = fields.Text(string='Comment')
+    is_ratee = fields.Boolean(
+        "Is Ratee?", 
+        default=False,
+        compute="_determine_is_ratee_user")
+    is_rater = fields.Boolean(
+        "Is Rater?", 
+        default=False,
+        compute="_determine_is_rater_user")
     
     # competency_overall_total = fields.Float(
     #     "Overall total?", 
@@ -176,4 +185,22 @@ class EmployeeCompetency(models.Model):
                     'default_composition_mode': 'comment',
                 })
                 template_id.with_context(ctx).send_mail(record.id, False)
+
+    def _determine_is_ratee_user(self):
+        for rec in self:
+            if rec.employee_id and rec.employee_id.user_id.id == self.env.uid:
+                rec.is_ratee = True
+            else:
+                rec.is_ratee = False
+
+    def _determine_is_rater_user(self):
+        for rec in self:
+            if rec.rater_ids:
+                raters_uids = rec.rater_ids.search([]).mapped('employee_ids').mapped('user_id')
+                if self.env.uid in raters_uids.mapped('id'):
+                    rec.is_rater = True
+                else:
+                    rec.is_rater = False
+            else:
+                rec.is_rater = False
  
