@@ -84,7 +84,7 @@
                                     </form>
                                 </field>
                             </page>
-                            <page name="competency_reviewer_ids" string="Reviewers">
+                            <page name="competency_reviewer_ids" string="Ratees">
                                 <field name="competency_reviewer_ids" readonly="0" string="">
                                     <tree string="Competency" create="1">
                                         <field name="staff_id" readonly="1" string="Staff No:"/> 

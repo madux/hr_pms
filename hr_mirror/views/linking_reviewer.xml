@@ -73,6 +73,6 @@
 				</p>
 			</field>
 		</record>
-        <menuitem id="view_hr_mirror_competency_reviewer_menu" name="Linking Reviewer" sequence="2" parent="hr_mirror.view_hr_mirror_competency_config_menu" action="hr_mirror.action_hr_competency_reviewer_id"/>
+        <menuitem id="view_hr_mirror_competency_reviewer_menu" name="Linking Raters" sequence="2" parent="hr_mirror.view_hr_mirror_competency_config_menu" action="hr_mirror.action_hr_competency_reviewer_id"/>
 
 </odoo>
