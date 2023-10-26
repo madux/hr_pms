@@ -118,7 +118,7 @@ class EmployeeCompetency(models.Model):
     
  
     def validation_before_submission(self):
-        lines = self.mapped('competency_ids').mapped('competency_attribute_line_ids')
+        lines = self.sudo().mapped('competency_ids').mapped('competency_attribute_line_ids')
         if self.state == "draft":
             if self.employee_id.user_id.id != self.env.uid:
                 raise ValidationError("You are not responsible to submit this record")
@@ -154,7 +154,7 @@ class EmployeeCompetency(models.Model):
                         }) for att in comp.competency_attribute_line_ids]
                     }) for comp in self.competency_ids],
                 })
-                self._send_mail_to(new_hr_competency)
+                self.sudo()._send_mail_to(new_hr_competency)
     
     def action_submit(self):
         self.validation_before_submission()
