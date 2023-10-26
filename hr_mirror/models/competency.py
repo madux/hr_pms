@@ -316,7 +316,7 @@ class mirrorCompetency(models.Model):
         )
     competency_overall_total = fields.Float(
         "Overall total?", 
-        help='Average of the total sum of competency sverage score; EG. 100 + 30 + 10 / 3',
+        help='Average of the total sum of competency sverage score; EG. 100 + 80 + 100 + 100 + 100 / 5',
         compute="compute_competency_overall_total"
         )
     rater_comment = fields.Text(string='Comment')
