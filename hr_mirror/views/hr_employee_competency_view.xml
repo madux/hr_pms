@@ -99,9 +99,10 @@
                                             </page>
                                         </notebook>
                                     </form>
-                                    <tree string="Competency" delete="false" create="false" decoration-success="self_rate_level=='all_rated'">
-                                        <field name="self_rate_level" invisible="1" readonly="1" force_save="1"/>
+                                    <tree string="Competency" delete="false" create="false">
                                         <field name="name"/>
+                                        <field name="self_rate_level" invisible="1" readonly="1" force_save="1"/>
+                                        <field name="self_rate_level_bool" invisible="0" icon="fa-check" readonly="1" force_save="1"/>
                                     </tree>
                                 </field>
                                 <field name="is_ratee" invisible="1" readonly="1" force_save="1"/>

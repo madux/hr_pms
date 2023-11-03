@@ -126,9 +126,10 @@
                                             </page>
                                         </notebook>
                                     </form>
-                                    <tree string="Competency" delete="false" create="false" decoration-success="rater_level=='all_rated'">
+                                    <tree string="Competency" delete="false" create="false">
                                         <field name="rater_level" invisible="1" readonly="1" force_save="1" />
                                         <field name="name"/>
+                                        <field name="rater_level_bool" invisible="0" icon="fa-check" readonly="1" force_save="1" />
                                         <field name="average_total" string="Avg. Total" invisible="1"/>
                                         <field name="percentage_average_total" readonly="1" force_save="1" groups="base.group_system,hr_pms.group_pms_officer_id"/>
                                     </tree>
