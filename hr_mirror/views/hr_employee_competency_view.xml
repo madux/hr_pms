@@ -111,7 +111,7 @@
                                     <field name="ratee_comment" placeholder="Add your comment here" attrs="{'readonly': [('is_ratee', '=', False)]}"/> 
                                 </group>
                             </page> 
-                            <page name="rater_ids" string="Appraiser(s)">
+                            <page name="rater_ids" string="Rater(s)">
                                 <field name="rater_ids" string="" readonly="1" options="{'no_create': True,'no_open': True}">
                                     <tree string="">
                                         <field name="category_role_id" readonly="0" force_save="1" string="Category" options="{'no_create': True,'no_open': True}"/>
