@@ -183,7 +183,7 @@ class hrCompetencySectionLine(models.Model):
                 record.rater_level_bool = True
             elif any(line.appraiser_rating_term for line in record.competency_attribute_line_ids):
                 record.rater_level = 'partially_rated'
-                record.rater_level_bool = True
+                record.rater_level_bool = False
             else:
                 record.rater_level = 'no_rating'
                 record.rater_level_bool = False 
