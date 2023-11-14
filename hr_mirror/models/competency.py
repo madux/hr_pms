@@ -169,6 +169,8 @@ class hrCompetencySectionLine(models.Model):
                 record.self_rate_level_bool = True
             elif any(line.self_rating_term for line in record.competency_attribute_line_ids):
                 record.self_rate_level = 'partially_rated'
+                record.self_rate_level_bool = False
+
             else:
                 record.self_rate_level = 'no_rating'
                 record.self_rate_level_bool = False
