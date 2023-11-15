@@ -103,7 +103,7 @@
                                             </group>
                                             <group>
                                                 <field name="average_total" readonly="1" force_save="1" string="Avg. Total" invisible="1"/>
-                                                <field name="rater_level_bool" />
+                                                <field name="rater_level_bool" invisible="1" />
                                             </group>
                                         </group>
                                         <notebook> 
