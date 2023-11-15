@@ -148,45 +148,23 @@ class hrCompetencySectionLine(models.Model):
         string="Attributes",
         copy=False
     )
-    self_rate_level = fields.Selection([
-        ('all_rated', 'All Rated'),
-        ('partially_rated', 'Partially Rated'),
-        ('no_rating', 'No Rating')
-    ], string="Competency Rating", compute='_compute_self_rate_level', store=True)
-    self_rate_level_bool = fields.Boolean(string='Completion', compute='_compute_self_rate_level')
-    rater_level = fields.Selection([
-        ('all_rated', 'All Rated'),
-        ('partially_rated', 'Partially Rated'),
-        ('no_rating', 'No Rating')
-    ], string="Competency Rating", compute='_compute_rater_level', store=True)
-    rater_level_bool = fields.Boolean(string='Completion', compute='_compute_rater_level')
+    self_rate_level_bool = fields.Boolean(string='Completion', default=False)
+    rater_level_bool = fields.Boolean(string='Completion', default=False)
 
-    @api.depends('competency_attribute_line_ids.self_rating_term')
-    def _compute_self_rate_level(self):
-        for record in self:
-            if all(line.self_rating_term for line in record.competency_attribute_line_ids):
-                record.self_rate_level = 'all_rated'
-                record.self_rate_level_bool = True
-            elif any(line.self_rating_term for line in record.competency_attribute_line_ids):
-                record.self_rate_level = 'partially_rated'
-                record.self_rate_level_bool = False
-
+    @api.onchange('competency_attribute_line_ids')
+    def onchange_competency_attribute_line_ids(self):
+        if self.competency_attribute_line_ids:
+            all_not_rated_self = self.mapped('competency_attribute_line_ids').filtered(lambda x: not x.self_rating_term)
+            if all_not_rated_self:
+                self.self_rate_level_bool = False 
             else:
-                record.self_rate_level = 'no_rating'
-                record.self_rate_level_bool = False
-
-    @api.depends('competency_attribute_line_ids.appraiser_rating_term')
-    def _compute_rater_level(self):
-        for record in self:
-            if all(line.appraiser_rating_term for line in record.competency_attribute_line_ids):
-                record.rater_level = 'all_rated'
-                record.rater_level_bool = True
-            elif any(line.appraiser_rating_term for line in record.competency_attribute_line_ids):
-                record.rater_level = 'partially_rated'
-                record.rater_level_bool = False
+                self.self_rate_level_bool = True
+            all_not_rated_rater = self.mapped('competency_attribute_line_ids').filtered(lambda x: not x.appraiser_rating_term)
+            if all_not_rated_rater:
+                self.rater_level_bool = False 
             else:
-                record.rater_level = 'no_rating'
-                record.rater_level_bool = False 
+                self.rater_level_bool = True  
+ 
 
     @api.depends('competency_attribute_line_ids')
     def compute_average_total(self):
