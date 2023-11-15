@@ -103,6 +103,7 @@
                                             </group>
                                             <group>
                                                 <field name="average_total" readonly="1" force_save="1" string="Avg. Total" invisible="1"/>
+                                                <field name="rater_level_bool" invisible="1" />
                                             </group>
                                         </group>
                                         <notebook> 
@@ -127,7 +128,6 @@
                                         </notebook>
                                     </form>
                                     <tree string="Competency" delete="false" create="false">
-                                        <field name="rater_level" invisible="1" readonly="1" force_save="1" />
                                         <field name="name"/>
                                         <field name="rater_level_bool" invisible="0" icon="fa-check" readonly="1" force_save="1" />
                                         <field name="average_total" string="Avg. Total" invisible="1"/>
