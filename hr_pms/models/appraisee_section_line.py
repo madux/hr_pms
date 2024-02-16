@@ -30,15 +30,15 @@ class KRA_SectionLine(models.Model):
     )
 
     name = fields.Char(
-        string='Description',
+        string='KRA',
         size=300
         )
     weightage = fields.Float(
-        string='FA Weight (Total 100%)', 
+        string='Weightage', 
         )
     
     appraisee_weightage = fields.Float(
-        string='Weight (Total 100%)',
+        string='AA Weightage',
         )
     administrative_supervisor_rating = fields.Integer(
         string='AA Rating', 
@@ -68,8 +68,17 @@ class KRA_SectionLine(models.Model):
         default=False,
         compute="compute_user_rating_role"
         )
+    target = fields.Char(
+        string='Target', 
+        size=8
+        )
 
     state = fields.Selection([
+        ('goal_setting_draft', 'Goal Settings'),
+        ('gs_fa', 'Goal Settings: FA TO APPROVE'),
+        ('hyr_draft', 'Draft'),
+        ('hyr_admin_rating', 'Admin Supervisor'),
+        ('hyr_functional_rating', 'Functional Supervisor'),
         ('draft', 'Draft'),
         ('admin_rating', 'Admin Supervisor'),
         ('functional_rating', 'Functional Supervisor'),
@@ -77,7 +86,7 @@ class KRA_SectionLine(models.Model):
         ('wating_approval', 'HR to Approve'),
         ('done', 'Done'),
         ('withdraw', 'Withdrawn'),
-        ], string="Status", default = "draft", readonly=True, related="kra_section_id.state")
+        ], string="Status", readonly=True, related="kra_section_id.state")
     
     weighted_score = fields.Float(
         string='Weighted (%) Score of specific KRA', 
@@ -92,6 +101,21 @@ class KRA_SectionLine(models.Model):
         string="Is required", 
         default=False
         )
+    # hyr_fa_rating = fields.Selection([
+    #     ('poor_average', 'Poor Progress'),
+    #     ('good_average', 'Good Average'),
+    #     ('excellent', 'Excellent'),
+        # ], string="FA(HYR) Review", default = "", readonly=False)
+    hyr_fa_rating = fields.Selection([
+        ('poor_progress', 'Poor Progress'),
+        ('good_progress', 'Good Progress'),
+        ('average_progress', 'Average Progress'),
+        ], string="FA(Mid Year) Review", default = "", readonly=False)
+    hyr_aa_rating = fields.Selection([
+        ('poor_progress', 'Poor Progress'),
+        ('good_progress', 'Good Progress'),
+        ('average_progress', 'Average Progress'),
+        ], string="AA(HYR) Review", default = "", readonly=False)
     
     @api.onchange('appraisee_weightage')
     def onchange_appraisee_weightage(self):
@@ -216,10 +240,12 @@ class KRA_SectionLine(models.Model):
                 rec.weighted_score = 0
 
     def unlink(self):
-        for delete in self.filtered(lambda delete: delete.state not in ['draft']):
+        for delete in self.filtered(lambda delete: delete.state not in ['goal_setting_draft']):
             raise ValidationError(_('You cannot delete a KRA section once submitted Click the Ok and then discard button to go back'))
         return super(KRA_SectionLine, self).unlink()
     
+
+
 class LC_SectionLine(models.Model):
     _name = "lc.section.line"
     _description= "Employee appraisee LC Section lines"
@@ -234,7 +260,7 @@ class LC_SectionLine(models.Model):
         size=70
         )
     weightage = fields.Float(
-        string='Weight (Total 100%)', 
+        string='Weightage', 
         default=20,
         readonly=True
         )
@@ -406,7 +432,7 @@ class FC_SectionLine(models.Model):
         string='Description', 
         )
     weightage = fields.Integer(
-        string='Weight (Total 100%)', 
+        string='Weightage', 
         required=False,
         readonly=True
         )

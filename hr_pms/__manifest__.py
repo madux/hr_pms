@@ -20,6 +20,7 @@
             'views/pms_department_view.xml',
             'views/section_view.xml',
             'wizards/post_normalisation_views.xml',
+            'wizards/goal_setting_upload_views.xml',
             'views/appraisee_view.xml',
             'views/employee_inherit_view.xml',
             'views/hr_level_category.xml',
@@ -31,6 +32,9 @@
             'wizards/appraisal_return_view.xml',
             'static/xml/dashboard_action.xml',
             # 'views/employees_import_view.xml',
+            'report/pms_appraisal_templates.xml',
+            # 'report/pms_appraisal_reports.xml',
+
 
     ],
     'css': [],

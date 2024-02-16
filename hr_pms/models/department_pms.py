@@ -128,6 +128,12 @@ class PMSDepartment(models.Model):
         "pms_department_id",
         string="Department Section Lines"
     )
+    type_of_pms = fields.Selection([
+        ('gs', 'Goal Setting'),
+        ('hyr', 'Mid year review'),
+        ('fyr', 'Annual review'),
+        ], string="Type of PMS", default = "gs", 
+        copy=True)
     active = fields.Boolean(
         string="Active", 
         readonly=True, 
@@ -211,125 +217,127 @@ class PMSDepartment(models.Model):
     # Ensure all the appraisals sent to employees will be activated or published
     def button_publish(self):
         '''Publishing the records to employees of the department'''
-        if not self.section_line_ids:
-            raise ValidationError(
-                """Please ensure section line is added"""
-            )
         Employee = self.env['hr.employee']
         PMS_Appraisee = self.env['pms.appraisee']
-        job_position_ids = self.hr_category_id.mapped('job_role_ids').filtered(
-            lambda se: se.department_id.id == self.department_id.id)
-        appraises = []
-        categ_name = self.hr_category_id.category.category
-        # THIS IS TO PREVENT DUPLICATE APPRAISAL
-        level_type_name = 'JM' if categ_name == 'Junior Management' else 'MM' if categ_name == 'Middle Management' else 'SM' 
-        for jb in job_position_ids:
-            employees = Employee.search([
-                ('job_id', '=', jb.id),
-                # ('department_id', '=', jb.department_id.id),
-                ('level_id.name', '=', level_type_name)
-                ])
-            if employees:
-                for emp in employees:
-                    pms_appraisee = PMS_Appraisee.create({
-                        'name': self.name + ': - '+ emp.name, 
-                        'department_id': emp.department_id.id, 
-                        'employee_id': emp.id, 
-                        'pms_department_id': self.id,
-                        'pms_year_id': self.pms_year_id.id,
-                        'date_from': self.pms_year_id.date_from,
-                        'date_end': self.pms_year_id.date_end,
-                        'deadline': self.deadline,
-                    }) 
-                    appraises.append(pms_appraisee)
-                    kra_pms_department_section = self.mapped('section_line_ids').filtered(
-                        lambda res: res.type_of_section == "KRA")
-                    if kra_pms_department_section:
-                        kra_section = kra_pms_department_section[0]
-                        kra_section_lines = kra_section.section_line_ids
-                        # raise ValidationError(f"Thee scale is {kra_section.section_avg_scale}")
-                        pms_appraisee.write({
-                            'kra_section_line_ids': [(0, 0, {
-                                                        'kra_section_id': pms_appraisee.id,
-                                                        'name': secline.name,
-                                                        'is_required': secline.is_required,
-                                                        # 'section_avg_scale': kra_section.section_id.section_avg_scale,
-                                                        'section_avg_scale': kra_section.section_avg_scale,
-                                                        'weightage': 0,
-                                                        'administrative_supervisor_rating': 0,
-                                                        'functional_supervisor_rating': 0,
-                                                        'self_rating': 0,
-                                                        }) for secline in kra_section_lines] 
-                        })
-                    fc_pms_department_section = self.mapped('section_line_ids').filtered(
-                        lambda res: res.type_of_section == "FC")
-                    if fc_pms_department_section:
-                        fc_section = fc_pms_department_section[0]
-                        fc_section_lines = fc_section.section_line_ids
-                        if fc_section_lines:
+        for rec in self:
+            if not rec.section_line_ids:
+                raise ValidationError(
+                    f"""Please ensure section line is added {rec.department_id.name}"""
+                )
+            job_position_ids = rec.hr_category_id.mapped('job_role_ids').filtered(
+                lambda se: se.department_id.id == rec.department_id.id)
+            appraises = []
+            categ_name = rec.hr_category_id.category.category
+            # THIS IS TO PREVENT DUPLICATE APPRAISAL
+            level_type_name = 'JM' if categ_name == 'Junior Management' else 'MM' if categ_name == 'Middle Management' else 'SM' 
+            for jb in job_position_ids:
+                employees = Employee.search([
+                    ('job_id', '=', jb.id),
+                    # ('department_id', '=', jb.department_id.id),
+                    ('level_id.name', '=', level_type_name)
+                    ])
+                if employees:
+                    for emp in employees:
+                        pms_appraisee = PMS_Appraisee.create({
+                            'name': f'GOAL SETTINGS: {rec.name} - {emp.name}', 
+                            'department_id': emp.department_id.id, 
+                            'employee_id': emp.id, 
+                            'pms_department_id': rec.id,
+                            'pms_year_id': rec.pms_year_id.id,
+                            'type_of_pms': rec.type_of_pms,
+                            'date_from': rec.pms_year_id.date_from,
+                            'date_end': rec.pms_year_id.date_end,
+                            'deadline': rec.deadline,
+                        }) 
+                        appraises.append(pms_appraisee)
+                        kra_pms_department_section = rec.mapped('section_line_ids').filtered(
+                            lambda res: res.type_of_section == "KRA")
+                        if kra_pms_department_section:
+                            kra_section = kra_pms_department_section[0]
+                            kra_section_lines = kra_section.section_line_ids
+                            # raise ValidationError(f"Thee scale is {kra_section.section_avg_scale}")
                             pms_appraisee.write({
-                                'fc_section_line_ids': [(0, 0, {
-                                                            'fc_section_id': pms_appraisee.id,
-                                                            'name': sec.name,
-                                                            'is_required': sec.is_required,
-                                                            'weightage': fc_section.section_id.input_weightage,
-                                                            # 'section_avg_scale': fc_section.section_id.section_avg_scale,
-                                                            'section_avg_scale': fc_section.section_avg_scale,
+                                'kra_section_line_ids': [(0, 0, {
+                                                            'kra_section_id': pms_appraisee.id,
+                                                            'name': secline.name,
+                                                            'is_required': secline.is_required,
+                                                            # 'section_avg_scale': kra_section.section_id.section_avg_scale,
+                                                            'section_avg_scale': kra_section.section_avg_scale,
+                                                            'weightage': 0,
                                                             'administrative_supervisor_rating': 0,
                                                             'functional_supervisor_rating': 0,
-                                                            'reviewer_rating': 0,
-                                                            }) for sec in fc_section_lines] 
+                                                            'self_rating': 0,
+                                                            }) for secline in kra_section_lines] 
                             })
-                        else:
+                        fc_pms_department_section = rec.mapped('section_line_ids').filtered(
+                            lambda res: res.type_of_section == "FC")
+                        if fc_pms_department_section:
+                            fc_section = fc_pms_department_section[0]
+                            fc_section_lines = fc_section.section_line_ids
+                            if fc_section_lines:
+                                pms_appraisee.write({
+                                    'fc_section_line_ids': [(0, 0, {
+                                                                'fc_section_id': pms_appraisee.id,
+                                                                'name': sec.name,
+                                                                'is_required': sec.is_required,
+                                                                'weightage': fc_section.section_id.input_weightage,
+                                                                # 'section_avg_scale': fc_section.section_id.section_avg_scale,
+                                                                'section_avg_scale': fc_section.section_avg_scale,
+                                                                'administrative_supervisor_rating': 0,
+                                                                'functional_supervisor_rating': 0,
+                                                                'reviewer_rating': 0,
+                                                                }) for sec in fc_section_lines] 
+                                })
+                            else:
+                                pms_appraisee.write({
+                                    'fc_section_line_ids': [(0, 0, {
+                                                                'fc_section_id': pms_appraisee.id,
+                                                                'name': 'Functional Competency',
+                                                                'is_required': False,
+                                                                'weightage': fc_section.section_id.input_weightage,
+                                                                # 'section_avg_scale': fc_section.section_id.section_avg_scale,
+                                                                'section_avg_scale': fc_section.section_avg_scale,
+                                                                'administrative_supervisor_rating': 0,
+                                                                'functional_supervisor_rating': 0,
+                                                                'reviewer_rating': 0,
+                                                                })] 
+                                })
+
+
+                        lc_pms_department_section = rec.mapped('section_line_ids').filtered(
+                            lambda res: res.type_of_section == "LC")
+                        if lc_pms_department_section:
+                            lc_section = lc_pms_department_section[0]
+                            lc_section_lines = lc_section.section_line_ids
                             pms_appraisee.write({
-                                'fc_section_line_ids': [(0, 0, {
-                                                            'fc_section_id': pms_appraisee.id,
-                                                            'name': 'Functional Competency',
-                                                            'is_required': False,
-                                                            'weightage': fc_section.section_id.input_weightage,
-                                                            # 'section_avg_scale': fc_section.section_id.section_avg_scale,
-                                                            'section_avg_scale': fc_section.section_avg_scale,
+                                'lc_section_line_ids': [(0, 0, {
+                                                            'lc_section_id': pms_appraisee.id,
+                                                            'name': secline.name,
+                                                            'is_required': secline.is_required,
+                                                            # 'section_avg_scale': lc_section.section_id.section_avg_scale,
+                                                            'section_avg_scale': lc_section.section_avg_scale,
+                                                            'weightage': lc_section.section_id.input_weightage,
                                                             'administrative_supervisor_rating': 0,
                                                             'functional_supervisor_rating': 0,
-                                                            'reviewer_rating': 0,
-                                                            })] 
+                                                            'section_line_id': secline.section_line_id.id,
+                                                            'kba_descriptions': '\n'.join([kbline.name for kbline in secline.kba_description_ids]),
+                                                            }) for secline in lc_section_lines] 
                             })
-
-
-                    lc_pms_department_section = self.mapped('section_line_ids').filtered(
-                        lambda res: res.type_of_section == "LC")
-                    if lc_pms_department_section:
-                        lc_section = lc_pms_department_section[0]
-                        lc_section_lines = lc_section.section_line_ids
-                        pms_appraisee.write({
-                            'lc_section_line_ids': [(0, 0, {
-                                                        'lc_section_id': pms_appraisee.id,
-                                                        'name': secline.name,
-                                                        'is_required': secline.is_required,
-                                                        # 'section_avg_scale': lc_section.section_id.section_avg_scale,
-                                                        'section_avg_scale': lc_section.section_avg_scale,
-                                                        'weightage': lc_section.section_id.input_weightage,
-                                                        'administrative_supervisor_rating': 0,
-                                                        'functional_supervisor_rating': 0,
-                                                        'section_line_id': secline.section_line_id.id,
-                                                        'kba_descriptions': '\n'.join([kbline.name for kbline in secline.kba_description_ids]),
-                                                        }) for secline in lc_section_lines] 
-                        })
-                    # current_assessment
-                    self.get_current_assessment_lines(pms_appraisee)
-                    # potential_assessment
-                    self.get_potential_assessment_lines(pms_appraisee)
-                    email_items = [
-                        emp.administrative_supervisor_id.work_email,
-                        emp.reviewer_id.work_email,
-                        emp.parent_id.work_email,
-                    ]
-                    self.action_notify(emp, pms_appraisee, emp.work_email, email_items)
-        # raise ValidationError(appraises)
-        self.write({
-            'state':'published'
-        })
-    
+                        # current_assessment
+                        rec.get_current_assessment_lines(pms_appraisee)
+                        # potential_assessment
+                        rec.get_potential_assessment_lines(pms_appraisee)
+                        email_items = [
+                            emp.administrative_supervisor_id.work_email,
+                            emp.reviewer_id.work_email,
+                            emp.parent_id.work_email,
+                        ]
+                        rec.action_notify(emp, pms_appraisee, emp.work_email, email_items)
+            # raise ValidationError(appraises)
+            rec.write({
+                'state':'published'
+            })
+        
     def button_cancel(self):
         for rec in self:
             related_appraisals = self.env['pms.appraisee'].search([

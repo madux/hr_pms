@@ -1,0 +1,112 @@
+<odoo>
+    <data>
+        <record id="mail_template_mirror_notification" model="mail.template">
+            <field name="name">360-Degree Feedback: Self-Assessment </field>
+            <field name="model_id" ref="hr_mirror.model_hr_employee_competency"/>
+            <field name="email_from">${object.write_uid.company_id.email || object.write_uid.login}</field>
+            <field name="email_to">${object.employee_id.work_email}</field>
+            <field name="subject">360-Degree Feedback: Self-Assessment</field>
+            <field name="reply_to">eedctalentmanagement@enugudisco.com</field>
+            <field name="body_html" type="html">
+            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 16px; background-color: white; color: #454748; border-collapse:separate;">
+                    <tbody>
+                        <!-- CONTENT -->
+                        <tr>
+                            <td align="center" style="min-width: 590px;">
+                                <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+
+                                    <tr><td valign="top" style="font-size: 15px;">
+                                        <div>
+                                            Dear ${object.employee_id.name or ''},<br/> <br/>
+                                            I hope this message finds you well. As part of our ongoing commitment to fostering professional growth and development,
+                                            we are initiating the 360-degree feedback process.
+                                            <br/>We kindly request you to take a moment and to complete your self-assessment by following the steps below: <br/>
+                                            <ol>
+                                                <br/><li> <a href='http://hrpms.myeedc.com:8069/web'>Click the link</a> or Copy the URL: <a>http://hrpms.myeedc.com:8069</a> </li>
+                                                <br/><li>Log in using your credentials sent earlier</li>
+                                                <br/><li>Click 360 Feedback in the menu</li>
+                                                <br/><li>Click the "${object.name}" record and wait for it to open</li>
+                                                <br/><li>Click and edit and select each of the leadership categories to rate yourself</li>
+                                            </ol>
+
+                                            <br/>If you encounter any technical issues or have questions about the self-assessment process,
+                                                please don't hesitate to reach out to the
+                                            <a href='mailto:eedctalentmanagement@enugudisco.com'>HR Team</a> for assistance.
+                                            <br/> Thank you for your participation.
+                                            <br /><br/>
+                                            Regards,<br/>HR Administrator<br/>EEDC Corporate Headquarters<br/>eedctalentmanagement@enugudisco.com
+                                        </div>
+                                    </td></tr>
+                                    <tr><td style="text-align:center;">
+                                    <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                                    </td></tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                </td></tr>
+            </table>
+        </field>
+        <field name="lang">${object.employee_id.user_id.partner_id.lang}</field>
+        <field name="auto_delete" eval="False"/>
+        </record>
+
+        <record id="mail_template_mirror_raters_notification" model="mail.template">
+            <field name="name">Request for Your Feedback Template </field>
+            <field name="model_id" ref="hr_mirror.model_hr_competency"/>
+            <field name="email_from">eedctalentmanagement@enugudisco.com</field>
+            <field name="email_to">${object.rated_by.work_email}</field>
+            <field name="subject">Request for Your Feedback: 360-Degree Assessment for ${object.employee_id.name}</field>
+            <field name="email_cc">${object.employee_id.work_email}</field>
+            <field name="reply_to">eedctalentmanagement@enugudisco.com</field>
+            <field name="body_html" type="html">
+            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 16px; background-color: white; color: #454748; border-collapse:separate;">
+                    <tbody>
+                        <!-- CONTENT -->
+                        <tr>
+                            <td align="center" style="min-width: 590px;">
+                                <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+
+                                    <tr><td valign="top" style="font-size: 15px;">
+                                        <div>
+                                            Dear ${object.rated_by.name or ''},<br/> <br/>
+                                            I hope this message finds you well. As part of our ongoing
+                                            commitment to fostering professional growth and development,
+                                            you have been selected to provide valuable feedback on the performance of ${object.employee_id.name} as part of our 360-degree feedback process.
+                                            <br/>Your input is highly valued and will contribute to our efforts to enhance leadership competencies within our organization. 
+                                            <br/>To provide your feedback on ${object.employee_id.name}, please follow these steps: <br/>
+                                            <br/><ol>
+                                                <br/><li> <a href='http://hrpms.myeedc.com:8069/web'>Click the link</a> or Copy the URL: <a>http://hrpms.myeedc.com:8069</a> </li>
+                                                <br/><li>Log in using your credentials sent earlier</li>
+                                                <br/><li>Click 360 Feedback in the menu</li>
+                                                <br/><li>Click the "${object.name}" record and wait for it to open</li>
+                                                <br/><li>Click edit and select and give your feedback on each of the leadership categories</li>
+                                            </ol>
+
+                                            <br/>If you encounter any technical issues or have questions about the self-assessment process,
+                                                please don't hesitate to reach out to the
+                                            <a href='mailto:eedctalentmanagement@enugudisco.com'>HR Team</a> for assistance.
+                                            <br/> Thank you for your participation.
+                                            <br /><br/>
+                                            Regards,<br/>HR Administrator<br/>EEDC Corporate Headquarters<br/>eedctalentmanagement@enugudisco.com
+                                        </div>
+                                    </td></tr>
+                                    <tr><td style="text-align:center;">
+                                    <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                                    </td></tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                </td></tr>
+            </table>
+        </field>
+        <field name="lang">${object.employee_id.user_id.partner_id.lang}</field>
+        <field name="auto_delete" eval="False"/>
+        </record>
+    </data>
+</odoo>

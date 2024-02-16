@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <odoo>
+        <record id="view_hr_competency_config_filter" model="ir.ui.view">
+			<field name="name">hr.competency</field>
+			<field name="model">hr.competency.config</field>
+			<field name="arch" type="xml">
+				<search string="Search competency Config">
+                    <field name="name"/> 
+                    <filter string="Leadership competency" name="type_lc" domain="[('type_of_competency','=', 'lc')]"/>
+                    <filter string="Functional competency" name="type_fc" domain="[('type_of_competency','=', 'fc')]"/>
+                    <group  expand='0' string='Group by...'>
+                        <filter name="type_al" string='Competency' domain="[]" context="{'group_by' : 'type_of_competency'}"/>
+                    </group>
+				</search>
+			</field>
+		</record>
+   
+        
+		<record id="view_hr_competency_config_form" model="ir.ui.view">
+			<field name="name">Competency form</field>
+			<field name="model">hr.competency.config</field>
+			<field name="arch" type="xml">
+				<form string="HR Competency" create="1">
+                    <header> 
+                        <button 
+                            name="action_publish" 
+                            string="Publish" 
+                            class="oe_highlight" 
+                            type="object"
+                            states="draft"
+                            confirm="Are you sure you want to publish"
+                        />
+                        <button 
+                            name="action_cancel_publish" 
+                            string="UnPublish" 
+                            type="object"
+                            states="publish"
+                            confirm="Are you sure you want to Unpublish"
+                        />
+                        <field name="state" widget="statusbar" clickable="False" invisible="0" readonly="0" force_save="1"
+							statusbar_visible="draft,publish,unpublish"
+							/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" default_focus="1" required="1"/>
+                            </h1>
+                        </div> 
+                        <group>
+                            <group>
+                                <field name="type_of_competency" invisible="0" readonly="0" force_save="1"/> 
+                                <field name="period_id" readonly="0" string="Period"/>  
+                            </group>
+                            <group>
+                                <!-- <field name="competency_reviewer_ids" invisible="0" widget="many2many_tags" force_save="1"/>  -->
+                            </group>
+                        </group>
+                        <notebook> 
+                            <page name="competency_ids" string="Competency Section">
+                                <field name="competency_ids" readonly="0" string="Competency">
+                                    <tree string="Competency" create="1">
+                                        <field name="name" readonly="1" string="Name"/> 
+                                        <field name="type_of_competency" readonly="0" string="Type"/>  
+                                    </tree>
+                                    <form string="Competency Section">
+                                        <group> 
+                                            <group>
+                                                <field name="name" readonly="0" force_save="1" string="Description"/>
+                                            </group>
+                                            <group>
+                                                <field name="type_of_competency" readonly="0" string="Type"/>  
+                                            </group>
+                                        </group>
+                                        <notebook> 
+                                            <page name="lc_attribute_ids" string="Competency Attributes">
+                                                <field name="lc_attribute_ids" readonly="0" string="Competency Attributes">
+                                                    <tree string="" editable="bottom">
+                                                        <field name="name" readonly="0" force_save="1" string="Description"/>
+                                                    </tree>
+                                                </field>
+                                            </page>
+                                        </notebook>
+                                    </form>
+                                </field>
+                            </page>
+                            <page name="competency_reviewer_ids" string="Ratees">
+                                <field name="competency_reviewer_ids" readonly="0" string="">
+                                    <tree string="Competency" create="1">
+                                        <field name="staff_id" readonly="1" string="Staff No:"/> 
+                                        <field name="employee_id" readonly="0" string="Employee"/>  
+                                        <field name="department_id" readonly="0" string="Department"/>  
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+			</field>
+		</record>
+
+		<record id="view_hr_competency_config_tree" model="ir.ui.view">
+			<field name="name">Competency form</field>
+			<field name="model">hr.competency.config</field>
+			<field name="arch" type="xml">
+				<tree string="Competency" create="1">
+                    <field name="name" readonly="1" string="Name"/> 
+                    <field name="type_of_competency" readonly="0" string="Type"/>  
+                    <field name="state" readonly="1" string="State"/>   
+                </tree>
+			</field>
+		</record>
+
+		<record id="action_hr_competency_config_id" model="ir.actions.act_window">
+			<field name="name">Competency</field>
+			<field name="res_model">hr.competency.config</field>
+			<field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+             <field name="search_view_id" ref="hr_mirror.view_hr_competency_config_filter" />
+			<field name="view_id" eval="False"/>
+			<field name="help" type="html">
+				<p class="oe_view_noconten_create">
+					 Kindly click to create a record
+				</p>
+			</field>
+		</record>
+        <menuitem id="view_hr_mirror_competency_config_menu" name="Configuration" sequence="10" parent="hr_mirror.view_hr_mirror_competency_menu" groups="base.group_system,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
+        <!-- <menuitem id="view_hr_mirror_competency_linking_menu" name="Link Reviewer" sequence="1" parent="hr_mirror.view_hr_mirror_competency_config_menu" action="hr_mirror.action_hr_competency_config_id"/> -->
+        <menuitem id="view_hr_mirror_competency_template_menu" name="Template" sequence="1" parent="hr_mirror.view_hr_mirror_competency_config_menu" action="hr_mirror.action_hr_competency_config_id"/>
+
+</odoo>

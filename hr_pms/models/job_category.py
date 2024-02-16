@@ -13,6 +13,12 @@ class PMSJobCategory(models.Model):
         string="Name", 
         required=True)
     
+    is_done = fields.Boolean(
+        string="Is Done", 
+        help="""Used to keep track of completed PMS template. 
+        If set, computation of employee appraiser will not take effect""",
+        default=False)
+    
     category = fields.Many2one('hr.level.category', string="Category")
     sequence = fields.Char(
         string="Sequence")
@@ -38,7 +44,17 @@ class PMSJobCategory(models.Model):
     
     pms_year_id = fields.Many2one(
         'pms.year', string="Period")
-    
+    allow_mid_year_review = fields.Boolean(string="Allow Mid year review",
+                                           help="Allow the appraisee to start Mid year review")
+    allow_annual_review_submission = fields.Boolean(
+        string="Allow Annual review", 
+        help="Allow the appraisee to start Annual year review")
+    type_of_pms = fields.Selection([
+        ('gs', 'Goal Setting'),
+        ('hyr', 'Mid year review'),
+        ('fyr', 'Annual year review'),
+        ], string="Type of PMS", default = "gs", 
+        copy=True)
     date_from = fields.Date(
         string="Date From", 
         readonly=False, 
@@ -212,6 +228,7 @@ class PMSJobCategory(models.Model):
                         'department_id': department_id.id,
                         'department_manager_id': department_id.manager_id.id,
                         'pms_year_id': self.pms_year_id.id,
+                        'type_of_pms': self.type_of_pms,
                         'date_from': self.pms_year_id.date_from,
                         'date_end': self.pms_year_id.date_end,
                         'deadline': self.deadline,
