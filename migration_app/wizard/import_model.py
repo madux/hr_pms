@@ -277,8 +277,9 @@ class ImportRecords(models.TransientModel):
 
                 if user:
                     _logger.info("User already exists...")
-                    if user.partner_id:
-                        _logger.info("User is connected to an employee record...checking staffno")
+                    connected_user = self.env['hr.employee'].sudo().search([('user_id', '=', user.id)], limit=1)
+                    if connected_user:
+                        _logger.info("Different Employee using this login detail...checking staffno")
                         login = vals.get('staff_number')
                         user = User.search([('login', '=', login),('active', '=', True)],limit=1) # Checks if staffno exist
                         if not user:
