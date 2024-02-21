@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <odoo>
+        <record id="view_hr_competency_filter" model="ir.ui.view">
+			<field name="name">hr.competency</field>
+			<field name="model">hr.competency</field>
+			<field name="arch" type="xml">
+				<search string="Search HR Competency">
+                    <field name="name"/> 
+                    <filter string="Leadership competency" name="type_lc" domain="[('type_of_competency','=', 'lc')]"/>
+                    <filter string="Functional competency" name="type_fc" domain="[('type_of_competency','=', 'fc')]"/>
+                    <group  expand='0' string='Group by...'>
+                        <filter name="type_all" string='Competency' domain="[]" context="{'group_by' : 'type_of_competency'}"/>
+                        <filter name="rated_by" string='Reviewers' domain="[]" context="{'group_by' : 'rated_by'}"/>
+                        <filter name="employee_id" string='Employee' domain="[]" context="{'group_by' : 'employee_id'}"/>
+                    </group>
+				</search>
+			</field>
+		</record>
+   
+        
+		<record id="view_hr_competency_form" model="ir.ui.view">
+			<field name="name">Competency form</field>
+			<field name="model">hr.competency</field>
+			<field name="arch" type="xml">
+				<form string="HR Competency" create="0">
+                    <header> 
+                        <!-- <button 
+                            name="action_submit" 
+                            string="Submit" 
+                            class="oe_highlight" 
+                            type="object"
+                            attrs="{'invisible': [('state', 'not in', ['draft'])]}"
+                            confirm="Are you sure you want to submit?"
+                        /> -->
+                        <button 
+                            name="action_done" 
+                            string="Complete" 
+                            class="oe_highlight" 
+                            type="object"
+                            attrs="{'invisible': ['|', ('state', 'not in', ['in_review']), ('is_reviewer', '=', False)]}"
+                            confirm="Are you sure you want to complete?"
+                        />
+                        <button 
+                            name="action_sign" 
+                            string="Sign Off" 
+                            class="oe_highlight" 
+                            type="object" 
+                            attrs="{'invisible': ['|', ('state', 'not in', ['completed']), ('is_appraisee', '=', False)]}"
+                            confirm="Are you sure you want to sign off?"
+                        />
+                        <!-- <button 
+                            name="action_refuse" 
+                            string="Refuse" 
+                            type="object"
+                            attrs="{'invisible': ['|', ('state', 'not in', ['completed']), ('is_reviewer', '=', False)]}"
+                            confirm="Are you sure you want to sign off?"
+                        /> -->
+                        <button 
+                            name="action_withdraw" 
+                            string="Withdraw" 
+                            type="object"
+                            attrs="{'invisible': ['|', ('state', 'not in', ['in_review']), ('is_appraisee', '=', False)]}"
+                            confirm="Are you sure you want to Withdraw"
+                        />
+                        <field name="state" widget="statusbar" clickable="False" invisible="0" readonly="0" force_save="1"
+							statusbar_visible="draft,in_review,completed,signed"
+							/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" default_focus="1" readonly="1"/>
+                            </h1>
+                        </div> 
+                        <group>
+                            <group>
+                                <field name="staff_id" invisible="0" readonly="1" force_save="1"/> 
+                                <field name="employee_id" invisible="0" readonly="1" required="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="hr_competency_id" invisible="0" readonly="1" required="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                             
+                                <field name="publish_date" invisible="0" readonly="1" force_save="1"/> 
+                                <field name="is_reviewer" invisible="1" readonly="0" force_save="1"/>
+                                <field name="is_appraisee" invisible="1" readonly="0" force_save="1"/> 
+                                <field name="active" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="rated_by" invisible="0" readonly="1" required="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="category_role_id" invisible="0" readonly="1" force_save="1" options="{'no_create': True,'no_open': True}"/> 
+                                <field name="date_of_submission" invisible="0" readonly="1" force_save="1"/> 
+                                <field name="perception" invisible="0" readonly="0" force_save="1"
+                                attrs="{'invisible': ['|', ('state', 'not in', ['completed']), ('is_appraisee', '=', False)]}"/> 
+                                <field name="competency_overall_total" readonly="1" string="Overall score" groups="base.group_system,hr_pms.group_pms_officer_id"/>
+                            </group>
+                        </group>
+                        <notebook> 
+                            <page name="competency_ids" string="Competency Section">
+                                <field name="competency_ids" readonly="0" string="Competency" options="{'no_open': False}">
+                                    
+                                    <form string="" delete="false" create="false">
+                                        <group> 
+                                            <group>
+                                                <field name="name" readonly="1" force_save="1" string="Description"/>
+                                            </group>
+                                            <group>
+                                                <field name="average_total" readonly="1" force_save="1" string="Avg. Total" invisible="1"/>
+                                                <field name="rater_level_bool" invisible="1" />
+                                            </group>
+                                        </group>
+                                        <notebook> 
+                                            <page name="competency_attribute_line_ids" string="Attributes">
+                                                <field name="competency_attribute_line_ids" readonly="0" string="Competency" options="{'no_open': True}">
+                                                    <tree string="" editable="bottom" delete="false" create="false">
+                                                        <field name="name" readonly="1" force_save="1" string="Description"/>
+                                                        <field name="is_reviewer" invisible="1" readonly="1" force_save="1" string="Is reviewer"/>
+                                                        <field name="is_appraisee" invisible="1" readonly="1" force_save="1" string="Is appraisee"/>
+                                                        <field name="rate" string="Self Rating" readonly="0" force_save="1" invisible="1"/>
+                                                        <field name="appraiser_rate" string="Appraiser Rating" readonly="0" force_save="1" invisible="1"/>
+
+                                                        <field name="self_rating_term" string="Self Rating" invisible="1" readonly="0" force_save="1" required="1"
+                                                        attrs="{'readonly': [('is_appraisee', '=', False)]}"/>
+                                                        <field name="appraiser_rating_term" string="Appraiser Rating" readonly="0" force_save="1" required="1"
+                                                        attrs="{'readonly': [('is_reviewer', '=', False)]}"/>
+
+                                                        <field name="percentage_rate" readonly="1" invisible="1"/>
+                                                    </tree> 
+                                                </field>
+                                            </page>
+                                        </notebook>
+                                    </form>
+                                    <tree string="Competency" delete="false" create="false">
+                                        <field name="name"/>
+                                        <field name="rater_level_bool" invisible="0" icon="fa-check" readonly="1" force_save="1" />
+                                        <field name="average_total" string="Avg. Total" invisible="1"/>
+                                        <field name="percentage_average_total" readonly="1" force_save="1" groups="base.group_system,hr_pms.group_pms_officer_id"/>
+                                    </tree>
+                                </field>
+                                <group>
+                                    <field name="rater_comment"  placeholder="Add your comment here" attrs="{'readonly': [('is_reviewer', '=', False)]}"/>
+                                </group> 
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+			</field>
+		</record>
+
+		<record id="view_hr_competency_tree" model="ir.ui.view">
+			<field name="name">Competency form</field>
+			<field name="model">hr.competency</field>
+			<field name="arch" type="xml">
+				<tree string="Competency" create="0">
+                    <field name="name" readonly="1" string="Description"/> 
+                    <field name="employee_id" readonly="1" string="Appraisee"/>
+                    <field name="rated_by" readonly="1" string="Rated by"/>
+                    <!-- <field name="competency_overall_total" readonly="1" string="Overall score"/> -->
+                    <field name="not_completed" readonly="1" string="Rating Status" widget="boolean_toggle"/>  
+                    <field name="state" readonly="1" string="State"/>   
+                </tree>
+			</field>
+		</record>
+
+		<record id="action_hr_competency_id" model="ir.actions.act_window">
+			<field name="name">Competency</field>
+			<field name="res_model">hr.competency</field>
+			<field name="view_mode">tree,form</field>
+            <field name="domain">[('is_reviewer', '=', True)]</field>
+             <field name="search_view_id" ref="hr_mirror.view_hr_competency_filter" />
+			<field name="view_id" eval="False"/>
+			<field name="help" type="html">
+				<p class="oe_view_noconten_create">
+					 Kindly click to create a record
+				</p>
+			</field>
+		</record>
+        <menuitem id="view_hr_mirror_competency_menu" name="360 Degree Rating" sequence="10" web_icon="hr_mirror,static/description/icon.png" 
+        groups="base.group_system,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id,hr_mirror.group_mirror_user_id,base.group_user"/>
+            <menuitem id="view_hr_mirror_competency_rating_menu" name="Appraiser Rating" sequence="2" parent="hr_mirror.view_hr_mirror_competency_menu" action="hr_mirror.action_hr_competency_id"/>
+
+</odoo>

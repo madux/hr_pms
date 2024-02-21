@@ -56,7 +56,7 @@ class currentAssessmentSectionLine(models.Model):
         string='Description', 
         )
     weightage = fields.Float(
-        string='Weight (Total 100%)'
+        string='Weightage'
         )
     
     administrative_supervisor_rating = fields.Integer(
@@ -91,10 +91,10 @@ class currentAssessmentSectionLine(models.Model):
         )
     assessment_type = fields.Selection([
         ('none', ''),
-        ('Ordinary', 'Ordinary'),
-        ('Diligent', 'Diligent'),
-        ('Fantastic', 'Fantastic'),
-        ('Superb', 'Superb'),
+        ('Ordinary', 'Ordinary (P4)'),
+        ('Diligent', 'Diligent (P3)'),
+        ('Fantastic', 'Fantastic (P2)'),
+        ('Superb', 'Superb (P1)'),
         ], string="Choose", default = "none", readonly=False)
     
     @api.onchange('assessment_type')
@@ -157,7 +157,7 @@ class PotentialSectionLine(models.Model):
         string='Description', 
         )
     weightage = fields.Float(
-        string='Weight (Total 100%)', 
+        string='Weightage', 
         )
     administrative_supervisor_rating = fields.Integer(
         string='AA Rating', 
