@@ -2,13 +2,23 @@ from datetime import datetime, timedelta
 import time
 import base64
 from odoo import models, fields, api, _, SUPERUSER_ID
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 import logging
 from lxml import etree
 
 _logger = logging.getLogger(__name__)
 
-
+def get_fa_rating(functional_supervisor_rating, administrative_supervisor_rating,reviewer_rating):
+    f_rating = 30
+    if functional_supervisor_rating > 0:
+        if administrative_supervisor_rating < 1 and reviewer_rating < 1:
+            f_rating = 100
+        elif reviewer_rating > 0 and administrative_supervisor_rating < 1:
+            f_rating = 60
+        elif reviewer_rating < 1 and administrative_supervisor_rating > 0:
+            f_rating = 70
+    return f_rating
+    
 class KRA_SectionLine(models.Model):
     _name = "kra.section.line"
     _description= "Employee appraisee KRA Section lines"
@@ -20,14 +30,16 @@ class KRA_SectionLine(models.Model):
     )
 
     name = fields.Char(
-        string='Description', 
-        
+        string='Description',
+        size=300
         )
     weightage = fields.Float(
-        string='Weight (Total 100%) by Appraisee', 
-        
+        string='FA Weight (Total 100%)', 
         )
     
+    appraisee_weightage = fields.Float(
+        string='Weight (Total 100%)',
+        )
     administrative_supervisor_rating = fields.Integer(
         string='AA Rating', 
         )
@@ -38,6 +50,9 @@ class KRA_SectionLine(models.Model):
     functional_supervisor_rating = fields.Integer(
         string='FA Rating', 
         )
+    reviewer_rating = fields.Integer(
+        string='Reviewer Ratings',
+        ) 
     is_functional_manager = fields.Boolean(
         string="is functional manager", 
         default=False,
@@ -78,47 +93,89 @@ class KRA_SectionLine(models.Model):
         default=False
         )
     
+    @api.onchange('appraisee_weightage')
+    def onchange_appraisee_weightage(self):
+        if self.appraisee_weightage:
+            self.weightage = self.appraisee_weightage
+    
     @api.onchange(
         'self_rating', 
         'functional_supervisor_rating', 
-        'administrative_supervisor_rating')
+        'administrative_supervisor_rating',
+        'reviewer_rating')
     def onchange_rating(self):
         if self.state == 'functional_rating':
             if self.kra_section_id.employee_id.parent_id and self.env.user.id != self.kra_section_id.employee_id.parent_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating 
-                because you are not the employee's functional manager"""
+                self.functional_supervisor_rating = 0
+                raise UserError(
+                """Ops ! You are not entitled to add a rating\n because you are not the employee's functional manager"""
                 )
         if self.state == 'admin_rating':
             if self.kra_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.kra_section_id.employee_id.administrative_supervisor_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating 
-                because you are not the employee's administrative supervisor"""
+                self.administrative_supervisor_rating = 0
+                raise UserError(
+                """Ops ! You are not entitled to add a rating \n because you are not the employee's administrative supervisor"""
                 )
+        if self.state == 'reviewer_rating':
+            if self.kra_section_id.employee_id.reviewer_id and self.env.user.id != self.kra_section_id.employee_id.reviewer_id.user_id.id:
+                self.reviewer_rating = 0
+                raise UserError("Ops ! You are not entitled to add a rating because you are not the employee's reviewer")
             
         if self.self_rating > self.section_avg_scale:
-            self.self_rating = False
+            self.self_rating = 1
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Self rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
         if self.functional_supervisor_rating > self.section_avg_scale:
-
+            self.functional_supervisor_rating = 1
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Functional supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
-            self.self_rating = False
             return {'warning': message}
         
         if self.administrative_supervisor_rating > self.section_avg_scale:
-            self.self_rating = False
+            self.administrative_supervisor_rating = 1
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
+    
+        if self.reviewer_rating > self.section_avg_scale:
+            self.reviewer_rating = 1
+            message = {
+                    'title': 'Invalid Scale',
+                    'message': "Reviewer's rating Scale should be in the range of 1 - {}".format(self.section_avg_scale)
+                }
+            return {'warning': message}
+
+    @api.onchange('weightage',)
+    def onchange_weightage(self):
+        if self.weightage > 0 and self.weightage not in range (5, 26):
+            self.weightage = 0
+            raise UserError('Weightage must be within the range of 5 to 25')
+            # message = {
+            #     'title': 'Invalid Weight',
+            #     'message': 'Weightage must be within the range of 5 to 25'
+            # }
+            # self.weightage = 0
+            # return {'warning': message}
+    
+    @api.onchange('appraisee_weightage',)
+    def onchange_appraisee_weightage(self):
+        if self.appraisee_weightage > 0 and self.appraisee_weightage not in range (5, 26):
+            self.appraisee_weightage = 0
+            raise UserError('Appraisee Weightage must be within the range of 5 to 25')
+            # message = {
+            #     'title': 'Invalid Weight',
+            #     'message': 'Appraisee Weightage must be within the range of 5 to 25'
+            # }
+            # self.weightage = 0
+            # return {'warning': message}
+
     
     @api.depends('kra_section_id')
     def compute_user_rating_role(self):
@@ -134,26 +191,35 @@ class KRA_SectionLine(models.Model):
             self.is_reviewer = True if current_user == self.kra_section_id.employee_id.reviewer_id.user_id.id else False
         else:
             self.is_functional_manager,self.is_administrative_supervisor,self.is_reviewer = False, False, False
-    
+     
     @api.depends(
         'weightage',
         'administrative_supervisor_rating',
-        'functional_supervisor_rating')
+        'functional_supervisor_rating',
+        'reviewer_rating')
     def compute_weighted_score(self):
         # =(((admin_rating*40 )+(functional_rating *60))/4) * (weightage /100)
         for rec in self:
             fc_avg_scale = rec.section_avg_scale or 4 # or 5 is set as default in case nothing was provided
-            if rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
-
-                ar = rec.administrative_supervisor_rating * 40
-                f_rating = 60 if rec.administrative_supervisor_rating > 0 else 100
+            if rec.administrative_supervisor_rating or rec.functional_supervisor_rating or rec.reviewer_rating:
+                ar = rec.administrative_supervisor_rating * 30 if rec.administrative_supervisor_rating > 0 else 0
+                # f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+                f_rating = get_fa_rating(
+                    rec.functional_supervisor_rating, 
+                    rec.administrative_supervisor_rating, 
+                    rec.reviewer_rating)
                 fr = rec.functional_supervisor_rating * f_rating
-                ratings = (ar + fr) / fc_avg_scale
+                rr = rec.reviewer_rating * 40
+                ratings = (ar + fr + rr) / fc_avg_scale
                 rec.weighted_score = ratings * (rec.weightage / 100)
             else:
                 rec.weighted_score = 0
 
-
+    def unlink(self):
+        for delete in self.filtered(lambda delete: delete.state not in ['draft']):
+            raise ValidationError(_('You cannot delete a KRA section once submitted Click the Ok and then discard button to go back'))
+        return super(KRA_SectionLine, self).unlink()
+    
 class LC_SectionLine(models.Model):
     _name = "lc.section.line"
     _description= "Employee appraisee LC Section lines"
@@ -165,6 +231,7 @@ class LC_SectionLine(models.Model):
 
     name = fields.Char(
         string='Description',
+        size=70
         )
     weightage = fields.Float(
         string='Weight (Total 100%)', 
@@ -214,7 +281,9 @@ class LC_SectionLine(models.Model):
         'pms.section.line', 
         string="Attributes"
         )
-    
+    kba_descriptions = fields.Text(
+        string='Description',
+        )
     state = fields.Selection([
         ('draft', 'Draft'),
         ('admin_rating', 'Admin Supervisor'),
@@ -233,40 +302,54 @@ class LC_SectionLine(models.Model):
     def onchange_rating(self):
         if self.state == 'functional_rating':
             if self.lc_section_id.employee_id.parent_id and self.env.user.id != self.lc_section_id.employee_id.parent_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating because you are not the employee's functional manager"""
-                )
+                self.functional_supervisor_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """
+                    Ops ! You are not entitled to add a rating \n because you are not the employee's functional manager
+                    """
+                }
+
         if self.state == 'admin_rating':
             if self.lc_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.lc_section_id.employee_id.administrative_supervisor_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating 
-                because you are not the employee's administrative supervisor"""
-                )
+                self.administrative_supervisor_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """
+                    Ops ! You are not entitled to add a rating \n because you are not the employee's administrative supervisor
+                    """
+                }
+                 
         if self.state == 'reviewer_rating':
             if self.lc_section_id.employee_id.reviewer_id and self.env.user.id != self.lc_section_id.employee_id.reviewer_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating because you are not the employee's reviewer"""
-                )
+                self.reviewer_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """
+                    Ops ! You are not entitled to add a rating because you are not the employee's reviewer
+                    """
+                }
+            
             
         if self.functional_supervisor_rating > self.section_avg_scale:
+            self.functional_supervisor_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Functional supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
-            self.functional_supervisor_rating = False
             return {'warning': message}
         if self.administrative_supervisor_rating > self.section_avg_scale:
-            self.administrative_supervisor_rating = False
+            self.administrative_supervisor_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
         if self.reviewer_rating > self.section_avg_scale:
-            self.reviewer_rating = False
+            self.reviewer_rating = 0
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
+                    'message': "Reviewer's rating Scale should be in the range of 1 - {}".format(self.section_avg_scale)
                 }
             return {'warning': message}
     
@@ -295,8 +378,12 @@ class LC_SectionLine(models.Model):
         for rec in self:
             fc_avg_scale = rec.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
-                ar = rec.administrative_supervisor_rating * 30
-                f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+                ar = rec.administrative_supervisor_rating * 30 if rec.administrative_supervisor_rating > 0 else 0
+                # f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+                f_rating = get_fa_rating(
+                    rec.functional_supervisor_rating, 
+                    rec.administrative_supervisor_rating, 
+                    rec.reviewer_rating)
                 fr = rec.functional_supervisor_rating * f_rating
                 rr = rec.reviewer_rating * 40
                 ratings = (ar + fr + rr) / fc_avg_scale
@@ -381,41 +468,49 @@ class FC_SectionLine(models.Model):
     def onchange_rating(self):
         if self.state == 'functional_rating':
             if self.fc_section_id.employee_id.parent_id and self.env.user.id != self.fc_section_id.employee_id.parent_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating 
-                because you are not the employee's functional manager"""
-                )
+                self.functional_supervisor_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """
+                    Ops ! You are not entitled to add a rating because you are not the employee's reviewer
+                    """
+                }
         if self.state == 'admin_rating':
             if self.fc_section_id.employee_id.administrative_supervisor_id and self.env.user.id != self.fc_section_id.employee_id.administrative_supervisor_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating 
-                because you are not the employee's administrative supervisor"""
-                )
+                self.administrative_supervisor_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """
+                    Ops ! You are not entitled to add a rating because you are not the employee's administrative supervisor
+                    """
+                }
         if self.state == 'reviewer_rating':
             if self.fc_section_id.employee_id.reviewer_id and self.env.user.id != self.fc_section_id.employee_id.reviewer_id.user_id.id:
-                raise ValidationError(
-                """Ops ! You are not entitled to add a rating
-                    because you are not the employee's reviewer"""
-                )
+                self.reviewer_rating = 0
+                return {
+                    'title': 'Security Rule',
+                    'message': """Ops ! You are not entitled to add a rating because you are not the employee's reviewer
+                    """
+                }
         if self.functional_supervisor_rating > self.section_avg_scale:
+            self.functional_supervisor_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Functional supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
-            self.functional_supervisor_rating = False
             return {'warning': message}
         if self.administrative_supervisor_rating > self.section_avg_scale:
-            self.administrative_supervisor_rating = False
+            self.administrative_supervisor_rating = 0
             message = {
                     'title': 'Invalid Scale',
                     'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
                 }
             return {'warning': message}
         if self.reviewer_rating > self.section_avg_scale:
-            self.reviewer_rating = False
+            self.reviewer_rating = 0
             message = {
                     'title': 'Invalid Scale',
-                    'message': 'Administrative supervisor rating Scale should be in the range of 1 - {}'.format(self.section_avg_scale)
+                    'message': "Reviewer's supervisor rating Scale should be in the range of 1 - {}".format(self.section_avg_scale)
                 }
             return {'warning': message}
     
@@ -445,8 +540,12 @@ class FC_SectionLine(models.Model):
         for rec in self:
             fc_avg_scale = rec.section_avg_scale or 5 # or 5 is set as default in case nothing was provided
             if rec.reviewer_rating or rec.administrative_supervisor_rating or rec.functional_supervisor_rating:
-                ar = rec.administrative_supervisor_rating * 30
-                f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+                ar = rec.administrative_supervisor_rating * 30 if rec.administrative_supervisor_rating > 0 else 0
+                # f_rating = 30 if rec.administrative_supervisor_rating > 0 else 60
+                f_rating = get_fa_rating(
+                    rec.functional_supervisor_rating, 
+                    rec.administrative_supervisor_rating, 
+                    rec.reviewer_rating)
                 fr = rec.functional_supervisor_rating * f_rating
                 rr = rec.reviewer_rating * 40
                 ratings = (ar + fr + rr) / fc_avg_scale

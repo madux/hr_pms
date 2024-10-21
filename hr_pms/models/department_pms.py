@@ -24,6 +24,10 @@ class PMS_Department_SectionLine(models.Model):
         'pms.section.line', 
         string="Attributes"
         )
+    kba_description_ids = fields.One2many(
+        'kba.descriptions',
+        'pms_section_line_id',
+        string="KBA Description",) 
 
 class PMS_Department_Section(models.Model):
     _name = "pms.department.section"
@@ -50,7 +54,17 @@ class PMS_Department_Section(models.Model):
         'pms.section', 
         string="Section ID"
         )
-
+    
+    @api.onchange('min_line_number', 'max_line_number')
+    def onchange_min_max_limit(self):
+        if self.min_line_number > self.max_line_number:
+            self.max_line_number = 7
+            self.min_line_number = 5
+            message = {
+                'title': 'Invalid',
+                'message': 'Minimum limit must not be greater than Maximum limit'
+            }
+            return {'warning': message}
 
 class PMSDepartment(models.Model):
     _name = "pms.department"
@@ -124,22 +138,8 @@ class PMSDepartment(models.Model):
     def onchange_department_id(self):
         if self.department_id:
             self.department_manager_id = self.department_id.parent_id.id
-    
-    # TODO If is_department_head is set to true, display the buttons to them
-    # @api.depends('department_id')
-    # def check_department_head(self):
-    #     """Checks if the current user is the departmental Manager"""
-    #     for rec in self:
-    #         if rec.department_id.parent_id.user_id.id == self.env.user.id:
-    #             rec.is_department_head = True 
-    #         else:
-    #             rec.is_department_head = False 
-
-    def get_current_assessment_lines(self, appraisee):
-        # vals = self.env['assessment.description'].search([
-        #     ('type', '=', 'current')
-        # ])
-        # if vals:
+     
+    def get_current_assessment_lines(self, appraisee): 
         vals = [
             'Administrative Appraiser',
             'Functional Appraiser',
@@ -156,10 +156,6 @@ class PMSDepartment(models.Model):
         })
     
     def get_potential_assessment_lines(self, appraisee):
-        # vals = self.env['assessment.description'].search([
-        #     ('type', '=', 'potential')
-        # ])
-        # if vals:
         vals = [
             'Administrative Appraiser',
             'Functional Appraiser',
@@ -178,15 +174,16 @@ class PMSDepartment(models.Model):
 
     def get_url(self, id, name):
         base_url = http.request.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        base_url += '/web#id=%d&view_type=form&model=%s' % (id, name)
+        base_url += '/web'
+        # base_url += '/web#id=%d&view_type=form&model=%s' % (id, name)
         return "<a href={}> </b>Click<a/>. ".format(base_url)
     
     def action_notify(self, employee, rec, email_to, email_cc):
         email_from = self.env.user.email
         subject = "Employee Appraisal Notification"
         msg = """Dear {}, <br/> 
-        I wish to notify you that your appraisal with description {} \
-        for the period {} has been generated.\
+        I wish to notify you that your appraisal with description {} <br/>\
+        for the period {} has been generated.<br/>\
         <br/>Kindly {} to review <br/>\
         Yours Faithfully<br/>{}<br/>HR Department ({})""".format(
             employee.name,
@@ -222,10 +219,15 @@ class PMSDepartment(models.Model):
         PMS_Appraisee = self.env['pms.appraisee']
         job_position_ids = self.hr_category_id.mapped('job_role_ids').filtered(
             lambda se: se.department_id.id == self.department_id.id)
+        appraises = []
+        categ_name = self.hr_category_id.category.category
+        # THIS IS TO PREVENT DUPLICATE APPRAISAL
+        level_type_name = 'JM' if categ_name == 'Junior Management' else 'MM' if categ_name == 'Middle Management' else 'SM' 
         for jb in job_position_ids:
             employees = Employee.search([
                 ('job_id', '=', jb.id),
-                ('department_id', '=', jb.department_id.id)
+                # ('department_id', '=', jb.department_id.id),
+                ('level_id.name', '=', level_type_name)
                 ])
             if employees:
                 for emp in employees:
@@ -239,6 +241,7 @@ class PMSDepartment(models.Model):
                         'date_end': self.pms_year_id.date_end,
                         'deadline': self.deadline,
                     }) 
+                    appraises.append(pms_appraisee)
                     kra_pms_department_section = self.mapped('section_line_ids').filtered(
                         lambda res: res.type_of_section == "KRA")
                     if kra_pms_department_section:
@@ -309,7 +312,7 @@ class PMSDepartment(models.Model):
                                                         'administrative_supervisor_rating': 0,
                                                         'functional_supervisor_rating': 0,
                                                         'section_line_id': secline.section_line_id.id,
-                                                        # 'self_rating': 0,
+                                                        'kba_descriptions': '\n'.join([kbline.name for kbline in secline.kba_description_ids]),
                                                         }) for secline in lc_section_lines] 
                         })
                     # current_assessment
@@ -322,19 +325,47 @@ class PMSDepartment(models.Model):
                         emp.parent_id.work_email,
                     ]
                     self.action_notify(emp, pms_appraisee, emp.work_email, email_items)
+        # raise ValidationError(appraises)
         self.write({
             'state':'published'
         })
     
-    # TODO Add cancel button as with security Departmental heads sees this button,
-    # Ensure all the appraisals sent to employees will be deactivated or cancelled
     def button_cancel(self):
         for rec in self:
+            related_appraisals = self.env['pms.appraisee'].search([
+                ('pms_department_id', '=', rec.id),('active', '=', True)
+                ])
+            for app in related_appraisals:
+                app.write({'active': False})
             rec.write({
                 'state':'cancel'
+            })
+    
+    def button_undo_cancel(self):
+        for rec in self:
+            related_appraisals = self.env['pms.appraisee'].search([
+                ('pms_department_id', '=', rec.id),('active', '=', False)
+                ])
+            for app in related_appraisals:
+                app.write({'active': True})
+            rec.write({
+                'state':'published'
             })
 
     def button_set_to_draft(self):
         self.write({
                 'state':'draft'
             })
+        
+    def action_mass_publish(self): 
+        rec_ids = self.env.context.get('active_ids', []) 
+        for rec in rec_ids:
+            record = self.env['pms.department'].browse([rec])
+            record.button_publish()
+
+    def button_mass_cancel(self):
+        rec_ids = self.env.context.get('active_ids', []) 
+        for rec in rec_ids:
+            record = self.env['pms.department'].browse([rec])
+            record.button_cancel()
+            record.button_set_to_draft()

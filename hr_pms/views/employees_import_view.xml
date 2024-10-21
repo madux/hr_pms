@@ -35,7 +35,7 @@
     </record>
 
     <menuitem id="employees_import_menu_form" name="Import Employees" parent="hr_pms.view_hr_pms_menu"
-              sequence="32" action="employees_import_action"/>
+              sequence="32" action="employees_import_action" groups="base.group_system"/>
     <menuitem id="menu_hr_import" name="Import Employees"
-              parent="hr.menu_hr_root" action="employees_import_action" sequence="40"/>
+              parent="hr.menu_hr_root" action="employees_import_action" sequence="40" groups="base.group_system"/>
 </odoo>

@@ -12,3 +12,5 @@ from . import appraisee_section_line
 from . import other_appraisee_line
 from . import assessment_config
 from . import employees_import
+from . import ir_attachment
+# from . import post_normalisation

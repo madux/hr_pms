@@ -11,7 +11,7 @@
                             string="Publish" 
                             class="oe_highlight" 
                             type="object"
-                            states="draft,cancel" 
+                            states="draft" 
                             confirm="Are you sure you want to Publish: This action will generate appraisal templates for departments" 
                             groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
@@ -27,9 +27,9 @@
                         <button 
                             name="button_republish" 
                             string="Re-publish" 
-                            class="oe_highlight" 
                             type="object" 
                             states="cancel" 
+                            confirm="Are you sure you want to reactivate a cancelled document? This will cancel sent appraisals" 
                             groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"
                         />
                         <button 
@@ -58,6 +58,7 @@
 						<group>
                             <separator string="Details" colspan="4"/>
                             <group>
+                                <field name="category" required="1"/>
                                 <field name="sequence" readonly="1"/>
                                 <field name="pms_year_id" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="date_from" readonly="1" force_save="1"/>
@@ -66,6 +67,7 @@
                             <group>
                                 <field name="deadline"/>
                                 <field name="published_date" readonly="1" force_save="1"/>
+                                <field name="online_deadline_date" readonly="0" force_save="1"/>
                             </group>
                             <separator string="Category Section Weight" colspan="4"/>
                             <group>
@@ -74,7 +76,7 @@
                                 <field name="lc_weighted_score" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             </group>
                             <group>
-                                <field name="loaded_via_data" invisible="0" readonly="0"/>
+                                <field name="loaded_via_data" invisible="1" readonly="0"/>
                             </group>
                             <div class="alert alert-info" role="alert">
                                 You are required to provide the Section <br/>
@@ -100,7 +102,7 @@
 										</group>
 										</form>
 										<tree string="Job Functions / Position" delete="true" create="true">
-                                            <field name="name" required="1"/>   
+                                            <field name="name" required="1" string="Job Position"/>   
 											<field name="department_id" required="1"/> 
 											<field name="description" string="Job description"/>
 										</tree>
@@ -119,8 +121,8 @@
 										<group>
 											<group>
 												<field name="type_of_section" readonly="0"/> 
+												<field name="min_line_number" required="0"/> 
 												<field name="max_line_number" required="0"/> 
-												
 											</group>
 											<group>
 												<field name="pms_category_id" readonly="1"/> 
@@ -139,11 +141,11 @@
                                                 <group>
                                                     <group>
                                                         <field name="is_required" readonly="0"/> 
-                                                        <field name="description" required="0" placeholder="Does not avoid conflict(s); ...opportunities to build healthy work environment"/>
+                                                        <field name="description" invisible="1" required="0" placeholder="Does not avoid conflict(s); ...opportunities to build healthy work environment"/>
 
                                                     </group>
                                                     <group>
-                                                        <field name="section_id" required="0" readonly="1"/> 
+                                                        <field name="section_id" required="0" readonly="1" groups="base.group_system"/> 
                                                     </group>
                                                 </group>
                                                 <notebook>
@@ -168,6 +170,7 @@
                                     <tree string="" delete="true">
                                         <field name="name"/> 
                                         <field name="type_of_section"/> 
+										<field name="min_line_number"/> 
                                         <field name="max_line_number"/> 
                                         <field name="section_avg_scale"/> 
                                         <field name="input_weightage"/> 
