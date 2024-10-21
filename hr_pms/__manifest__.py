@@ -4,7 +4,7 @@
 
 {
     'name': 'HR Performance Management',
-    'version': '13.0',
+    'version': '14.0',
     'author': "Maach Services / Maduka Chris Sopulu",
     'summary': 'HR Performance Management: To enable users generate PMS for employees',
     'depends': ['base','hr'],
