@@ -46,7 +46,10 @@ class HRLevelcategory(models.Model):
             self.job_role_ids = False 
             if employees:
                 for rec in employees:
-                    self.job_role_ids = [(4, rec.job_id.id)]
+                    if rec.job_id:
+                        self.job_role_ids = [(4, rec.job_id.id)]
+                    else:
+                        raise ValidationError(f'Employee with name {rec.name} does not have a designation or job role assigned')
 
     @api.constrains('category')
     def check_category(self):
@@ -181,7 +184,15 @@ class HrEmployee(models.Model):
         self.update_pms_user_group(userId, groups)
 
 class HrEmployeeBase(models.AbstractModel):
-    _inherit = "hr.employee.base" 
+    _inherit = "hr.employee.base"
+
+    @api.constrains('employee_number')
+    def _check_duplicate_employee_number(self):
+        employee = self.env['hr.employee'].sudo()
+        if self.employee_number not in ["", False]:
+            duplicate_employee = employee.search([('employee_number', '=', self.employee_number)], limit=2)
+            if len([r for r in duplicate_employee]) > 1:
+                raise ValidationError("Employee with same staff ID already existing")
 
     # pms_appraisal_ids = fields.Many2many('usl.employee.appraisal', string="Appraisals", readonly=True)
     administrative_supervisor_id = fields.Many2one('hr.employee', string="Administrative Supervisor")
@@ -275,25 +286,85 @@ class HrEmployeeBase(models.AbstractModel):
             else: # either send it to the employee manager or supervisors email
                 email_to = record.parent_id.work_email or record.administrative_supervisor_id.work_email 
                 template_to_use = "mail_template_non_email_subordinates_pms_notification"
-            ir_model_data = self.env['ir.model.data']
-            template_id = ir_model_data.get_object_reference('hr_pms', template_to_use)[1]         
-            if template_id:
+            # ir_model_data = self.env['ir.model.data']
+            # template_id = ir_model_data.get_object_reference('hr_pms', template_to_use)[1] 
+            template = self.env.ref(f'hr_pms.{template_to_use}')
+            if template:
                 ctx = dict()
                 ctx.update({
                     'default_model': 'hr.employee',
                     'default_res_id': record.id,
-                    'default_use_template': bool(template_id),
-                    'default_template_id': template_id,
+                    'default_use_template': bool(template),
+                    'default_template_id': template.id,
                     'default_composition_mode': 'comment',
                 })
-                template_rec = self.env['mail.template'].browse(template_id)
+                # template_rec = self.env['mail.template'].browse([template_id.id])
                 if email_to:
-                    template_rec.write({'email_to': email_to})
-                template_rec.with_context(ctx).send_mail(record.id, False)
+                    template.write({'email_to': email_to})
+                template.with_context(ctx).send_mail(record.id, False)
             # record.action_send_mail(
             #     'mail_template_pms_notification', 
             #     [record.work_email, record.private_email],
             #     )
+
+    def generate_user_record(self):
+        emp_portal_group = self.env.ref("base.group_portal")
+        emp_internal_group = self.env.ref("base.group_user")
+        emp_memo_user_group = self.env.ref("company_memo.mainmemo_officer")
+        Group = self.env['res.groups'].sudo()
+        group_list = [(4, emp_portal_group.id)]
+        rec_ids = self.env.context.get('active_ids', [])
+        for rec in rec_ids:
+            record = self.env['hr.employee'].browse([rec])
+            email = record.work_email or record.private_email
+            fullname = record.name
+            user, password = False, False
+            login = email if email and email.endswith('@enugudisco.com') else record.employee_number
+            if login:
+                password = ''.join(random.choice('EdcpasHwodfo!xyzus$rs1234567') for _ in range(10))
+                user_vals = {
+                'name' : fullname,
+                'login' : login,
+                'password': password,
+                }
+                _logger.info(f"Creating employee Rep User..with password --- and login {login}.")
+                User = self.env['res.users'].sudo()
+                user = User.search([('login', '=', login)],limit=1)
+
+                groups_to_remove = Group.search(
+                    ['|',
+                    ('name', '=', 'Contact Creation'),
+                    ('id', 'in', [
+                    self.env.ref('base.group_user').id,
+                    self.env.ref('base.group_public').id,
+                    ]),
+                    ])
+                for group in groups_to_remove:
+                    tup = (3,group.id)
+                    group_list.append(tup)
+                    
+                if user:
+                    _logger.info("User already exists...")
+                    password = False
+                else:
+                    user = User.create(user_vals)
+                    _logger.info("Creating User record...")
+                _logger.info('Adding user to group ...')
+
+                # employee_exists_as_manager = self.env['hr.department'].search([('manager_id', '=', record.id)], limit=1)
+                # if employee_exists_as_manager:
+                #     tup = (3,emp_portal_group.id)
+                #     group_list.append(tup)
+                #     # group_list = [
+                #     #     (4, emp_internal_group.id), 
+                #     #     (4, emp_memo_user_group.id), 
+                #     #     ]
+                # else:
+                #     # group_list = [(3, emp_internal_group.id)]
+                #     tup = (3,emp_internal_group.id)
+                #     group_list.append(tup)
+                user.sudo().write({'groups_id':group_list})
+                record.sudo().write({'user_id': user.id, 'migrated_password': password})
     
     # def action_send_mail(self, with_template_id, email_items= None, email_from=None):
     #     '''Email_to = [lists of emails], Contexts = {Dictionary} '''

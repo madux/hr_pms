@@ -1,13 +1,12 @@
 odoo.define('hr_pms.dashboard', function(require){
     "use strict";
     var AbstractAction = require('web.AbstractAction');
-    var view_registry = require('web.view_registry');   
+    // var view_registry = require('web.view_registry');   
     var ajax = require('web.ajax');
     var core = require('web.core');
     var QWeb = core.qweb;
     var PosDashboard = AbstractAction.extend({
         template: 'PMSDashboard',
-
         events: {
             "click .widget-1": function(){ 
                 var self = this;

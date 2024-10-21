@@ -15,12 +15,13 @@ class Send_PMS_back(models.TransientModel):
     def post(self):
         record_id = self.env['pms.appraisee'].search([('id','=', self.record_id.id)])
         reasons = "<b><h4>Message From: %s </b><br/> Please refer to the reason on the refusal comment section:</h4><br/>* %s." %(self.env.user.name,self.reason)
-        if self.reason:
+        if self.reason and record_id:
+            record_id._get_appraisal_return_state()
             msg_body = "Dear Sir/Madam, </br> We wish to notify you that {} appraisal with reference <br/>{} has been returned with reason(s) below; \
              <br/>{} <br/><br/>HR Administrator<br/>\
              Should you require any additional information, please contact ICT support for help.<br/>\
-             <a href='https://ictsupport.eedc.online'>Click ICT Support link</a>".format(self.direct_employee_id.name, self.record_id.name, self.reason)
-            record_id.sudo().write({'reason_back': "By {}: {}".format(self.env.user.name, self.reason),'state': 'draft'})
+             <a href='https://easypaybillsng.com/#Contact'>Click ICT Support link</a>".format(self.direct_employee_id.name, self.record_id.name, self.reason)
+            record_id.sudo().write({'reason_back': "By {}: {}".format(self.env.user.name, self.reason)})
             self.mail_sending_reject(msg_body)
         else:
             raise ValidationError('Please Add the Reasons for refusal') 
@@ -28,7 +29,9 @@ class Send_PMS_back(models.TransientModel):
 
     def mail_sending_reject(self, msg_body):
         subject = "Rejection Notification"
-        email_from = self.env.user.email
+        user = self.env.user
+        employee = self.env['hr.employee'].search([('user_id', '=', user.id)], limit=1)
+        email_from = user.email or employee.work_email
         mail_to = self.direct_employee_id.work_email or self.direct_employee_id.private_email
         initiator = self.record_id.employee_id.parent_id.work_email
         # emails = (','.join(str(item2.work_email) for item2 in self.users_followers))

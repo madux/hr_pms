@@ -35,12 +35,12 @@
                                 <button name="reset_employee_user_password" type="object" string="Reset user login" required="0" groups="base.group_system,hr.group_hr_manager"/>
                             </group> 
                             <group> 
-                                <field name="grade_id" required="0" options="{'no_create': True,'no_open': True}"/>
-                                <field name="level_id" required="0" options="{'no_create': True,'no_open': True}"/>
-                                <field name="unit_id" required="0" options="{'no_create': True,'no_open': True}"/>
-                                <field name="work_unit_id" required="0" options="{'no_create': True,'no_open': True}"/>
-                                <field name="ps_district_id" required="0" options="{'no_create': True,'no_open': True}"/>
-                                <field name="hr_region_id" required="0" options="{'no_create': True,'no_open': True}"/>
+                                <field name="grade_id" required="0" options="{'no_create': True,'no_open': False}"/>
+                                <field name="level_id" required="1" options="{'no_create': True,'no_open': True}"/>
+                                <field name="unit_id" required="0" options="{'no_create': True,'no_open': False}"/>
+                                <field name="work_unit_id" required="0" options="{'no_create': True,'no_open': False}"/>
+                                <field name="ps_district_id" required="0" options="{'no_create': True,'no_open': False}"/>
+                                <field name="hr_region_id" required="0" options="{'no_create': True,'no_open': False}"/>
                             </group> 
                         </group> 
                     </page>
@@ -69,7 +69,7 @@
                         </div>
                     </button>
 
-                    <button name="stat_button_warning" type="object" groups="hr.group_hr_user" class="oe_stat_button" icon="fa-archive">
+                    <button name="stat_button_warning" type="object" groups="base.group_system,hr.group_hr_user" class="oe_stat_button" icon="fa-archive">
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_value">
                                 <field name="pms_number_warning" readonly="1" force_save="1"/>
@@ -80,7 +80,7 @@
                         </div>
                     </button>
 
-                    <button name="stat_button_absent" type="object" groups="hr.group_hr_user" class="oe_stat_button" icon="fa-archive">
+                    <button name="stat_button_absent" type="object" groups="base.group_system,hr.group_hr_user" class="oe_stat_button" icon="fa-archive">
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_value">
                                 <field name="pms_number_absent" readonly="1" force_save="1"/>
@@ -91,7 +91,7 @@
                         </div>
                     </button>
 
-                    <button name="stat_button_number_commendation" type="object" groups="hr.group_hr_user" class="oe_stat_button" icon="fa-plus">
+                    <button name="stat_button_number_commendation" type="object" groups="base.group_system,hr.group_hr_user" class="oe_stat_button" icon="fa-plus">
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_value">
                                 <field name="pms_number_commendation" readonly="1" force_save="1"/>
@@ -207,6 +207,8 @@
             <field name="code">action=model.sudo().send_credential_notification()</field>
         </record>
 
+        
+
         <record id="ir_action_server_update_employee_user_credentials" model="ir.actions.server">
 			<field name="name">Update Employee Password</field>
             <field name="type">ir.actions.server</field>
@@ -246,8 +248,8 @@
         </record>
 
     <menuitem id="view_pms_district_menu" name="District" sequence="50" parent="hr_pms.view_hr_pms_config_menu" action="hr_pms.action_employee_district_view_id"
-    groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
+    groups="base.group_system,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
     <menuitem id="view_pms_unit_menu" name="Unit" sequence="51" parent="hr_pms.view_hr_pms_config_menu" action="hr_pms.action_employee_work_unit_view_id"
-    groups="hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
+    groups="base.group_system,hr_pms.group_pms_officer_id,hr_pms.group_pms_manager_id"/>
     </data>
 </odoo>

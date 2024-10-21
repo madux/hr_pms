@@ -38,7 +38,17 @@ class PMSJobCategory(models.Model):
     
     pms_year_id = fields.Many2one(
         'pms.year', string="Period")
-    
+    allow_mid_year_review = fields.Boolean(string="Allow Mid year review",
+                                           help="Allow the appraisee to start Mid year review")
+    allow_annual_review_submission = fields.Boolean(
+        string="Allow Annual review", 
+        help="Allow the appraisee to start Annual year review")
+    type_of_pms = fields.Selection([
+        ('gs', 'Goal Setting'),
+        ('hyr', 'Mid year review'),
+        ('fyr', 'Annual year review'),
+        ], string="Type of PMS", default = "gs", 
+        copy=True)
     date_from = fields.Date(
         string="Date From", 
         readonly=False, 
@@ -212,6 +222,7 @@ class PMSJobCategory(models.Model):
                         'department_id': department_id.id,
                         'department_manager_id': department_id.manager_id.id,
                         'pms_year_id': self.pms_year_id.id,
+                        'type_of_pms': self.type_of_pms,
                         'date_from': self.pms_year_id.date_from,
                         'date_end': self.pms_year_id.date_end,
                         'deadline': self.deadline,
@@ -285,13 +296,13 @@ class PMSJobCategory(models.Model):
         """
         if template:
             ir_model_data = self.env['ir.model.data']
-            template_id = ir_model_data.get_object_reference('hr_pms', template)[1]
+            # template_id = ir_model_data.get_object_reference('hr_pms', template)[1]
+            template_id = self.env.ref(f'hr_pms.{template}')
             self.message_post_with_template(
                 template_id, composition_mode='comment',
                 model='{}'.format(self._name), res_id=self.id,
                 email_layout_xmlid='mail.mail_notification_light',
             )
-     
      
     def button_cancel(self):
         for rec in self.mapped('pms_department_ids'): #.filtered(

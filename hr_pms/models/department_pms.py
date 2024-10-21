@@ -128,6 +128,12 @@ class PMSDepartment(models.Model):
         "pms_department_id",
         string="Department Section Lines"
     )
+    type_of_pms = fields.Selection([
+        ('gs', 'Goal Setting'),
+        ('hyr', 'Mid year review'),
+        ('fyr', 'Annual review'),
+        ], string="Type of PMS", default = "gs", 
+        copy=True)
     active = fields.Boolean(
         string="Active", 
         readonly=True, 
@@ -232,11 +238,12 @@ class PMSDepartment(models.Model):
             if employees:
                 for emp in employees:
                     pms_appraisee = PMS_Appraisee.create({
-                        'name': self.name + ': - '+ emp.name, 
+                        'name': f'GOAL SETTINGS: {self.name} {emp.name}', 
                         'department_id': emp.department_id.id, 
                         'employee_id': emp.id, 
                         'pms_department_id': self.id,
                         'pms_year_id': self.pms_year_id.id,
+                        'type_of_pms': self.type_of_pms,
                         'date_from': self.pms_year_id.date_from,
                         'date_end': self.pms_year_id.date_end,
                         'deadline': self.deadline,

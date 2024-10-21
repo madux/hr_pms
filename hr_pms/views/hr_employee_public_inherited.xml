@@ -13,7 +13,7 @@
                     <field name="coach_id" invisible="1" options="{'no_create': True,'no_open': True}"/>
                 </xpath>
                 <field name="parent_id" position="after">
-                    <field name="administrative_supervisor_id" string="Administrative supervisor"/>
+                    <field name="administrative_supervisor_id" string="Administrative supervisor" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
                     <field name="reviewer_id" string="Reviewer" required="1" options="{'no_create': True,'no_open': True}"/>
                     <field name="unit_id" required="0" options="{'no_create': True,'no_open': True}"/>
                     <field name="work_unit_id" required="0" options="{'no_create': True,'no_open': True}"/>
@@ -25,4 +25,4 @@
             </field>
         </record>
     </data>
-</odoo>
+</odoo> 

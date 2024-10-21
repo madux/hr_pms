@@ -60,6 +60,7 @@
                             <group>
                                 <field name="category" required="1"/>
                                 <field name="sequence" readonly="1"/>
+                                <field name="type_of_pms" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="pms_year_id" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name="date_from" readonly="1" force_save="1"/>
                                 <field name="date_end" readonly="1" force_save="1"/>
@@ -68,6 +69,9 @@
                                 <field name="deadline"/>
                                 <field name="published_date" readonly="1" force_save="1"/>
                                 <field name="online_deadline_date" readonly="0" force_save="1"/>
+                                <field name="allow_mid_year_review" readonly="0" force_save="1"/>
+                                <field name="allow_annual_review_submission" readonly="0" force_save="1"/>
+
                             </group>
                             <separator string="Category Section Weight" colspan="4"/>
                             <group>
